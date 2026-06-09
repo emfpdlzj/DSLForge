@@ -15,6 +15,16 @@
   "main": "dist/extension.js",
   "activationEvents": [],
   "contributes": {
+    "configuration": {
+      "title": "DSLForge",
+      "properties": {
+        "dslforge.validation.command": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Workspace validation command used first by `DSLForge: Validate Current Grammar`. If empty, DSLForge auto-detects a supported `package.json` script."
+        }
+      }
+    },
     "commands": [
       {
         "command": "dslforge.createDslScaffold",

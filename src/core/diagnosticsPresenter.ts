@@ -2,9 +2,10 @@ import * as vscode from 'vscode';
 import { appendOutputLine, showOutputChannel } from './outputChannel';
 import type { ResolvedProjectContext } from './projectService';
 import type { ValidationRunResult } from '../types';
+import { publishValidationIssues } from './validationDiagnostics';
 
 export class DiagnosticsPresenter {
-  public presentValidationPreparation(
+  public presentValidationResult(
     projectContext: ResolvedProjectContext,
     result: ValidationRunResult
   ): void {
@@ -18,6 +19,7 @@ export class DiagnosticsPresenter {
     appendOutputLine(
       `[validation] commandSource=${result.plan.command.source}`
     );
+    appendOutputLine(`[validation] commandDetail=${result.plan.command.detail}`);
 
     if (result.plan.command.commandLine) {
       appendOutputLine(
@@ -29,12 +31,22 @@ export class DiagnosticsPresenter {
       appendOutputLine(`[validation] rationale=${rationaleLine}`);
     }
 
+    if (typeof result.exitCode !== 'undefined') {
+      appendOutputLine(`[validation] exitCode=${result.exitCode}`);
+    }
+
+    appendOutputLine(`[validation] issueCount=${result.issues.length}`);
+
+    publishValidationIssues(result.issues);
     showOutputChannel();
 
-    const message =
-      result.status === 'ready'
-        ? `DSLForge prepared validation for ${projectContext.adapter.displayName}. Execution wiring is the next step.`
-        : result.summary;
+    let message = result.summary;
+
+    if (result.status === 'succeeded') {
+      message = `DSLForge validation succeeded via ${result.plan.command.source}.`;
+    } else if (result.status === 'failed') {
+      message = `DSLForge validation failed via ${result.plan.command.source}. See Output and Problems for details.`;
+    }
 
     void vscode.window.showInformationMessage(message);
   }

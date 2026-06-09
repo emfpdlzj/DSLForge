@@ -19,6 +19,11 @@ export interface AdapterValidationPlanningInput {
   context: GrammarContextSelection;
 }
 
+export interface AdapterValidationPreferences {
+  preferredScriptNames: string[];
+  rationale: string[];
+}
+
 export interface AdapterValidationInterpretationInput {
   project: ProjectDetectionResult;
   context: GrammarContextSelection;
@@ -31,6 +36,8 @@ export interface DslAdapter {
 
   detect(input: AdapterDetectionInput): Promise<ProjectDetectionResult | undefined>;
   selectContext(input: AdapterContextSelectionInput): Promise<GrammarContextSelection>;
-  planValidation(input: AdapterValidationPlanningInput): Promise<ValidationPlan>;
+  getValidationPreferences(
+    input: AdapterValidationPlanningInput
+  ): Promise<AdapterValidationPreferences>;
   interpretValidationOutput?(input: AdapterValidationInterpretationInput): Promise<ValidationIssue[]>;
 }

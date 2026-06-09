@@ -34,6 +34,7 @@ export interface GrammarContextSelection {
 export interface ValidationCommandSuggestion {
   source: ValidationCommandSource;
   commandLine?: string;
+  scriptName?: string;
   detail: string;
 }
 
@@ -57,9 +58,10 @@ export interface ValidationPlan {
 }
 
 export interface ValidationRunResult {
-  status: 'ready' | 'needs_configuration';
+  status: 'succeeded' | 'failed' | 'needs_configuration';
   summary: string;
   plan: ValidationPlan;
   issues: ValidationIssue[];
   rawOutput?: string;
+  exitCode?: number | null;
 }

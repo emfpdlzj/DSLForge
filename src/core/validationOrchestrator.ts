@@ -1,14 +1,25 @@
 import type { ResolvedProjectContext } from './projectService';
 import type { ValidationRunResult } from '../types';
+import { appendOutputLine } from './outputChannel';
+import { runShellCommand } from './commandRunner';
+import { parseValidationIssues } from './validationDiagnostics';
+import { resolveValidationPlan } from './validationCommandResolver';
 
 export class ValidationOrchestrator {
-  public async prepareValidation(
+  public async runValidation(
     projectContext: ResolvedProjectContext
   ): Promise<ValidationRunResult> {
-    const plan = await projectContext.adapter.planValidation({
+    const preferences = await projectContext.adapter.getValidationPreferences({
       project: projectContext.detection,
       context: projectContext.context
     });
+    const plan = await resolveValidationPlan({
+      workspaceRoot: projectContext.workspaceFolder.uri.fsPath,
+      workspaceUri: projectContext.workspaceFolder.uri,
+      adapterDisplayName: projectContext.adapter.displayName,
+      preferredScriptNames: preferences.preferredScriptNames
+    });
+    plan.rationale.push(...preferences.rationale);
 
     if (plan.command.source === 'missing') {
       return {
@@ -19,11 +30,34 @@ export class ValidationOrchestrator {
       };
     }
 
+    appendOutputLine(
+      `[validation] executing=${plan.command.commandLine ?? 'unknown'}`
+    );
+
+    const execution = await runShellCommand(
+      plan.command.commandLine!,
+      projectContext.workspaceFolder.uri.fsPath
+    );
+    const issues = parseValidationIssues(execution.combinedOutput);
+
+    if (execution.exitCode === 0) {
+      return {
+        status: 'succeeded',
+        summary: 'Validation completed successfully.',
+        plan,
+        issues,
+        rawOutput: execution.combinedOutput,
+        exitCode: execution.exitCode
+      };
+    }
+
     return {
-      status: 'ready',
-      summary: 'Validation orchestration is ready. Command execution will be implemented next.',
+      status: 'failed',
+      summary: 'Validation failed. Review diagnostics and output for details.',
       plan,
-      issues: []
+      issues,
+      rawOutput: execution.combinedOutput,
+      exitCode: execution.exitCode
     };
   }
 }

@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import type {
+  AdapterValidationPreferences,
   AdapterContextSelectionInput,
   AdapterDetectionInput,
   AdapterValidationPlanningInput,
@@ -10,8 +11,7 @@ import { detectLangiumProject } from './projectDetection';
 import type {
   GrammarContextSelection,
   ProjectDetectionResult,
-  ProjectSignal,
-  ValidationPlan
+  ProjectSignal
 } from '../types';
 
 async function collectGrammarFiles(workspaceRoot: string): Promise<string[]> {
@@ -100,13 +100,11 @@ function selectContext(input: AdapterContextSelectionInput): Promise<GrammarCont
   });
 }
 
-function planValidation(input: AdapterValidationPlanningInput): Promise<ValidationPlan> {
+function getValidationPreferences(
+  input: AdapterValidationPlanningInput
+): Promise<AdapterValidationPreferences> {
   return Promise.resolve({
-    command: {
-      source: 'missing',
-      detail:
-        'Validation command resolution has not been implemented yet. Next step is user setting and package.json script discovery.'
-    },
+    preferredScriptNames: ['validate', 'langium:validate', 'langium:check', 'build'],
     rationale: [
       `Adapter selected: ${input.project.displayName}`,
       `Workspace root: ${input.project.context.workspaceRoot}`,
@@ -120,5 +118,5 @@ export const langiumAdapter: DslAdapter = {
   displayName: 'Langium',
   detect,
   selectContext,
-  planValidation
+  getValidationPreferences
 };
