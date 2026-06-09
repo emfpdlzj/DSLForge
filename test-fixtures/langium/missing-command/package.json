@@ -1,0 +1,7 @@
+{
+  "name": "dslforge-fixture-missing-command",
+  "private": true,
+  "scripts": {
+    "typecheck": "echo \"no validation script configured\""
+  }
+}

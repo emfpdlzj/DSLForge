@@ -1,0 +1,7 @@
+{
+  "name": "dslforge-fixture-package-script",
+  "private": true,
+  "scripts": {
+    "validate": "node ./scripts/validate.js"
+  }
+}

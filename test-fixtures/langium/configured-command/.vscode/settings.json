@@ -1,0 +1,3 @@
+{
+  "dslforge.validation.command": "node ./scripts/validate-configured.js"
+}
