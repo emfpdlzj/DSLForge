@@ -19,6 +19,6 @@ export function validateCurrentGrammar(): vscode.Disposable {
     }
 
     const result = await validationOrchestrator.runValidation(projectContext);
-    diagnosticsPresenter.presentValidationResult(projectContext, result);
+    await diagnosticsPresenter.presentValidationResult(projectContext, result);
   });
 }
