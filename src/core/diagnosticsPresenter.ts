@@ -124,8 +124,9 @@ function appendIssuePreview(issues: ValidationIssue[]): void {
 
   for (const issue of issues.slice(0, previewLimit)) {
     const codeLabel = issue.code ? ` [${issue.code}]` : '';
+    const sourceLabel = issue.source ? ` <${issue.source}>` : '';
     appendOutputLine(
-      `- ${issue.severity.toUpperCase()}${codeLabel} ${formatIssueLocation(issue)} ${issue.message}`
+      `- ${issue.severity.toUpperCase()}${codeLabel}${sourceLabel} ${formatIssueLocation(issue)} ${issue.message}`
     );
   }
 

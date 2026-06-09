@@ -87,7 +87,8 @@ export class ValidationOrchestrator {
           })
         : [];
       const genericIssues = parseValidationIssues(execution.combinedOutput, {
-        workspaceRoot: projectContext.workspaceFolder.uri.fsPath
+        workspaceRoot: projectContext.workspaceFolder.uri.fsPath,
+        defaultSource: projectContext.adapter.displayName
       });
       const issues = dedupeValidationIssues([
         ...interpretedIssues,

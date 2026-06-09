@@ -96,9 +96,67 @@ function parseWebpackTslIssues(
         endColumn: pendingIssue.endColumn,
         severity: pendingIssue.severity,
         code: codeMessageMatch.groups.code,
-        message: codeMessageMatch.groups.message.trim()
+        message: codeMessageMatch.groups.message.trim(),
+        source: 'TypeScript'
       });
       pendingIssue = undefined;
+    }
+  }
+
+  return issues;
+}
+
+function parseLangiumFrameworkIssues(
+  input: AdapterValidationInterpretationInput
+): ValidationIssue[] {
+  const issues: ValidationIssue[] = [];
+
+  for (const line of input.rawOutput.split(/\r?\n/)) {
+    const trimmed = line.trim();
+
+    const generatorFailureMatch =
+      /^(?<severity>Error|Warning):\s+(?<message>Failed to (?:load|read|generate).+)$/i.exec(
+        trimmed
+      );
+
+    if (generatorFailureMatch?.groups) {
+      issues.push({
+        severity:
+          generatorFailureMatch.groups.severity.toLowerCase() === 'warning'
+            ? 'warning'
+            : 'error',
+        message: generatorFailureMatch.groups.message.trim(),
+        source: 'Langium'
+      });
+      continue;
+    }
+
+    const referenceFailureMatch =
+      /^Error:\s+(?<message>Could not resolve reference to.+)$/i.exec(trimmed);
+
+    if (referenceFailureMatch?.groups) {
+      issues.push({
+        severity: 'error',
+        message: referenceFailureMatch.groups.message.trim(),
+        source: 'Langium'
+      });
+      continue;
+    }
+
+    const configFailureMatch =
+      /^(?<severity>Error|Warning):\s+(?<message>.+langium-config\.json.+)$/i.exec(
+        trimmed
+      );
+
+    if (configFailureMatch?.groups) {
+      issues.push({
+        severity:
+          configFailureMatch.groups.severity.toLowerCase() === 'warning'
+            ? 'warning'
+            : 'error',
+        message: configFailureMatch.groups.message.trim(),
+        source: 'Langium'
+      });
     }
   }
 
@@ -109,9 +167,15 @@ export function interpretLangiumValidationOutput(
   input: AdapterValidationInterpretationInput
 ): ValidationIssue[] {
   const genericIssues = parseValidationIssues(input.rawOutput, {
-    workspaceRoot: input.project.context.workspaceRoot
+    workspaceRoot: input.project.context.workspaceRoot,
+    defaultSource: 'Langium'
   });
   const webpackIssues = parseWebpackTslIssues(input);
+  const frameworkIssues = parseLangiumFrameworkIssues(input);
 
-  return dedupeValidationIssues([...webpackIssues, ...genericIssues]);
+  return dedupeValidationIssues([
+    ...webpackIssues,
+    ...frameworkIssues,
+    ...genericIssues
+  ]);
 }

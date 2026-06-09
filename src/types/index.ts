@@ -76,6 +76,7 @@ export interface ValidationIssue {
   endLine?: number;
   endColumn?: number;
   code?: string;
+  source?: string;
 }
 
 export interface ValidationPlan {
