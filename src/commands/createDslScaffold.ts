@@ -8,11 +8,16 @@ import {
   showFeatureExecutionError,
   showUnsupportedWorkspaceGuidance
 } from '../core/userGuidance';
+import { ensureTrustedWorkspace } from '../core/workspaceTrust';
 
 export const CREATE_DSL_SCAFFOLD_COMMAND = 'dslforge.createDslScaffold';
 
 export function createDslScaffold(): vscode.Disposable {
   return vscode.commands.registerCommand(CREATE_DSL_SCAFFOLD_COMMAND, async () => {
+    if (!(await ensureTrustedWorkspace('Create DSL Scaffold'))) {
+      return;
+    }
+
     const projectContext = await projectService.resolveProjectContext();
 
     if (!projectContext) {

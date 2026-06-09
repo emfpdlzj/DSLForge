@@ -5,14 +5,22 @@
   "version": "0.0.1",
   "publisher": "emfpdlzj",
   "engines": {
-    "vscode": "^1.74.0"
+    "vscode": "^1.120.0"
   },
   "categories": [
     "Programming Languages",
     "Other"
   ],
   "keywords": [],
-  "main": "dist/extension.js",
+  "main": "./dist/extension.js",
+  "icon": "media/icon.png",
+  "capabilities": {
+    "virtualWorkspaces": false,
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "DSLForge can inspect Langium workspaces in Restricted Mode, but validation and AI-backed commands require workspace trust."
+    }
+  },
   "activationEvents": [
     "onCommand:dslforge.createDslScaffold",
     "onCommand:dslforge.generateSampleDsl",
@@ -57,22 +65,22 @@
     "commands": [
       {
         "command": "dslforge.createDslScaffold",
-        "title": "DSLForge: Create DSL Scaffold",
+        "title": "Create DSL Scaffold",
         "category": "DSLForge"
       },
       {
         "command": "dslforge.generateSampleDsl",
-        "title": "DSLForge: Generate Sample DSL",
+        "title": "Generate Sample DSL",
         "category": "DSLForge"
       },
       {
         "command": "dslforge.validateCurrentGrammar",
-        "title": "DSLForge: Validate Current Grammar",
+        "title": "Validate Current Grammar",
         "category": "DSLForge"
       },
       {
         "command": "dslforge.explainCurrentGrammar",
-        "title": "DSLForge: Explain Current Grammar",
+        "title": "Explain Current Grammar",
         "category": "DSLForge"
       }
     ]
@@ -83,9 +91,10 @@
     "watch": "tsc -watch -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:diagnostics": "npm run build && node dist/test/diagnosticsFixtureRunner.js",
+    "test:manifest": "npm run build && node dist/test/manifestFixtureRunner.js",
     "test:projects": "npm run build && node dist/test/projectFixtureRunner.js",
     "clean": "rm -rf dist",
-    "test": "npm run build && node dist/test/diagnosticsFixtureRunner.js && node dist/test/projectFixtureRunner.js"
+    "test": "npm run build && node dist/test/diagnosticsFixtureRunner.js && node dist/test/projectFixtureRunner.js && node dist/test/manifestFixtureRunner.js"
   },
   "repository": {
     "type": "git",

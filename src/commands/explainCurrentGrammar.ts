@@ -8,11 +8,16 @@ import {
   showFeatureExecutionError,
   showUnsupportedWorkspaceGuidance
 } from '../core/userGuidance';
+import { ensureTrustedWorkspace } from '../core/workspaceTrust';
 
 export const EXPLAIN_CURRENT_GRAMMAR_COMMAND = 'dslforge.explainCurrentGrammar';
 
 export function explainCurrentGrammar(): vscode.Disposable {
   return vscode.commands.registerCommand(EXPLAIN_CURRENT_GRAMMAR_COMMAND, async () => {
+    if (!(await ensureTrustedWorkspace('Explain Current Grammar'))) {
+      return;
+    }
+
     const projectContext = await projectService.resolveProjectContext();
 
     if (!projectContext) {

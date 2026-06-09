@@ -6,6 +6,7 @@ import {
 } from './outputChannel';
 
 const OPEN_CHAT_SETTINGS_ACTION = 'Open Chat Settings';
+const MANAGE_WORKSPACE_TRUST_ACTION = 'Manage Workspace Trust';
 const SHOW_OUTPUT_ACTION = 'Show Output';
 
 async function showMessageWithActions(
@@ -13,6 +14,27 @@ async function showMessageWithActions(
   actions: readonly string[]
 ): Promise<string | undefined> {
   return vscode.window.showWarningMessage(message, ...actions);
+}
+
+async function openWorkspaceTrustManagement(): Promise<void> {
+  const candidateCommands = [
+    'workbench.trust.manage',
+    'workbench.trust.configure'
+  ];
+
+  for (const command of candidateCommands) {
+    try {
+      await vscode.commands.executeCommand(command);
+      return;
+    } catch {
+      // Fall through to the next trust-management command.
+    }
+  }
+
+  await vscode.commands.executeCommand(
+    'workbench.action.openSettings',
+    'security.workspace.trust.enabled'
+  );
 }
 
 export async function showUnsupportedWorkspaceGuidance(
@@ -69,6 +91,33 @@ export async function showAiSetupGuidance(
       'workbench.action.openSettings',
       'chat'
     );
+    return;
+  }
+
+  if (selection === SHOW_OUTPUT_ACTION) {
+    await vscode.commands.executeCommand('workbench.action.output.toggleOutput');
+  }
+}
+
+export async function showWorkspaceTrustGuidance(
+  featureName: string
+): Promise<void> {
+  const message =
+    `DSLForge cannot run ${featureName} in Restricted Mode. ` +
+    'Trust this workspace to allow validation commands and AI-backed grammar actions.';
+
+  appendOutputDivider(`DSLForge Workspace Trust ${featureName}`);
+  appendOutputLine(`trusted workspace: ${vscode.workspace.isTrusted}`);
+  appendOutputLine(`message: ${message}`);
+  showOutputChannel();
+
+  const selection = await showMessageWithActions(message, [
+    MANAGE_WORKSPACE_TRUST_ACTION,
+    SHOW_OUTPUT_ACTION
+  ]);
+
+  if (selection === MANAGE_WORKSPACE_TRUST_ACTION) {
+    await openWorkspaceTrustManagement();
     return;
   }
 

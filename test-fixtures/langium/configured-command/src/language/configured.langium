@@ -4,7 +4,16 @@ entry Model:
     items+=Item*;
 
 Item:
-    'item' name=ID;
+    NumberDecl | StringDecl;
 
-terminal ID: /[_a-zA-Z][\w]*/;
+NumberDecl:
+    '냥?' name=NAME value=CATSEQ;
+
+StringDecl:
+    '냐옹?' name=NAME value=STRING;
+
+terminal CATSEQ: /(냥)+/;
+terminal NAME: /[^\s]+/;
+terminal STRING: /[^\s]+/;
+
 hidden terminal WS: /\s+/;

@@ -5,11 +5,16 @@ import {
   validationOrchestrator
 } from '../core/services';
 import { showUnsupportedWorkspaceGuidance } from '../core/userGuidance';
+import { ensureTrustedWorkspace } from '../core/workspaceTrust';
 
 export const VALIDATE_CURRENT_GRAMMAR_COMMAND = 'dslforge.validateCurrentGrammar';
 
 export function validateCurrentGrammar(): vscode.Disposable {
   return vscode.commands.registerCommand(VALIDATE_CURRENT_GRAMMAR_COMMAND, async () => {
+    if (!(await ensureTrustedWorkspace('Validate Current Grammar'))) {
+      return;
+    }
+
     const projectContext = await projectService.resolveProjectContext();
 
     if (!projectContext) {

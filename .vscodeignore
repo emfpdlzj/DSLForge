@@ -1,0 +1,15 @@
+.agents/**
+.git/**
+.gitignore
+.idea/**
+.tmp-vsix-ext/**
+.tmp-vsix-user/**
+.vscode/**
+docs/**
+node_modules/**
+src/**
+test-fixtures/**
+tsconfig.json
+dist/test/**
+**/*.map
+*.vsix

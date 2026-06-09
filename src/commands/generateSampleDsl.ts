@@ -8,11 +8,16 @@ import {
   showFeatureExecutionError,
   showUnsupportedWorkspaceGuidance
 } from '../core/userGuidance';
+import { ensureTrustedWorkspace } from '../core/workspaceTrust';
 
 export const GENERATE_SAMPLE_DSL_COMMAND = 'dslforge.generateSampleDsl';
 
 export function generateSampleDsl(): vscode.Disposable {
   return vscode.commands.registerCommand(GENERATE_SAMPLE_DSL_COMMAND, async () => {
+    if (!(await ensureTrustedWorkspace('Generate Sample DSL'))) {
+      return;
+    }
+
     const projectContext = await projectService.resolveProjectContext();
 
     if (!projectContext) {
