@@ -1,6 +1,9 @@
 import * as vscode from 'vscode';
 import { getAiCommandGate } from '../core/aiCommandGate';
-import { projectService } from '../core/services';
+import {
+  dslScaffoldService,
+  projectService
+} from '../core/services';
 
 export const CREATE_DSL_SCAFFOLD_COMMAND = 'dslforge.createDslScaffold';
 
@@ -23,8 +26,17 @@ export function createDslScaffold(): vscode.Disposable {
       return;
     }
 
-    await vscode.window.showInformationMessage(
-      `Create DSL Scaffold is not implemented yet. Resolved adapter: ${projectContext.adapter.displayName}. Selected model: ${gateResult.selectedModel?.name ?? 'unknown'}.`
-    );
+    try {
+      await dslScaffoldService.createDslScaffold(
+        projectContext,
+        gateResult.selectedModel!
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'DSLForge could not create a DSL scaffold proposal.';
+      await vscode.window.showErrorMessage(message);
+    }
   });
 }

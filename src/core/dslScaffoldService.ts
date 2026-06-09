@@ -8,27 +8,30 @@ import {
 } from './grammarAiSupport';
 import type { ResolvedProjectContext } from './projectService';
 
-function buildExplanationPrompt(
+function buildScaffoldPrompt(
   projectContext: ResolvedProjectContext,
   contextBlock: string
 ): string {
   return [
-    'You are helping explain a Langium grammar inside VS Code.',
-    'Explain the current grammar for a DSL author, not an end user.',
-    'Be concrete and avoid generic AI filler.',
+    'You are helping design a Langium-first DSL scaffold inside VS Code.',
+    'Produce a practical scaffold proposal for a DSL authoring project.',
+    'Do not claim files already exist unless they are shown in context.',
+    'Do not ask follow-up questions. Make reasonable assumptions and label them clearly.',
     '',
     'Return markdown with these sections exactly:',
-    '1. Summary',
-    '2. Key Rules',
-    '3. Likely Intent',
-    '4. Risks or Ambiguities',
-    '5. Suggested Next Checks',
+    '1. Scaffold Overview',
+    '2. Suggested Files',
+    '3. package.json Scripts',
+    '4. Starter Grammar',
+    '5. Implementation Notes',
+    '6. Next Steps',
     '',
     'Requirements:',
-    '- Focus on grammar structure and authoring implications.',
-    '- Mention important parser rules, terminals, imports, and cross-reference implications when relevant.',
-    '- Call out ambiguities, missing constraints, or maintainability risks if visible.',
-    '- If evidence is limited, say so plainly.',
+    '- This is a preview proposal, not an instruction to write files automatically.',
+    '- Focus on Langium-first project structure and authoring workflow.',
+    '- Keep file suggestions practical and minimal for v0.1.',
+    '- Include fenced code blocks for important starter file contents.',
+    '- Suggested Files should explain each file purpose in one sentence.',
     '',
     `Workspace root: ${projectContext.workspaceFolder.uri.fsPath}`,
     `Adapter: ${projectContext.adapter.displayName}`,
@@ -40,36 +43,38 @@ function buildExplanationPrompt(
   ].join('\n');
 }
 
-export class GrammarExplanationService {
-  public async explainCurrentGrammar(
+export class DslScaffoldService {
+  public async createDslScaffold(
     projectContext: ResolvedProjectContext,
     model: vscode.LanguageModelChat
   ): Promise<void> {
     const context = await collectGrammarModelContext(projectContext);
     appendGrammarAiReport(
-      'DSLForge Explain Current Grammar',
+      'DSLForge Create DSL Scaffold',
       projectContext,
       model,
       context
     );
 
-    const explanation = await requestTextFromModel({
+    const scaffold = await requestTextFromModel({
       model,
-      progressTitle: 'DSLForge is explaining the current grammar',
+      progressTitle: 'DSLForge is creating a DSL scaffold proposal',
       justification:
-        'Explain the current Langium grammar for the user inside DSLForge.',
-      prompt: buildExplanationPrompt(projectContext, buildGrammarContextBlock(context))
+        'Create a Langium-first DSL scaffold proposal for the user inside DSLForge.',
+      prompt: buildScaffoldPrompt(projectContext, buildGrammarContextBlock(context))
     });
 
     const document = await vscode.workspace.openTextDocument({
       language: 'markdown',
       content: [
         buildAiDocumentHeader(
-          'DSLForge Grammar Explanation',
+          'DSLForge DSL Scaffold Proposal',
           projectContext,
           model
         ),
-        explanation
+        '> Preview only. DSLForge has not written any files.',
+        '',
+        scaffold
       ].join('\n')
     });
 

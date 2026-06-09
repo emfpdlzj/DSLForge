@@ -1,6 +1,9 @@
 import * as vscode from 'vscode';
 import { getAiCommandGate } from '../core/aiCommandGate';
-import { projectService } from '../core/services';
+import {
+  projectService,
+  sampleDslService
+} from '../core/services';
 
 export const GENERATE_SAMPLE_DSL_COMMAND = 'dslforge.generateSampleDsl';
 
@@ -23,8 +26,17 @@ export function generateSampleDsl(): vscode.Disposable {
       return;
     }
 
-    await vscode.window.showInformationMessage(
-      `Generate Sample DSL is not implemented yet. Resolved adapter: ${projectContext.adapter.displayName}. Selected model: ${gateResult.selectedModel?.name ?? 'unknown'}.`
-    );
+    try {
+      await sampleDslService.generateSampleDsl(
+        projectContext,
+        gateResult.selectedModel!
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'DSLForge could not generate sample DSL text.';
+      await vscode.window.showErrorMessage(message);
+    }
   });
 }

@@ -8,27 +8,27 @@ import {
 } from './grammarAiSupport';
 import type { ResolvedProjectContext } from './projectService';
 
-function buildExplanationPrompt(
+function buildSampleDslPrompt(
   projectContext: ResolvedProjectContext,
   contextBlock: string
 ): string {
   return [
-    'You are helping explain a Langium grammar inside VS Code.',
-    'Explain the current grammar for a DSL author, not an end user.',
-    'Be concrete and avoid generic AI filler.',
+    'You are generating sample DSL texts from a Langium grammar inside VS Code.',
+    'Generate realistic example inputs for a DSL author who is validating and refining the grammar.',
+    'Do not pretend to know constraints that are not visible in the grammar.',
     '',
     'Return markdown with these sections exactly:',
-    '1. Summary',
-    '2. Key Rules',
-    '3. Likely Intent',
-    '4. Risks or Ambiguities',
-    '5. Suggested Next Checks',
+    '1. Reading of the Grammar',
+    '2. Sample 1',
+    '3. Sample 2',
+    '4. Sample 3',
+    '5. Edge Cases to Try',
     '',
     'Requirements:',
-    '- Focus on grammar structure and authoring implications.',
-    '- Mention important parser rules, terminals, imports, and cross-reference implications when relevant.',
-    '- Call out ambiguities, missing constraints, or maintainability risks if visible.',
-    '- If evidence is limited, say so plainly.',
+    '- Put each sample in its own fenced code block.',
+    '- Vary the samples: one minimal, one representative, one more complex.',
+    '- If the grammar appears ambiguous or incomplete, mention that before or after the sample.',
+    '- Keep samples plausible for the grammar that is shown, even if some assumptions are required.',
     '',
     `Workspace root: ${projectContext.workspaceFolder.uri.fsPath}`,
     `Adapter: ${projectContext.adapter.displayName}`,
@@ -40,36 +40,36 @@ function buildExplanationPrompt(
   ].join('\n');
 }
 
-export class GrammarExplanationService {
-  public async explainCurrentGrammar(
+export class SampleDslService {
+  public async generateSampleDsl(
     projectContext: ResolvedProjectContext,
     model: vscode.LanguageModelChat
   ): Promise<void> {
     const context = await collectGrammarModelContext(projectContext);
     appendGrammarAiReport(
-      'DSLForge Explain Current Grammar',
+      'DSLForge Generate Sample DSL',
       projectContext,
       model,
       context
     );
 
-    const explanation = await requestTextFromModel({
+    const samples = await requestTextFromModel({
       model,
-      progressTitle: 'DSLForge is explaining the current grammar',
+      progressTitle: 'DSLForge is generating sample DSL text',
       justification:
-        'Explain the current Langium grammar for the user inside DSLForge.',
-      prompt: buildExplanationPrompt(projectContext, buildGrammarContextBlock(context))
+        'Generate sample DSL inputs from the current Langium grammar inside DSLForge.',
+      prompt: buildSampleDslPrompt(projectContext, buildGrammarContextBlock(context))
     });
 
     const document = await vscode.workspace.openTextDocument({
       language: 'markdown',
       content: [
         buildAiDocumentHeader(
-          'DSLForge Grammar Explanation',
+          'DSLForge Sample DSL Generation',
           projectContext,
           model
         ),
-        explanation
+        samples
       ].join('\n')
     });
 
