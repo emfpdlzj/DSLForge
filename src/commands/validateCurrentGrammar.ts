@@ -18,7 +18,16 @@ export function validateCurrentGrammar(): vscode.Disposable {
       return;
     }
 
-    const result = await validationOrchestrator.runValidation(projectContext);
-    await diagnosticsPresenter.presentValidationResult(projectContext, result);
+    await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: 'DSLForge is validating the current grammar',
+        cancellable: true
+      },
+      async (_progress, token) => {
+        const result = await validationOrchestrator.runValidation(projectContext, token);
+        await diagnosticsPresenter.presentValidationResult(projectContext, result);
+      }
+    );
   });
 }

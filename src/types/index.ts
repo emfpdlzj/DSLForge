@@ -84,11 +84,19 @@ export interface ValidationPlan {
 }
 
 export interface ValidationRunResult {
-  status: 'succeeded' | 'failed' | 'needs_configuration';
+  status:
+    | 'succeeded'
+    | 'failed'
+    | 'needs_configuration'
+    | 'cancelled'
+    | 'busy';
   summary: string;
   plan: ValidationPlan;
   issues: ValidationIssue[];
   rawOutput?: string;
   exitCode?: number | null;
   durationMs?: number;
+  signal?: NodeJS.Signals | null;
+  outputTruncated?: boolean;
+  executionError?: string;
 }

@@ -22,6 +22,12 @@
           "type": "string",
           "default": "",
           "markdownDescription": "Workspace validation command used first by `DSLForge: Validate Current Grammar`. If empty, DSLForge auto-detects a supported `package.json` script."
+        },
+        "dslforge.validation.maxCapturedOutputCharacters": {
+          "type": "number",
+          "default": 250000,
+          "minimum": 10000,
+          "markdownDescription": "Maximum number of output characters DSLForge keeps in memory while validation is running. Additional output is still streamed to the Output panel but is not retained for diagnostics parsing."
         }
       }
     },

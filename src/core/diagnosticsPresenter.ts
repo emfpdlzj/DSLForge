@@ -29,6 +29,10 @@ interface IssueSummary {
 }
 
 function buildValidationMessageDetail(result: ValidationRunResult): string {
+  if (result.status === 'busy') {
+    return 'an already-running validation command';
+  }
+
   if (result.plan.command.source === 'user-configured') {
     return `configured command "${result.plan.command.commandLine ?? ''}"`;
   }
@@ -165,8 +169,20 @@ function appendValidationReport(
     appendOutputLine(`exit code: ${result.exitCode}`);
   }
 
+  if (typeof result.signal !== 'undefined') {
+    appendOutputLine(`signal: ${result.signal ?? 'none'}`);
+  }
+
   if (typeof result.durationMs !== 'undefined') {
     appendOutputLine(`duration: ${result.durationMs}ms`);
+  }
+
+  if (result.outputTruncated) {
+    appendOutputLine('output: truncated to the in-memory capture limit');
+  }
+
+  if (result.executionError) {
+    appendOutputLine(`execution error: ${result.executionError}`);
   }
 
   appendOutputLine(`summary: ${result.summary}`);
@@ -278,7 +294,12 @@ export class DiagnosticsPresenter {
 
     if (result.status === 'failed') {
       const summary = buildIssueSummary(issuesToPublish);
-      const message = `DSLForge validation failed using ${buildValidationMessageDetail(result)}. ${formatIssueSummary(summary)}.`;
+      const executionTail = result.executionError
+        ? ` Start error: ${result.executionError}.`
+        : result.outputTruncated
+          ? ' Output capture was truncated.'
+          : '';
+      const message = `DSLForge validation failed using ${buildValidationMessageDetail(result)}. ${formatIssueSummary(summary)}.${executionTail}`;
       const actions =
         result.plan.command.source === 'user-configured'
           ? [problemsAction, outputAction, settingsAction]
@@ -286,6 +307,25 @@ export class DiagnosticsPresenter {
             ? [problemsAction, outputAction, packageJsonAction]
             : [problemsAction, outputAction];
       await showMessageWithActions('warning', message, actions);
+      return;
+    }
+
+    if (result.status === 'cancelled') {
+      const summary = buildIssueSummary(issuesToPublish);
+      await showMessageWithActions(
+        'warning',
+        `DSLForge cancelled validation using ${buildValidationMessageDetail(result)}. ${formatIssueSummary(summary)}.`,
+        [problemsAction, outputAction]
+      );
+      return;
+    }
+
+    if (result.status === 'busy') {
+      await showMessageWithActions(
+        'warning',
+        'DSLForge already has a validation run in progress for this workspace.',
+        [outputAction]
+      );
       return;
     }
 
