@@ -59,8 +59,9 @@
     "build": "tsc -p tsconfig.json",
     "watch": "tsc -watch -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:diagnostics": "npm run build && node dist/test/diagnosticsFixtureRunner.js",
     "clean": "rm -rf dist",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run test:diagnostics"
   },
   "repository": {
     "type": "git",

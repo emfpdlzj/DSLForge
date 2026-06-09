@@ -3,7 +3,7 @@ import type { AdapterValidationInterpretationInput } from '../core/adapter';
 import {
   dedupeValidationIssues,
   parseValidationIssues
-} from '../core/validationDiagnostics';
+} from '../core/validationIssueParser';
 import type { ValidationIssue } from '../types';
 
 interface PendingWebpackIssue {
@@ -163,15 +163,51 @@ function parseLangiumFrameworkIssues(
   return issues;
 }
 
+function filterDuplicateUnlocatedIssues(
+  baselineIssues: ValidationIssue[],
+  candidateIssues: ValidationIssue[]
+): ValidationIssue[] {
+  const locatedKeys = new Set(
+    baselineIssues
+      .filter((issue) => issue.filePath && issue.line && issue.column)
+      .map((issue) =>
+        [
+          issue.severity,
+          issue.source ?? '',
+          (issue.code ?? '').toUpperCase(),
+          issue.message.trim().toLowerCase()
+        ].join('::')
+      )
+  );
+
+  return candidateIssues.filter((issue) => {
+    if (issue.filePath || !issue.code) {
+      return true;
+    }
+
+    const key = [
+      issue.severity,
+      issue.source ?? '',
+      issue.code.toUpperCase(),
+      issue.message.trim().toLowerCase()
+    ].join('::');
+
+    return !locatedKeys.has(key);
+  });
+}
+
 export function interpretLangiumValidationOutput(
   input: AdapterValidationInterpretationInput
 ): ValidationIssue[] {
-  const genericIssues = parseValidationIssues(input.rawOutput, {
-    workspaceRoot: input.project.context.workspaceRoot,
-    defaultSource: 'Langium'
-  });
   const webpackIssues = parseWebpackTslIssues(input);
   const frameworkIssues = parseLangiumFrameworkIssues(input);
+  const genericIssues = filterDuplicateUnlocatedIssues(
+    webpackIssues,
+    parseValidationIssues(input.rawOutput, {
+    workspaceRoot: input.project.context.workspaceRoot,
+    defaultSource: 'Langium'
+    })
+  );
 
   return dedupeValidationIssues([
     ...webpackIssues,
