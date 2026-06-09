@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-export const GENERATE_SAMPLE_DSL_COMMAND = 'langforge.generateSampleDsl';
+export const GENERATE_SAMPLE_DSL_COMMAND = 'dslforge.generateSampleDsl';
 
 export function generateSampleDsl(): vscode.Disposable {
   return vscode.commands.registerCommand(GENERATE_SAMPLE_DSL_COMMAND, async () => {

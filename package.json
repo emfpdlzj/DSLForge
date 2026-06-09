@@ -1,7 +1,7 @@
 {
-  "name": "langforge",
-  "displayName": "LangForge",
-  "description": "Langium authoring assistant for DSL developers in Visual Studio Code.",
+  "name": "dslforge",
+  "displayName": "DSLForge",
+  "description": "DSL authoring workflow assistant for Visual Studio Code, starting with Langium.",
   "version": "0.0.1",
   "publisher": "emfpdlzj",
   "engines": {
@@ -17,24 +17,24 @@
   "contributes": {
     "commands": [
       {
-        "command": "langforge.createDslScaffold",
-        "title": "LangForge: Create DSL Scaffold",
-        "category": "LangForge"
+        "command": "dslforge.createDslScaffold",
+        "title": "DSLForge: Create DSL Scaffold",
+        "category": "DSLForge"
       },
       {
-        "command": "langforge.generateSampleDsl",
-        "title": "LangForge: Generate Sample DSL",
-        "category": "LangForge"
+        "command": "dslforge.generateSampleDsl",
+        "title": "DSLForge: Generate Sample DSL",
+        "category": "DSLForge"
       },
       {
-        "command": "langforge.validateCurrentGrammar",
-        "title": "LangForge: Validate Current Grammar",
-        "category": "LangForge"
+        "command": "dslforge.validateCurrentGrammar",
+        "title": "DSLForge: Validate Current Grammar",
+        "category": "DSLForge"
       },
       {
-        "command": "langforge.explainCurrentGrammar",
-        "title": "LangForge: Explain Current Grammar",
-        "category": "LangForge"
+        "command": "dslforge.explainCurrentGrammar",
+        "title": "DSLForge: Explain Current Grammar",
+        "category": "DSLForge"
       }
     ]
   },
@@ -48,15 +48,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/emfpdlzj/LangForge.git"
+    "url": "git+https://github.com/emfpdlzj/DSLForge.git"
   },
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/emfpdlzj/LangForge/issues"
+    "url": "https://github.com/emfpdlzj/DSLForge/issues"
   },
-  "homepage": "https://github.com/emfpdlzj/LangForge#readme",
+  "homepage": "https://github.com/emfpdlzj/DSLForge#readme",
   "devDependencies": {
     "@types/node": "^24.13.1",
     "@types/vscode": "^1.120.0",

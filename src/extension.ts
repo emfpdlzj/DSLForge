@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { registerCommands } from './commands';
 
 export function activate(context: vscode.ExtensionContext): void {
-  console.log('LangForge is now active.');
+  console.log('DSLForge is now active.');
   registerCommands(context);
 }
 

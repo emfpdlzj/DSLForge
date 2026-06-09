@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-export const EXPLAIN_CURRENT_GRAMMAR_COMMAND = 'langforge.explainCurrentGrammar';
+export const EXPLAIN_CURRENT_GRAMMAR_COMMAND = 'dslforge.explainCurrentGrammar';
 
 export function explainCurrentGrammar(): vscode.Disposable {
   return vscode.commands.registerCommand(EXPLAIN_CURRENT_GRAMMAR_COMMAND, async () => {
