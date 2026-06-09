@@ -1,0 +1,11 @@
+{
+  "name": "dslforge-fixture-import-context",
+  "private": true,
+  "devDependencies": {
+    "langium": "^3.0.0"
+  },
+  "scripts": {
+    "langium:generate": "echo \"langium generate import-context fixture\"",
+    "validate": "node ./scripts/validate.js"
+  }
+}

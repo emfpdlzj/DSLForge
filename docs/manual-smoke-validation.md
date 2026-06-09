@@ -7,6 +7,7 @@ This document fixes the three Langium validation-resolution paths used by `DSLFo
 - configured command: `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/langium/configured-command`
 - package script: `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/langium/package-script`
 - missing command: `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/langium/missing-command`
+- import context: `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/langium/import-context`
 
 ## Launch
 
@@ -15,6 +16,7 @@ Use one of the dedicated VS Code extension launch configurations in `.vscode/lau
 - `Run DSLForge: configured-command fixture`
 - `Run DSLForge: package-script fixture`
 - `Run DSLForge: missing-command fixture`
+- `Run DSLForge: import-context fixture`
 
 ## Case 1: Configured Command
 
@@ -58,6 +60,25 @@ Expected behavior:
   - `Configure validation command`
   - `Open workspace package.json`
 
+## Case 4: Import-Aware Context Selection
+
+Workspace:
+
+- `test-fixtures/langium/import-context`
+
+Expected behavior:
+
+- open `src/language/main.langium` before running the command
+- DSLForge auto-detects the `validate` script
+- Problems includes `IMP001`
+- Output report `selected context files` includes:
+  - `src/language/main.langium`
+  - `src/language/shared.langium`
+  - `src/language/tokens.langium`
+  - `langium-config.json`
+  - `package.json`
+- Output report `Context Notes` or file list shows imported grammar files were selected because they are transitively imported by the active grammar
+
 ## Manual Procedure
 
 1. Launch one of the fixture configurations.
@@ -65,3 +86,4 @@ Expected behavior:
 3. Run `DSLForge: Validate Current Grammar`.
 4. Check the notification message, Output panel, and Problems view.
 5. For the missing-command fixture, open Quick Fix on line 1 and verify both actions appear.
+6. For the import-context fixture, verify that the Output panel includes imported grammar files from the active grammar chain.

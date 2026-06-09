@@ -1,0 +1,13 @@
+{
+  "projectName": "ImportContextFixture",
+  "languages": [
+    {
+      "id": "import-context-fixture",
+      "grammar": "src/language/main.langium",
+      "fileExtensions": [
+        ".icf"
+      ]
+    }
+  ],
+  "out": "src/language/generated"
+}
