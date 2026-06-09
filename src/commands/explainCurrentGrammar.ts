@@ -1,6 +1,9 @@
 import * as vscode from 'vscode';
 import { getAiCommandGate } from '../core/aiCommandGate';
-import { projectService } from '../core/services';
+import {
+  grammarExplanationService,
+  projectService
+} from '../core/services';
 
 export const EXPLAIN_CURRENT_GRAMMAR_COMMAND = 'dslforge.explainCurrentGrammar';
 
@@ -23,8 +26,17 @@ export function explainCurrentGrammar(): vscode.Disposable {
       return;
     }
 
-    await vscode.window.showInformationMessage(
-      `Explain Current Grammar is not implemented yet. Resolved adapter: ${projectContext.adapter.displayName}. Selected model: ${gateResult.selectedModel?.name ?? 'unknown'}.`
-    );
+    try {
+      await grammarExplanationService.explainCurrentGrammar(
+        projectContext,
+        gateResult.selectedModel!
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'DSLForge could not explain the current grammar.';
+      await vscode.window.showErrorMessage(message);
+    }
   });
 }
