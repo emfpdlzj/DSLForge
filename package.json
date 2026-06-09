@@ -1,0 +1,27 @@
+{
+  "name": "llm-grammer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/extension.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "clean": "rm -rf dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emfpdlzj/llm-grammer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/emfpdlzj/llm-grammer/issues"
+  },
+  "homepage": "https://github.com/emfpdlzj/llm-grammer#readme",
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  }
+}
