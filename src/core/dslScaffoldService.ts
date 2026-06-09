@@ -36,7 +36,7 @@ function buildScaffoldPrompt(
     `Workspace root: ${projectContext.workspaceFolder.uri.fsPath}`,
     `Adapter: ${projectContext.adapter.displayName}`,
     `Active grammar: ${projectContext.context.activeGrammarFile ?? 'none'}`,
-    `Related files: ${projectContext.context.relatedFiles.length > 0 ? projectContext.context.relatedFiles.join(', ') : 'none'}`,
+    `Selected context files: ${projectContext.context.contextFiles.length > 0 ? projectContext.context.contextFiles.map((file) => file.filePath).join(', ') : 'none'}`,
     '',
     'Grammar context:',
     contextBlock

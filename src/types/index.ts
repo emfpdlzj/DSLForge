@@ -32,9 +32,26 @@ export interface ProjectDetectionResult {
   context: ProjectContext;
 }
 
+export type GrammarContextFileKind =
+  | 'active-grammar'
+  | 'imported-grammar'
+  | 'sibling-grammar'
+  | 'config'
+  | 'package-json';
+
+export type GrammarContextLanguageId = 'langium' | 'json' | 'plaintext';
+
+export interface GrammarContextFileSelection {
+  filePath: string;
+  kind: GrammarContextFileKind;
+  languageId: GrammarContextLanguageId;
+  detail?: string;
+}
+
 export interface GrammarContextSelection {
   activeGrammarFile?: string;
   relatedFiles: string[];
+  contextFiles: GrammarContextFileSelection[];
   notes: string[];
 }
 

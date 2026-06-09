@@ -1,11 +1,13 @@
 import * as vscode from 'vscode';
 import { appendOutputDivider, appendOutputLine, showOutputChannel } from './outputChannel';
 import type { ResolvedProjectContext } from './projectService';
+import type { GrammarContextFileSelection } from '../types';
 
 export interface GrammarContextFile {
   filePath: string;
   content: string;
   truncated: boolean;
+  languageId: string;
 }
 
 export interface GrammarModelContext {
@@ -20,17 +22,22 @@ export interface ModelTextRequest {
   prompt: string;
 }
 
-const MAX_CONTEXT_FILES = 3;
+const MAX_CONTEXT_FILES = 5;
 const MAX_CHARACTERS_PER_FILE = 8000;
 const MAX_TOTAL_CHARACTERS = 20000;
 
 function uniqueFilePaths(projectContext: ResolvedProjectContext): string[] {
-  const orderedPaths = [
-    projectContext.context.activeGrammarFile,
-    ...projectContext.context.relatedFiles
-  ].filter((value): value is string => Boolean(value));
+  return [
+    ...new Set(projectContext.context.contextFiles.map((file) => file.filePath))
+  ];
+}
 
-  return [...new Set(orderedPaths)];
+function selectionByPath(
+  projectContext: ResolvedProjectContext
+): Map<string, GrammarContextFileSelection> {
+  return new Map(
+    projectContext.context.contextFiles.map((file) => [file.filePath, file])
+  );
 }
 
 async function readFileContent(filePath: string): Promise<string> {
@@ -43,6 +50,7 @@ export async function collectGrammarModelContext(
 ): Promise<GrammarModelContext> {
   const files: GrammarContextFile[] = [];
   let remainingCharacters = MAX_TOTAL_CHARACTERS;
+  const selections = selectionByPath(projectContext);
 
   for (const filePath of uniqueFilePaths(projectContext).slice(0, MAX_CONTEXT_FILES)) {
     if (remainingCharacters <= 0) {
@@ -59,11 +67,18 @@ export async function collectGrammarModelContext(
     const content = truncated
       ? `${rawContent.slice(0, cappedLength)}\n// DSLForge note: file content truncated for model context.`
       : rawContent;
+    const selection = selections.get(filePath);
 
     files.push({
-      filePath,
+      filePath:
+        selection?.detail
+          ? `${filePath} [${selection.kind}: ${selection.detail}]`
+          : selection
+            ? `${filePath} [${selection.kind}]`
+            : filePath,
       content,
-      truncated
+      truncated,
+      languageId: selection?.languageId ?? 'text'
     });
     remainingCharacters -= content.length;
   }
@@ -84,7 +99,7 @@ export function buildGrammarContextBlock(context: GrammarModelContext): string {
       (file, index) =>
         `## File ${index + 1}: ${file.filePath}\n` +
         `Truncated: ${file.truncated ? 'yes' : 'no'}\n` +
-        '```langium\n' +
+        `\`\`\`${file.languageId}\n` +
         `${file.content}\n` +
         '```'
     )
@@ -107,9 +122,9 @@ export function appendGrammarAiReport(
   appendOutputLine(`context files: ${context.files.length}`);
   appendOutputLine(`context characters: ${context.totalCharacters}`);
 
-  for (const file of context.files) {
+  for (const file of projectContext.context.contextFiles) {
     appendOutputLine(
-      `- file: ${file.filePath}${file.truncated ? ' (truncated)' : ''}`
+      `- file: ${file.filePath} [${file.kind}]${file.detail ? ` (${file.detail})` : ''}`
     );
   }
 }

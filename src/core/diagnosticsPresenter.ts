@@ -148,7 +148,7 @@ function appendValidationReport(
     `active grammar: ${projectContext.context.activeGrammarFile ?? 'none'}`
   );
   appendOutputLine(
-    `related files: ${projectContext.context.relatedFiles.length > 0 ? projectContext.context.relatedFiles.join(', ') : 'none'}`
+    `selected context files: ${projectContext.context.contextFiles.length > 0 ? projectContext.context.contextFiles.map((file) => file.filePath).join(', ') : 'none'}`
   );
   appendOutputLine(
     `command source: ${result.plan.command.source}`
