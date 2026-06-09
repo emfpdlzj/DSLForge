@@ -13,7 +13,12 @@
   ],
   "keywords": [],
   "main": "dist/extension.js",
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:dslforge.createDslScaffold",
+    "onCommand:dslforge.generateSampleDsl",
+    "onCommand:dslforge.validateCurrentGrammar",
+    "onCommand:dslforge.explainCurrentGrammar"
+  ],
   "contributes": {
     "configuration": {
       "title": "DSLForge",
