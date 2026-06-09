@@ -8,6 +8,7 @@ import type {
 } from '../core/adapter';
 import { createProjectContext } from '../core/projectContext';
 import { detectLangiumProject } from './projectDetection';
+import { interpretLangiumValidationOutput } from './validationDiagnostics';
 import type {
   GrammarContextSelection,
   ProjectDetectionResult,
@@ -118,5 +119,7 @@ export const langiumAdapter: DslAdapter = {
   displayName: 'Langium',
   detect,
   selectContext,
-  getValidationPreferences
+  getValidationPreferences,
+  interpretValidationOutput: async (input) =>
+    interpretLangiumValidationOutput(input)
 };

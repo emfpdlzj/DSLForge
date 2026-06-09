@@ -2,7 +2,10 @@ import type { ResolvedProjectContext } from './projectService';
 import type { ValidationRunResult } from '../types';
 import { appendOutputLine } from './outputChannel';
 import { runShellCommand } from './commandRunner';
-import { parseValidationIssues } from './validationDiagnostics';
+import {
+  dedupeValidationIssues,
+  parseValidationIssues
+} from './validationDiagnostics';
 import { resolveValidationPlan } from './validationCommandResolver';
 
 export class ValidationOrchestrator {
@@ -38,7 +41,20 @@ export class ValidationOrchestrator {
       plan.command.commandLine!,
       projectContext.workspaceFolder.uri.fsPath
     );
-    const issues = parseValidationIssues(execution.combinedOutput);
+    const interpretedIssues = projectContext.adapter.interpretValidationOutput
+      ? await projectContext.adapter.interpretValidationOutput({
+          project: projectContext.detection,
+          context: projectContext.context,
+          rawOutput: execution.combinedOutput
+        })
+      : [];
+    const genericIssues = parseValidationIssues(execution.combinedOutput, {
+      workspaceRoot: projectContext.workspaceFolder.uri.fsPath
+    });
+    const issues = dedupeValidationIssues([
+      ...interpretedIssues,
+      ...genericIssues
+    ]);
 
     if (execution.exitCode === 0) {
       return {
