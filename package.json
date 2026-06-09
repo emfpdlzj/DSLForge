@@ -1,7 +1,7 @@
 {
-  "name": "llm-grammer",
-  "displayName": "LLM Grammer",
-  "description": "Langium-compatible assistant for DSL authors in Visual Studio Code.",
+  "name": "langforge",
+  "displayName": "LangForge",
+  "description": "Langium authoring assistant for DSL developers in Visual Studio Code.",
   "version": "0.0.1",
   "publisher": "emfpdlzj",
   "engines": {
@@ -17,24 +17,24 @@
   "contributes": {
     "commands": [
       {
-        "command": "llmGrammer.createDslScaffold",
-        "title": "LLM Grammer: Create DSL Scaffold",
-        "category": "LLM Grammer"
+        "command": "langforge.createDslScaffold",
+        "title": "LangForge: Create DSL Scaffold",
+        "category": "LangForge"
       },
       {
-        "command": "llmGrammer.generateSampleDsl",
-        "title": "LLM Grammer: Generate Sample DSL",
-        "category": "LLM Grammer"
+        "command": "langforge.generateSampleDsl",
+        "title": "LangForge: Generate Sample DSL",
+        "category": "LangForge"
       },
       {
-        "command": "llmGrammer.validateCurrentGrammar",
-        "title": "LLM Grammer: Validate Current Grammar",
-        "category": "LLM Grammer"
+        "command": "langforge.validateCurrentGrammar",
+        "title": "LangForge: Validate Current Grammar",
+        "category": "LangForge"
       },
       {
-        "command": "llmGrammer.explainCurrentGrammar",
-        "title": "LLM Grammer: Explain Current Grammar",
-        "category": "LLM Grammer"
+        "command": "langforge.explainCurrentGrammar",
+        "title": "LangForge: Explain Current Grammar",
+        "category": "LangForge"
       }
     ]
   },
@@ -48,15 +48,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/emfpdlzj/llm-grammer.git"
+    "url": "git+https://github.com/emfpdlzj/LangForge.git"
   },
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/emfpdlzj/llm-grammer/issues"
+    "url": "https://github.com/emfpdlzj/LangForge/issues"
   },
-  "homepage": "https://github.com/emfpdlzj/llm-grammer#readme",
+  "homepage": "https://github.com/emfpdlzj/LangForge#readme",
   "devDependencies": {
     "@types/node": "^24.13.1",
     "@types/vscode": "^1.120.0",

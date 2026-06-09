@@ -1,8 +1,8 @@
-# LLM Grammer Project Spec
+# LangForge Project Spec
 
 ## 1. Summary
 
-LLM Grammer is a VS Code extension for developers who design domain-specific languages with Langium.
+LangForge is a VS Code extension for developers who design domain-specific languages with Langium.
 It does not aim to replace Langium or build a new DSL runtime.
 Its role is to shorten the grammar authoring and validation loop by combining:
 
@@ -115,7 +115,7 @@ Recommended approach:
 
 - Use the VS Code Language Model API
 - Prefer the user's existing Copilot/VS Code model environment
-- Keep core non-AI workflows functional without model access where possible
+- AI-dependent commands should explicitly require Copilot or a supported VS Code model environment
 
 AI-assisted tasks:
 
@@ -131,6 +131,18 @@ Non-AI core tasks:
 - Langium command execution or orchestration
 - diagnostics collection
 - result presentation in VS Code
+
+AI availability policy:
+
+- `Explain Current Grammar`, `Create DSL Scaffold`, and `Generate Sample DSL` require Copilot or a supported VS Code model environment
+- If no supported model environment is available, the extension should explain what is required and stop the AI command
+- `Validate Current Grammar` must remain fully usable without AI
+
+Model-unavailable UX:
+
+- Explain that Copilot or a supported VS Code model environment is required
+- Point the user to sign-in or model setup
+- Do not attempt a low-quality pseudo-AI fallback
 
 ## 9. MVP
 
@@ -164,6 +176,7 @@ Each command should:
 - show what context was used
 - avoid silent destructive changes
 - prefer previewable outputs and explicit acceptance
+- if an AI command cannot run due to missing model access, explain the requirement clearly instead of degrading silently
 
 ### 10.2 Editing philosophy
 
@@ -171,6 +184,13 @@ Each command should:
 - Preview before write when changes are non-trivial
 - Human-readable explanations for every important action
 - No hidden autonomous loops in MVP
+
+### 10.3 Validation UX
+
+- Show which workspace command was executed
+- Show which files or project signals were used to choose the command
+- Convert raw validation output into structured diagnostics when possible
+- Keep the validation path aligned with the real workspace and CI flow
 
 ## 11. Technical Direction
 
@@ -193,7 +213,14 @@ Each command should:
 - `src/types`
   Shared domain types
 
-### 11.3 Future package split
+### 11.3 Command and setting naming
+
+- extension/package name: `langforge`
+- display name: `LangForge`
+- command prefix: `langforge.*`
+- planned setting prefix: `langforge.*`
+
+### 11.4 Future package split
 
 If the codebase grows, split into:
 
@@ -210,6 +237,7 @@ The MVP is successful if a Langium user can:
 - understand diagnostics more quickly than with raw CLI output alone
 - get a useful explanation of the current grammar
 - generate a reasonable starting scaffold or sample when needed
+- understand why an AI command cannot run when model access is unavailable
 
 ## 13. Risks
 
@@ -227,12 +255,18 @@ The MVP is successful if a Langium user can:
 - command registration
 - Langium project detection
 - validation command skeleton
+- workspace-script-based validation execution design
+- Output Channel and command execution wrapper
+- baseline test fixtures for Langium workspaces
 
 ### Phase 2
 
 - diagnostics capture and structured presentation
 - grammar explanation flow
 - prompt/context design for explanation
+- missing-model guidance UX for AI commands
+- validation command discovery and prioritization
+- VS Code diagnostics integration
 
 ### Phase 3
 
@@ -240,16 +274,66 @@ The MVP is successful if a Langium user can:
 - sample DSL generation
 - preview-oriented write flow
 
-## 15. Open Questions
+### Phase 4
+
+- fixture-based integration tests
+- README and command documentation
+- packaging and release readiness
+
+## 15. Implementation Plan
+
+### 15.1 Validation execution order
+
+Validation should run in this order:
+
+1. user-configured workspace validation command
+2. auto-detected `package.json` script such as `validate`, `langium:validate`, or `build`
+3. a clear error telling the user to configure a validation command
+
+Rationale:
+
+- keeps the extension aligned with the project's actual build flow
+- avoids tight coupling to Langium internals too early
+- allows custom validators and build checks to remain part of the workflow
+
+### 15.2 Project detection responsibilities
+
+Project detection should identify:
+
+- the active grammar file
+- related grammar files
+- workspace root
+- package metadata
+- Langium-related config and generated artifacts when relevant
+
+### 15.3 AI command responsibilities
+
+- `Explain Current Grammar` should summarize grammar structure, important rules, likely intent, and notable risks
+- `Create DSL Scaffold` should propose a starting structure and preview it before any write
+- `Generate Sample DSL` should provide example inputs derived from the current grammar context
+
+### 15.4 Non-goals for early implementation
+
+- internal Langium API as the primary validation engine
+- autonomous multi-file edits without review
+- pretending AI features work without model access
+
+## 16. Open Questions
 
 - How should Langium project detection be defined precisely?
 - Which files should be included by default as AI context?
-- Should validation call local scripts, Langium CLI, or internal APIs first?
-- What is the fallback UX when no language model is available?
+- How should workspace validation scripts be discovered and prioritized?
+- What exact guidance should be shown when no supported model environment is available?
 - How much automatic file writing is acceptable in the first release?
 
-## 16. Current Decision
+## 17. Current Decision
 
 Current working decision:
 
-Build a TypeScript-based VS Code extension that acts as a Langium-compatible assistant for DSL authors, with MVP value centered on validation, explanation, and scaffold support rather than engine creation.
+Build a TypeScript-based VS Code extension named LangForge that acts as a Langium-compatible assistant for DSL authors. The MVP should center on workspace-script-based validation, grammar explanation, and scaffold support rather than engine creation. AI-assisted commands should require Copilot or another supported VS Code model environment instead of pretending to offer a fallback when none is available.
+
+Additional confirmed decisions:
+
+- validation should follow the workspace's real scriptable workflow before any deeper Langium integration is attempted
+- command and setting identifiers should use the `langforge` prefix consistently
+- preview-oriented output is preferred for generated artifacts and non-trivial edits

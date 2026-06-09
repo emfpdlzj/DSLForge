@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { registerCommands } from './commands';
 
 export function activate(context: vscode.ExtensionContext): void {
-  console.log('LLM Grammer is now active.');
+  console.log('LangForge is now active.');
   registerCommands(context);
 }
 
