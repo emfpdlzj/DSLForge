@@ -3,7 +3,14 @@ export type FrameworkId = 'langium';
 export type ValidationCommandSource = 'user-configured' | 'package-script' | 'missing';
 
 export interface ProjectSignal {
-  kind: 'workspace-folder' | 'active-file' | 'grammar-file' | 'package-json';
+  kind:
+    | 'workspace-folder'
+    | 'active-file'
+    | 'grammar-file'
+    | 'package-json'
+    | 'config-file'
+    | 'dependency'
+    | 'script';
   value: string;
   detail?: string;
 }

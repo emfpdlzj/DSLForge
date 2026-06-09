@@ -11,8 +11,7 @@ import { detectLangiumProject } from './projectDetection';
 import { interpretLangiumValidationOutput } from './validationDiagnostics';
 import type {
   GrammarContextSelection,
-  ProjectDetectionResult,
-  ProjectSignal
+  ProjectDetectionResult
 } from '../types';
 
 async function collectGrammarFiles(workspaceRoot: string): Promise<string[]> {
@@ -22,62 +21,30 @@ async function collectGrammarFiles(workspaceRoot: string): Promise<string[]> {
   return grammarUris.map((uri) => uri.fsPath);
 }
 
-function buildSignals(workspaceRoot: string, activeFile: string | undefined, grammarFiles: string[]): ProjectSignal[] {
-  const signals: ProjectSignal[] = [
-    {
-      kind: 'workspace-folder',
-      value: workspaceRoot
-    }
-  ];
-
-  if (activeFile) {
-    signals.push({
-      kind: 'active-file',
-      value: activeFile
-    });
-  }
-
-  for (const grammarFile of grammarFiles) {
-    signals.push({
-      kind: 'grammar-file',
-      value: grammarFile
-    });
-  }
-
-  signals.push({
-    kind: 'package-json',
-    value: `${workspaceRoot}/package.json`
-  });
-
-  return signals;
-}
-
 async function detect(input: AdapterDetectionInput): Promise<ProjectDetectionResult | undefined> {
   const grammarFiles = await collectGrammarFiles(input.workspaceRoot);
-  const isActiveLangiumFile = input.activeFile?.endsWith('.langium') ?? false;
-
-  if (!isActiveLangiumFile && grammarFiles.length === 0) {
-    return undefined;
-  }
-
-  const detection = detectLangiumProject({
+  const detection = await detectLangiumProject({
     workspaceRoot: input.workspaceRoot,
     activeFile: input.activeFile,
     grammarFiles
   });
 
+  if (!detection) {
+    return undefined;
+  }
+
   return {
     adapterId: 'langium',
     framework: 'langium',
     displayName: 'Langium',
-    confidence: isActiveLangiumFile ? 100 : 80,
+    confidence: detection.confidence,
     context: createProjectContext({
       adapterId: 'langium',
       framework: 'langium',
       workspaceRoot: input.workspaceRoot,
       activeFile: input.activeFile,
       grammarFiles: detection.grammarFiles,
-      signals: buildSignals(input.workspaceRoot, input.activeFile, detection.grammarFiles)
+      signals: detection.signals
     })
   };
 }

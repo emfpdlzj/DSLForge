@@ -6,6 +6,8 @@ export type PackageManager = 'npm' | 'pnpm' | 'yarn' | 'bun';
 export interface WorkspacePackageManifest {
   packageManager?: string;
   scripts?: Record<string, string>;
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
 }
 
 export interface WorkspacePackageInfo {

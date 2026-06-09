@@ -1,0 +1,13 @@
+{
+  "projectName": "PackageScriptFixture",
+  "languages": [
+    {
+      "id": "package-script-fixture",
+      "grammar": "src/language/package-script.langium",
+      "fileExtensions": [
+        ".pkg"
+      ]
+    }
+  ],
+  "out": "src/language/generated"
+}

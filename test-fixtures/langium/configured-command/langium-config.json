@@ -1,0 +1,13 @@
+{
+  "projectName": "ConfiguredCommandFixture",
+  "languages": [
+    {
+      "id": "configured-command-fixture",
+      "grammar": "src/language/configured.langium",
+      "fileExtensions": [
+        ".cfg"
+      ]
+    }
+  ],
+  "out": "src/language/generated"
+}

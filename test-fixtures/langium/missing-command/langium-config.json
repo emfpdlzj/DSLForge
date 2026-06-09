@@ -1,0 +1,13 @@
+{
+  "projectName": "MissingCommandFixture",
+  "languages": [
+    {
+      "id": "missing-command-fixture",
+      "grammar": "src/language/missing-command.langium",
+      "fileExtensions": [
+        ".miss"
+      ]
+    }
+  ],
+  "out": "src/language/generated"
+}
