@@ -12,6 +12,7 @@ export class ValidationOrchestrator {
   public async runValidation(
     projectContext: ResolvedProjectContext
   ): Promise<ValidationRunResult> {
+    const startedAt = Date.now();
     const preferences = await projectContext.adapter.getValidationPreferences({
       project: projectContext.detection,
       context: projectContext.context
@@ -29,7 +30,8 @@ export class ValidationOrchestrator {
         status: 'needs_configuration',
         summary: 'Validation command configuration is required before validation can run.',
         plan,
-        issues: []
+        issues: [],
+        durationMs: Date.now() - startedAt
       };
     }
 
@@ -63,7 +65,8 @@ export class ValidationOrchestrator {
         plan,
         issues,
         rawOutput: execution.combinedOutput,
-        exitCode: execution.exitCode
+        exitCode: execution.exitCode,
+        durationMs: Date.now() - startedAt
       };
     }
 
@@ -73,7 +76,8 @@ export class ValidationOrchestrator {
       plan,
       issues,
       rawOutput: execution.combinedOutput,
-      exitCode: execution.exitCode
+      exitCode: execution.exitCode,
+      durationMs: Date.now() - startedAt
     };
   }
 }

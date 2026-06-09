@@ -66,4 +66,5 @@ export interface ValidationRunResult {
   issues: ValidationIssue[];
   rawOutput?: string;
   exitCode?: number | null;
+  durationMs?: number;
 }

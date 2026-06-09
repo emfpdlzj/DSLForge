@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
-import { appendOutputLine, showOutputChannel } from './outputChannel';
+import {
+  appendOutputDivider,
+  appendOutputLine,
+  showOutputChannel
+} from './outputChannel';
 import type { ResolvedProjectContext } from './projectService';
 import type { ValidationIssue, ValidationRunResult } from '../types';
 import { publishValidationIssues } from './validationDiagnostics';
@@ -14,6 +18,14 @@ interface MessageAction {
   title: string;
   command?: string;
   arguments?: unknown[];
+}
+
+interface IssueSummary {
+  errors: number;
+  warnings: number;
+  infos: number;
+  files: number;
+  unlocated: number;
 }
 
 function buildValidationMessageDetail(result: ValidationRunResult): string {
@@ -50,6 +62,150 @@ function createMissingConfigurationIssue(
   ];
 }
 
+function buildIssueSummary(issues: ValidationIssue[]): IssueSummary {
+  const files = new Set<string>();
+  let errors = 0;
+  let warnings = 0;
+  let infos = 0;
+  let unlocated = 0;
+
+  for (const issue of issues) {
+    if (issue.filePath) {
+      files.add(issue.filePath);
+    } else {
+      unlocated += 1;
+    }
+
+    if (issue.severity === 'warning') {
+      warnings += 1;
+      continue;
+    }
+
+    if (issue.severity === 'info') {
+      infos += 1;
+      continue;
+    }
+
+    errors += 1;
+  }
+
+  return {
+    errors,
+    warnings,
+    infos,
+    files: files.size,
+    unlocated
+  };
+}
+
+function formatIssueLocation(issue: ValidationIssue): string {
+  if (!issue.filePath || !issue.line || !issue.column) {
+    return 'unlocated';
+  }
+
+  return `${issue.filePath}:${issue.line}:${issue.column}`;
+}
+
+function formatIssueSummary(summary: IssueSummary): string {
+  return `${summary.errors} error(s), ${summary.warnings} warning(s), ${summary.infos} info message(s) across ${summary.files} file(s)`;
+}
+
+function appendIssuePreview(issues: ValidationIssue[]): void {
+  const previewLimit = 10;
+
+  if (issues.length === 0) {
+    appendOutputLine('No structured diagnostics were extracted from the validation output.');
+    return;
+  }
+
+  for (const issue of issues.slice(0, previewLimit)) {
+    const codeLabel = issue.code ? ` [${issue.code}]` : '';
+    appendOutputLine(
+      `- ${issue.severity.toUpperCase()}${codeLabel} ${formatIssueLocation(issue)} ${issue.message}`
+    );
+  }
+
+  if (issues.length > previewLimit) {
+    appendOutputLine(
+      `... ${issues.length - previewLimit} more issue(s) omitted from the preview.`
+    );
+  }
+}
+
+function appendValidationReport(
+  projectContext: ResolvedProjectContext,
+  result: ValidationRunResult,
+  publishedIssues: ValidationIssue[]
+): void {
+  const issueSummary = buildIssueSummary(publishedIssues);
+  const timestamp = new Date().toISOString();
+
+  appendOutputDivider(`DSLForge Validation Report ${timestamp}`);
+  appendOutputLine(`workspace: ${projectContext.workspaceFolder.uri.fsPath}`);
+  appendOutputLine(`adapter: ${projectContext.adapter.displayName}`);
+  appendOutputLine(`status: ${result.status}`);
+  appendOutputLine(
+    `active grammar: ${projectContext.context.activeGrammarFile ?? 'none'}`
+  );
+  appendOutputLine(
+    `related files: ${projectContext.context.relatedFiles.length > 0 ? projectContext.context.relatedFiles.join(', ') : 'none'}`
+  );
+  appendOutputLine(
+    `command source: ${result.plan.command.source}`
+  );
+  appendOutputLine(
+    `command detail: ${result.plan.command.detail}`
+  );
+
+  if (result.plan.command.commandLine) {
+    appendOutputLine(`command line: ${result.plan.command.commandLine}`);
+  }
+
+  if (typeof result.exitCode !== 'undefined') {
+    appendOutputLine(`exit code: ${result.exitCode}`);
+  }
+
+  if (typeof result.durationMs !== 'undefined') {
+    appendOutputLine(`duration: ${result.durationMs}ms`);
+  }
+
+  appendOutputLine(`summary: ${result.summary}`);
+  appendOutputLine(`structured diagnostics: ${formatIssueSummary(issueSummary)}`);
+
+  if (issueSummary.unlocated > 0) {
+    appendOutputLine(`unlocated diagnostics: ${issueSummary.unlocated}`);
+  }
+
+  appendOutputDivider('Context Notes');
+
+  if (projectContext.context.notes.length === 0) {
+    appendOutputLine('No context notes recorded.');
+  } else {
+    for (const note of projectContext.context.notes) {
+      appendOutputLine(`- ${note}`);
+    }
+  }
+
+  appendOutputDivider('Project Signals');
+
+  if (projectContext.detection.context.signals.length === 0) {
+    appendOutputLine('No project signals recorded.');
+  } else {
+    for (const signal of projectContext.detection.context.signals) {
+      const detail = signal.detail ? ` (${signal.detail})` : '';
+      appendOutputLine(`- ${signal.kind}: ${signal.value}${detail}`);
+    }
+  }
+
+  appendOutputDivider('Validation Rationale');
+  for (const rationaleLine of result.plan.rationale) {
+    appendOutputLine(`- ${rationaleLine}`);
+  }
+
+  appendOutputDivider('Diagnostic Preview');
+  appendIssuePreview(publishedIssues);
+}
+
 async function showMessageWithActions(
   severity: 'info' | 'warning' | 'error',
   message: string,
@@ -80,45 +236,22 @@ export class DiagnosticsPresenter {
     projectContext: ResolvedProjectContext,
     result: ValidationRunResult
   ): Promise<void> {
-    appendOutputLine(
-      `[validation] adapter=${projectContext.adapter.id} workspace=${projectContext.workspaceFolder.uri.fsPath}`
-    );
-    appendOutputLine(
-      `[validation] activeGrammar=${projectContext.context.activeGrammarFile ?? 'none'}`
-    );
-    appendOutputLine(`[validation] status=${result.status}`);
-    appendOutputLine(
-      `[validation] commandSource=${result.plan.command.source}`
-    );
-    appendOutputLine(`[validation] commandDetail=${result.plan.command.detail}`);
-
-    if (result.plan.command.commandLine) {
-      appendOutputLine(
-        `[validation] command=${result.plan.command.commandLine}`
-      );
-    }
-
-    for (const rationaleLine of result.plan.rationale) {
-      appendOutputLine(`[validation] rationale=${rationaleLine}`);
-    }
-
-    if (typeof result.exitCode !== 'undefined') {
-      appendOutputLine(`[validation] exitCode=${result.exitCode}`);
-    }
-
-    appendOutputLine(`[validation] issueCount=${result.issues.length}`);
-
     const issuesToPublish =
       result.status === 'needs_configuration'
         ? [...result.issues, ...createMissingConfigurationIssue(projectContext, result)]
         : result.issues;
 
     publishValidationIssues(issuesToPublish);
+    appendValidationReport(projectContext, result, issuesToPublish);
     showOutputChannel();
 
     const outputAction: MessageAction = {
       title: 'Show Output',
       command: 'workbench.action.output.toggleOutput'
+    };
+    const problemsAction: MessageAction = {
+      title: 'Show Problems',
+      command: 'workbench.actions.view.problems'
     };
     const settingsAction: MessageAction = {
       title: 'Open Settings',
@@ -131,25 +264,27 @@ export class DiagnosticsPresenter {
     };
 
     if (result.status === 'succeeded') {
-      const message = `DSLForge validation succeeded using ${buildValidationMessageDetail(result)}.`;
+      const summary = buildIssueSummary(issuesToPublish);
+      const message = `DSLForge validation succeeded using ${buildValidationMessageDetail(result)}. ${formatIssueSummary(summary)}.`;
       const actions =
         result.plan.command.source === 'user-configured'
-          ? [outputAction, settingsAction]
+          ? [problemsAction, outputAction, settingsAction]
           : result.plan.command.source === 'package-script'
-            ? [outputAction, packageJsonAction]
-            : [outputAction];
+            ? [problemsAction, outputAction, packageJsonAction]
+            : [problemsAction, outputAction];
       await showMessageWithActions('info', message, actions);
       return;
     }
 
     if (result.status === 'failed') {
-      const message = `DSLForge validation failed using ${buildValidationMessageDetail(result)}. See Output and Problems for details.`;
+      const summary = buildIssueSummary(issuesToPublish);
+      const message = `DSLForge validation failed using ${buildValidationMessageDetail(result)}. ${formatIssueSummary(summary)}.`;
       const actions =
         result.plan.command.source === 'user-configured'
-          ? [outputAction, settingsAction]
+          ? [problemsAction, outputAction, settingsAction]
           : result.plan.command.source === 'package-script'
-            ? [outputAction, packageJsonAction]
-            : [outputAction];
+            ? [problemsAction, outputAction, packageJsonAction]
+            : [problemsAction, outputAction];
       await showMessageWithActions('warning', message, actions);
       return;
     }
@@ -157,7 +292,7 @@ export class DiagnosticsPresenter {
     await showMessageWithActions(
       'warning',
       'DSLForge could not resolve a validation command. Configure dslforge.validation.command or add a supported package.json script.',
-      [settingsAction, packageJsonAction, outputAction]
+      [settingsAction, packageJsonAction, problemsAction, outputAction]
     );
   }
 }
