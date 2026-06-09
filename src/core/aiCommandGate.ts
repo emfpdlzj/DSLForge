@@ -4,6 +4,7 @@ import {
   appendOutputLine,
   showOutputChannel
 } from './outputChannel';
+import { showAiSetupGuidance } from './userGuidance';
 
 export type AiGateStatus = 'ready' | 'missing_model' | 'no_access';
 
@@ -14,9 +15,6 @@ export interface AiGateResult {
   selectedModel?: vscode.LanguageModelChat;
   availableModelCount: number;
 }
-
-const OPEN_AI_SETTINGS_ACTION = 'Open Settings';
-const SHOW_OUTPUT_ACTION = 'Show Output';
 
 function preferModel(
   models: readonly vscode.LanguageModelChat[],
@@ -40,28 +38,6 @@ function preferModel(
   }
 
   return copilotModels[0] ?? models[0];
-}
-
-async function showBlockedAiMessage(result: AiGateResult): Promise<void> {
-  const selection = await vscode.window.showWarningMessage(
-    result.message,
-    OPEN_AI_SETTINGS_ACTION,
-    SHOW_OUTPUT_ACTION
-  );
-
-  if (selection === OPEN_AI_SETTINGS_ACTION) {
-    await vscode.commands.executeCommand(
-      'workbench.action.openSettings',
-      'chat'
-    );
-    return;
-  }
-
-  if (selection === SHOW_OUTPUT_ACTION) {
-    await vscode.commands.executeCommand(
-      'workbench.action.output.toggleOutput'
-    );
-  }
 }
 
 function appendAiGateReport(result: AiGateResult): void {
@@ -100,7 +76,7 @@ export class AiCommandGate {
 
       appendAiGateReport(result);
       showOutputChannel();
-      await showBlockedAiMessage(result);
+      await showAiSetupGuidance(featureName, result.message);
       return result;
     }
 
@@ -115,7 +91,7 @@ export class AiCommandGate {
 
       appendAiGateReport(result);
       showOutputChannel();
-      await showBlockedAiMessage(result);
+      await showAiSetupGuidance(featureName, result.message);
       return result;
     }
 

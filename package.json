@@ -28,6 +28,24 @@
           "default": 250000,
           "minimum": 10000,
           "markdownDescription": "Maximum number of output characters DSLForge keeps in memory while validation is running. Additional output is still streamed to the Output panel but is not retained for diagnostics parsing."
+        },
+        "dslforge.ai.maxContextFiles": {
+          "type": "number",
+          "default": 5,
+          "minimum": 1,
+          "markdownDescription": "Maximum number of selected context files DSLForge sends to AI-backed commands such as `Explain Current Grammar`, `Create DSL Scaffold`, and `Generate Sample DSL`."
+        },
+        "dslforge.ai.maxCharactersPerFile": {
+          "type": "number",
+          "default": 8000,
+          "minimum": 1000,
+          "markdownDescription": "Maximum number of characters DSLForge includes from any single context file for AI-backed commands."
+        },
+        "dslforge.ai.maxContextCharacters": {
+          "type": "number",
+          "default": 20000,
+          "minimum": 4000,
+          "markdownDescription": "Maximum total number of context characters DSLForge sends to AI-backed commands across all selected files."
         }
       }
     },

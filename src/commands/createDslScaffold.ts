@@ -4,6 +4,10 @@ import {
   dslScaffoldService,
   projectService
 } from '../core/services';
+import {
+  showFeatureExecutionError,
+  showUnsupportedWorkspaceGuidance
+} from '../core/userGuidance';
 
 export const CREATE_DSL_SCAFFOLD_COMMAND = 'dslforge.createDslScaffold';
 
@@ -12,9 +16,7 @@ export function createDslScaffold(): vscode.Disposable {
     const projectContext = await projectService.resolveProjectContext();
 
     if (!projectContext) {
-      await vscode.window.showWarningMessage(
-        'DSLForge could not detect a supported DSL project in the current workspace.'
-      );
+      await showUnsupportedWorkspaceGuidance('Create DSL Scaffold');
       return;
     }
 
@@ -36,7 +38,7 @@ export function createDslScaffold(): vscode.Disposable {
         error instanceof Error
           ? error.message
           : 'DSLForge could not create a DSL scaffold proposal.';
-      await vscode.window.showErrorMessage(message);
+      await showFeatureExecutionError('Create DSL Scaffold', message);
     }
   });
 }

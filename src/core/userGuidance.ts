@@ -1,0 +1,93 @@
+import * as vscode from 'vscode';
+import {
+  appendOutputDivider,
+  appendOutputLine,
+  showOutputChannel
+} from './outputChannel';
+
+const OPEN_CHAT_SETTINGS_ACTION = 'Open Chat Settings';
+const SHOW_OUTPUT_ACTION = 'Show Output';
+
+async function showMessageWithActions(
+  message: string,
+  actions: readonly string[]
+): Promise<string | undefined> {
+  return vscode.window.showWarningMessage(message, ...actions);
+}
+
+export async function showUnsupportedWorkspaceGuidance(
+  featureName: string
+): Promise<void> {
+  const message =
+    `DSLForge could not detect a supported DSL workspace for ${featureName}. ` +
+    'In v0.1, DSLForge supports Langium workspaces. Open a workspace with .langium files or langium-config.json, then retry.';
+
+  appendOutputDivider(`DSLForge Workspace Guidance ${featureName}`);
+  appendOutputLine(`message: ${message}`);
+  showOutputChannel();
+
+  const selection = await showMessageWithActions(message, [SHOW_OUTPUT_ACTION]);
+
+  if (selection === SHOW_OUTPUT_ACTION) {
+    await vscode.commands.executeCommand('workbench.action.output.toggleOutput');
+  }
+}
+
+export async function showFeatureExecutionError(
+  featureName: string,
+  message: string
+): Promise<void> {
+  appendOutputDivider(`DSLForge Error ${featureName}`);
+  appendOutputLine(`message: ${message}`);
+  showOutputChannel();
+
+  const selection = await vscode.window.showErrorMessage(
+    message,
+    SHOW_OUTPUT_ACTION
+  );
+
+  if (selection === SHOW_OUTPUT_ACTION) {
+    await vscode.commands.executeCommand('workbench.action.output.toggleOutput');
+  }
+}
+
+export async function showAiSetupGuidance(
+  featureName: string,
+  message: string
+): Promise<void> {
+  appendOutputDivider(`DSLForge AI Setup Guidance ${featureName}`);
+  appendOutputLine(`message: ${message}`);
+  showOutputChannel();
+
+  const selection = await showMessageWithActions(message, [
+    OPEN_CHAT_SETTINGS_ACTION,
+    SHOW_OUTPUT_ACTION
+  ]);
+
+  if (selection === OPEN_CHAT_SETTINGS_ACTION) {
+    await vscode.commands.executeCommand(
+      'workbench.action.openSettings',
+      'chat'
+    );
+    return;
+  }
+
+  if (selection === SHOW_OUTPUT_ACTION) {
+    await vscode.commands.executeCommand('workbench.action.output.toggleOutput');
+  }
+}
+
+export async function showMissingWorkspacePackageJsonGuidance(): Promise<void> {
+  const message =
+    'DSLForge could not open package.json in the workspace root. Confirm that the workspace root is correct, then retry.';
+
+  appendOutputDivider('DSLForge package.json Guidance');
+  appendOutputLine(`message: ${message}`);
+  showOutputChannel();
+
+  const selection = await showMessageWithActions(message, [SHOW_OUTPUT_ACTION]);
+
+  if (selection === SHOW_OUTPUT_ACTION) {
+    await vscode.commands.executeCommand('workbench.action.output.toggleOutput');
+  }
+}

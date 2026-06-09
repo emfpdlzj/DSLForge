@@ -4,6 +4,7 @@ import {
   projectService,
   validationOrchestrator
 } from '../core/services';
+import { showUnsupportedWorkspaceGuidance } from '../core/userGuidance';
 
 export const VALIDATE_CURRENT_GRAMMAR_COMMAND = 'dslforge.validateCurrentGrammar';
 
@@ -12,9 +13,7 @@ export function validateCurrentGrammar(): vscode.Disposable {
     const projectContext = await projectService.resolveProjectContext();
 
     if (!projectContext) {
-      await vscode.window.showWarningMessage(
-        'DSLForge could not detect a supported DSL project in the current workspace.'
-      );
+      await showUnsupportedWorkspaceGuidance('Validate Current Grammar');
       return;
     }
 

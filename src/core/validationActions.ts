@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
+import { showMissingWorkspacePackageJsonGuidance } from './userGuidance';
 
 export const OPEN_VALIDATION_SETTINGS_COMMAND =
   'dslforge.openValidationSettings';
@@ -34,9 +35,7 @@ export function registerValidationActionCommands(
         const packageJsonPath = path.join(args.workspaceRoot, 'package.json');
 
         if (!fs.existsSync(packageJsonPath)) {
-          await vscode.window.showWarningMessage(
-            'DSLForge could not find package.json in the workspace root.'
-          );
+          await showMissingWorkspacePackageJsonGuidance();
           return;
         }
 

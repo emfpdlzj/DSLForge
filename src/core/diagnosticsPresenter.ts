@@ -271,11 +271,11 @@ export class DiagnosticsPresenter {
       command: 'workbench.actions.view.problems'
     };
     const settingsAction: MessageAction = {
-      title: 'Open Settings',
+      title: 'Open Validation Settings',
       command: OPEN_VALIDATION_SETTINGS_COMMAND
     };
     const packageJsonAction: MessageAction = {
-      title: 'Open package.json',
+      title: 'Open Workspace package.json',
       command: OPEN_WORKSPACE_PACKAGE_JSON_COMMAND,
       arguments: [{ workspaceRoot: projectContext.workspaceFolder.uri.fsPath }]
     };

@@ -42,6 +42,32 @@ const MAX_CONTEXT_FILES = 5;
 const MAX_CHARACTERS_PER_FILE = 8000;
 const MAX_TOTAL_CHARACTERS = 20000;
 
+function getAiContextLimits(projectContext: ResolvedProjectContext): {
+  maxContextFiles: number;
+  maxCharactersPerFile: number;
+  maxTotalCharacters: number;
+} {
+  const configuration = vscode.workspace.getConfiguration(
+    'dslforge',
+    projectContext.workspaceFolder.uri
+  );
+
+  return {
+    maxContextFiles: Math.max(
+      configuration.get<number>('ai.maxContextFiles') ?? MAX_CONTEXT_FILES,
+      1
+    ),
+    maxCharactersPerFile: Math.max(
+      configuration.get<number>('ai.maxCharactersPerFile') ?? MAX_CHARACTERS_PER_FILE,
+      1000
+    ),
+    maxTotalCharacters: Math.max(
+      configuration.get<number>('ai.maxContextCharacters') ?? MAX_TOTAL_CHARACTERS,
+      4000
+    )
+  };
+}
+
 function buildProjectContextSummary(projectContext: ResolvedProjectContext): string[] {
   return [
     `Workspace root: ${projectContext.workspaceFolder.uri.fsPath}`,
@@ -74,10 +100,11 @@ export async function collectGrammarModelContext(
   projectContext: ResolvedProjectContext
 ): Promise<GrammarModelContext> {
   const files: GrammarContextFile[] = [];
-  let remainingCharacters = MAX_TOTAL_CHARACTERS;
+  const limits = getAiContextLimits(projectContext);
+  let remainingCharacters = limits.maxTotalCharacters;
   const selections = selectionByPath(projectContext);
 
-  for (const filePath of uniqueFilePaths(projectContext).slice(0, MAX_CONTEXT_FILES)) {
+  for (const filePath of uniqueFilePaths(projectContext).slice(0, limits.maxContextFiles)) {
     if (remainingCharacters <= 0) {
       break;
     }
@@ -85,7 +112,7 @@ export async function collectGrammarModelContext(
     const rawContent = await readFileContent(filePath);
     const cappedLength = Math.min(
       rawContent.length,
-      MAX_CHARACTERS_PER_FILE,
+      limits.maxCharactersPerFile,
       remainingCharacters
     );
     const truncated = rawContent.length > cappedLength;
@@ -110,7 +137,7 @@ export async function collectGrammarModelContext(
 
   return {
     files,
-    totalCharacters: MAX_TOTAL_CHARACTERS - remainingCharacters
+    totalCharacters: limits.maxTotalCharacters - remainingCharacters
   };
 }
 

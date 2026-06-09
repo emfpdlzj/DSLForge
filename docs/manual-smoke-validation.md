@@ -57,8 +57,8 @@ Expected behavior:
 - warning message explains that validation command resolution failed
 - Problems contains a warning with code `dslforge.validation.missing`
 - Quick Fix offers:
-  - `Configure validation command`
-  - `Open workspace package.json`
+  - `Open Validation Settings`
+  - `Open Workspace package.json`
 
 ## Case 4: Import-Aware Context Selection
 

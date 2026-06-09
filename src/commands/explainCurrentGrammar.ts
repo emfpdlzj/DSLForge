@@ -4,6 +4,10 @@ import {
   grammarExplanationService,
   projectService
 } from '../core/services';
+import {
+  showFeatureExecutionError,
+  showUnsupportedWorkspaceGuidance
+} from '../core/userGuidance';
 
 export const EXPLAIN_CURRENT_GRAMMAR_COMMAND = 'dslforge.explainCurrentGrammar';
 
@@ -12,9 +16,7 @@ export function explainCurrentGrammar(): vscode.Disposable {
     const projectContext = await projectService.resolveProjectContext();
 
     if (!projectContext) {
-      await vscode.window.showWarningMessage(
-        'DSLForge could not detect a supported DSL project in the current workspace.'
-      );
+      await showUnsupportedWorkspaceGuidance('Explain Current Grammar');
       return;
     }
 
@@ -36,7 +38,7 @@ export function explainCurrentGrammar(): vscode.Disposable {
         error instanceof Error
           ? error.message
           : 'DSLForge could not explain the current grammar.';
-      await vscode.window.showErrorMessage(message);
+      await showFeatureExecutionError('Explain Current Grammar', message);
     }
   });
 }

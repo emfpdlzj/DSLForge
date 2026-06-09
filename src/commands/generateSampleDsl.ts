@@ -4,6 +4,10 @@ import {
   projectService,
   sampleDslService
 } from '../core/services';
+import {
+  showFeatureExecutionError,
+  showUnsupportedWorkspaceGuidance
+} from '../core/userGuidance';
 
 export const GENERATE_SAMPLE_DSL_COMMAND = 'dslforge.generateSampleDsl';
 
@@ -12,9 +16,7 @@ export function generateSampleDsl(): vscode.Disposable {
     const projectContext = await projectService.resolveProjectContext();
 
     if (!projectContext) {
-      await vscode.window.showWarningMessage(
-        'DSLForge could not detect a supported DSL project in the current workspace.'
-      );
+      await showUnsupportedWorkspaceGuidance('Generate Sample DSL');
       return;
     }
 
@@ -36,7 +38,7 @@ export function generateSampleDsl(): vscode.Disposable {
         error instanceof Error
           ? error.message
           : 'DSLForge could not generate sample DSL text.';
-      await vscode.window.showErrorMessage(message);
+      await showFeatureExecutionError('Generate Sample DSL', message);
     }
   });
 }

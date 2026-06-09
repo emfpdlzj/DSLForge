@@ -30,12 +30,12 @@ function hasMissingValidationDiagnostic(
 
 function createOpenSettingsAction(): vscode.CodeAction {
   const action = new vscode.CodeAction(
-    'Configure validation command',
+    'Open Validation Settings',
     vscode.CodeActionKind.QuickFix
   );
   action.command = {
     command: OPEN_VALIDATION_SETTINGS_COMMAND,
-    title: 'Configure validation command'
+    title: 'Open Validation Settings'
   };
   return action;
 }
@@ -50,12 +50,12 @@ function createOpenPackageJsonAction(
   }
 
   const action = new vscode.CodeAction(
-    'Open workspace package.json',
+    'Open Workspace package.json',
     vscode.CodeActionKind.QuickFix
   );
   action.command = {
     command: OPEN_WORKSPACE_PACKAGE_JSON_COMMAND,
-    title: 'Open workspace package.json',
+    title: 'Open Workspace package.json',
     arguments: [{ workspaceRoot }]
   };
   return action;
