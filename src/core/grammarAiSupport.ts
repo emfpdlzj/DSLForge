@@ -22,9 +22,34 @@ export interface ModelTextRequest {
   prompt: string;
 }
 
+export interface AiDocumentContract {
+  outputTitle: string;
+  progressTitle: string;
+  justification: string;
+  systemIntent: readonly string[];
+  sections: readonly string[];
+  requirements: readonly string[];
+  previewOnly?: boolean;
+}
+
+export interface AiDocumentContractValidation {
+  missingSections: string[];
+  unexpectedSections: string[];
+  normalized: boolean;
+}
+
 const MAX_CONTEXT_FILES = 5;
 const MAX_CHARACTERS_PER_FILE = 8000;
 const MAX_TOTAL_CHARACTERS = 20000;
+
+function buildProjectContextSummary(projectContext: ResolvedProjectContext): string[] {
+  return [
+    `Workspace root: ${projectContext.workspaceFolder.uri.fsPath}`,
+    `Adapter: ${projectContext.adapter.displayName}`,
+    `Active grammar: ${projectContext.context.activeGrammarFile ?? 'none'}`,
+    `Selected context files: ${projectContext.context.contextFiles.length > 0 ? projectContext.context.contextFiles.map((file) => file.filePath).join(', ') : 'none'}`
+  ];
+}
 
 function uniqueFilePaths(projectContext: ResolvedProjectContext): string[] {
   return [
@@ -104,6 +129,142 @@ export function buildGrammarContextBlock(context: GrammarModelContext): string {
         '```'
     )
     .join('\n\n');
+}
+
+export function buildAiContractPrompt(
+  projectContext: ResolvedProjectContext,
+  contextBlock: string,
+  contract: AiDocumentContract
+): string {
+  return [
+    ...contract.systemIntent,
+    '',
+    'Return markdown only.',
+    'Use these section headings exactly and in this order:',
+    ...contract.sections.map((section, index) => `${index + 1}. ## ${section}`),
+    '',
+    'Requirements:',
+    ...contract.requirements.map((requirement) => `- ${requirement}`),
+    '',
+    ...buildProjectContextSummary(projectContext),
+    '',
+    'Grammar context:',
+    contextBlock
+  ].join('\n');
+}
+
+function extractMarkdownHeading(line: string): string | undefined {
+  const match = /^(?:#{1,6})\s+(?<heading>.+?)\s*$/.exec(line.trim());
+  return match?.groups?.heading?.trim();
+}
+
+export function normalizeAiContractMarkdown(
+  rawMarkdown: string,
+  contract: AiDocumentContract
+): {
+  markdown: string;
+  validation: AiDocumentContractValidation;
+} {
+  const lines = rawMarkdown.split(/\r?\n/);
+  const expectedSections = new Set(contract.sections);
+  const sectionContent = new Map<string, string[]>();
+  const unexpectedSections: string[] = [];
+  const preamble: string[] = [];
+  let currentSection: string | undefined;
+
+  for (const section of contract.sections) {
+    sectionContent.set(section, []);
+  }
+
+  for (const line of lines) {
+    const heading = extractMarkdownHeading(line);
+
+    if (heading) {
+      if (expectedSections.has(heading)) {
+        currentSection = heading;
+        continue;
+      }
+
+      unexpectedSections.push(heading);
+
+      if (currentSection) {
+        sectionContent.get(currentSection)?.push(line);
+      } else {
+        preamble.push(line);
+      }
+
+      continue;
+    }
+
+    if (currentSection) {
+      sectionContent.get(currentSection)?.push(line);
+    } else {
+      preamble.push(line);
+    }
+  }
+
+  const missingSections = contract.sections.filter((section) => {
+    const joined = sectionContent.get(section)?.join('\n').trim() ?? '';
+    return joined.length === 0;
+  });
+  const normalized = preamble.join('\n').trim().length > 0 || missingSections.length > 0 || unexpectedSections.length > 0;
+  const carryover = preamble.join('\n').trim();
+  let carryoverConsumed = false;
+
+  const markdown = contract.sections
+    .map((section, index) => {
+      const explicitContent = sectionContent.get(section)?.join('\n').trim() ?? '';
+      const fallbackContent =
+        !carryoverConsumed && carryover.length > 0
+          ? carryover
+          : '_Model response did not provide this section explicitly._';
+      const content = explicitContent || fallbackContent;
+
+      if (!explicitContent && !carryoverConsumed && carryover.length > 0) {
+        carryoverConsumed = true;
+      }
+
+      const suffix =
+        index === contract.sections.length - 1 && unexpectedSections.length > 0
+          ? `\n\nAdditional unstructured headings seen in model output: ${[
+              ...new Set(unexpectedSections)
+            ].join(', ')}.`
+          : '';
+
+      return [`## ${section}`, '', `${content}${suffix}`.trim()].join('\n');
+    })
+    .join('\n\n');
+
+  return {
+    markdown,
+    validation: {
+      missingSections,
+      unexpectedSections: [...new Set(unexpectedSections)],
+      normalized
+    }
+  };
+}
+
+export function appendAiContractReport(
+  title: string,
+  contract: AiDocumentContract,
+  validation: AiDocumentContractValidation
+): void {
+  appendOutputDivider(title);
+  appendOutputLine(`expected sections: ${contract.sections.join(', ')}`);
+  appendOutputLine(
+    `contract status: ${validation.normalized ? 'normalized after model response drift' : 'exact'}`
+  );
+
+  if (validation.missingSections.length > 0) {
+    appendOutputLine(`missing sections: ${validation.missingSections.join(', ')}`);
+  }
+
+  if (validation.unexpectedSections.length > 0) {
+    appendOutputLine(
+      `unexpected sections: ${validation.unexpectedSections.join(', ')}`
+    );
+  }
 }
 
 export function appendGrammarAiReport(
@@ -191,7 +352,8 @@ export async function requestTextFromModel(
 export function buildAiDocumentHeader(
   title: string,
   projectContext: ResolvedProjectContext,
-  model: vscode.LanguageModelChat
+  model: vscode.LanguageModelChat,
+  metadata: string[] = []
 ): string {
   const generatedAt = new Date().toISOString();
 
@@ -202,6 +364,7 @@ export function buildAiDocumentHeader(
     `- Adapter: ${projectContext.adapter.displayName}`,
     `- Model: ${model.vendor}/${model.family} (${model.name})`,
     `- Active grammar: ${projectContext.context.activeGrammarFile ?? 'none'}`,
+    ...metadata.map((line) => `- ${line}`),
     ''
   ].join('\n');
 }
