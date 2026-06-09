@@ -1,0 +1,266 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
+import { readWorkspacePackageInfo } from '../core/workspacePackage';
+import type { GrammarContextFileSelection, GrammarContextSelection } from '../types';
+
+export interface LangiumContextSelectionInput {
+  workspaceRoot: string;
+  activeFile?: string;
+  grammarFiles: string[];
+}
+
+async function readTextFile(filePath: string): Promise<string> {
+  return fs.readFile(filePath, 'utf8');
+}
+
+async function pathExists(filePath: string): Promise<boolean> {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function readLangiumConfigGrammarFiles(
+  workspaceRoot: string
+): Promise<string[]> {
+  const configPath = path.join(workspaceRoot, 'langium-config.json');
+
+  if (!(await pathExists(configPath))) {
+    return [];
+  }
+
+  try {
+    const rawConfig = await readTextFile(configPath);
+    const parsed = JSON.parse(rawConfig) as {
+      languages?: Array<{ grammar?: string }>;
+    };
+
+    return (parsed.languages ?? [])
+      .map((language) => language.grammar)
+      .filter((value): value is string => Boolean(value))
+      .map((grammarPath) => path.normalize(path.resolve(workspaceRoot, grammarPath)));
+  } catch {
+    return [];
+  }
+}
+
+export function parseLangiumImports(content: string): string[] {
+  const imports = new Set<string>();
+  const importPattern = /^\s*import\s+['"](?<specifier>[^'"]+)['"]/gm;
+
+  for (const match of content.matchAll(importPattern)) {
+    const specifier = match.groups?.specifier;
+
+    if (specifier) {
+      imports.add(specifier);
+    }
+  }
+
+  return [...imports];
+}
+
+async function resolveImportPath(
+  fromGrammarFile: string,
+  importSpecifier: string
+): Promise<string | undefined> {
+  const basePath = path.resolve(path.dirname(fromGrammarFile), importSpecifier);
+  const candidates = basePath.endsWith('.langium')
+    ? [basePath]
+    : [basePath, `${basePath}.langium`];
+
+  for (const candidate of candidates) {
+    if (await pathExists(candidate)) {
+      return path.normalize(candidate);
+    }
+  }
+
+  return undefined;
+}
+
+export async function collectImportedGrammarFiles(
+  activeGrammarFile: string | undefined
+): Promise<string[]> {
+  if (!activeGrammarFile) {
+    return [];
+  }
+
+  const visited = new Set<string>([activeGrammarFile]);
+  const queue = [activeGrammarFile];
+  const importedFiles: string[] = [];
+
+  while (queue.length > 0) {
+    const currentFile = queue.shift();
+
+    if (!currentFile) {
+      continue;
+    }
+
+    let content = '';
+
+    try {
+      content = await readTextFile(currentFile);
+    } catch {
+      continue;
+    }
+
+    for (const importSpecifier of parseLangiumImports(content)) {
+      const resolvedImport = await resolveImportPath(currentFile, importSpecifier);
+
+      if (!resolvedImport || visited.has(resolvedImport)) {
+        continue;
+      }
+
+      visited.add(resolvedImport);
+      importedFiles.push(resolvedImport);
+      queue.push(resolvedImport);
+    }
+  }
+
+  return importedFiles;
+}
+
+function dedupeSelections(
+  selections: GrammarContextFileSelection[]
+): GrammarContextFileSelection[] {
+  const seen = new Set<string>();
+  const deduped: GrammarContextFileSelection[] = [];
+
+  for (const selection of selections) {
+    if (seen.has(selection.filePath)) {
+      continue;
+    }
+
+    seen.add(selection.filePath);
+    deduped.push(selection);
+  }
+
+  return deduped;
+}
+
+export async function determineActiveGrammarFile(
+  input: LangiumContextSelectionInput
+): Promise<string | undefined> {
+  if (input.activeFile?.endsWith('.langium')) {
+    return path.normalize(input.activeFile);
+  }
+
+  const configuredGrammarFiles = await readLangiumConfigGrammarFiles(input.workspaceRoot);
+
+  for (const grammarFile of configuredGrammarFiles) {
+    if (input.grammarFiles.includes(grammarFile)) {
+      return grammarFile;
+    }
+  }
+
+  return input.grammarFiles[0];
+}
+
+export async function buildLangiumContextSelection(
+  input: LangiumContextSelectionInput
+): Promise<GrammarContextSelection> {
+  const workspaceRoot = input.workspaceRoot;
+  const grammarFiles = input.grammarFiles.map((filePath) => path.normalize(filePath));
+  const activeGrammarFile = await determineActiveGrammarFile({
+    ...input,
+    grammarFiles
+  });
+  const configuredGrammarFiles = await readLangiumConfigGrammarFiles(workspaceRoot);
+  const importedGrammarFiles = await collectImportedGrammarFiles(activeGrammarFile);
+  const siblingGrammarFiles = grammarFiles.filter(
+    (grammarFile) =>
+      grammarFile !== activeGrammarFile &&
+      !importedGrammarFiles.includes(grammarFile)
+  );
+  const packageInfo = await readWorkspacePackageInfo(workspaceRoot);
+  const contextSelections: GrammarContextFileSelection[] = [];
+
+  if (activeGrammarFile) {
+    contextSelections.push({
+      filePath: activeGrammarFile,
+      kind: 'active-grammar',
+      languageId: 'langium',
+      detail: 'Primary grammar selected for the command context'
+    });
+  }
+
+  for (const grammarFile of importedGrammarFiles) {
+    contextSelections.push({
+      filePath: grammarFile,
+      kind: 'imported-grammar',
+      languageId: 'langium',
+      detail: 'Imported by the active grammar'
+    });
+  }
+
+  const langiumConfigPath = path.join(workspaceRoot, 'langium-config.json');
+
+  if (await pathExists(langiumConfigPath)) {
+    contextSelections.push({
+      filePath: langiumConfigPath,
+      kind: 'config',
+      languageId: 'json',
+      detail: 'Langium root configuration'
+    });
+  }
+
+  if (packageInfo) {
+    contextSelections.push({
+      filePath: packageInfo.packageJsonPath,
+      kind: 'package-json',
+      languageId: 'json',
+      detail: 'Workspace package metadata and scripts'
+    });
+  }
+
+  for (const grammarFile of configuredGrammarFiles) {
+    if (grammarFile === activeGrammarFile || importedGrammarFiles.includes(grammarFile)) {
+      continue;
+    }
+
+    contextSelections.push({
+      filePath: grammarFile,
+      kind: 'sibling-grammar',
+      languageId: 'langium',
+      detail: 'Referenced by langium-config.json'
+    });
+  }
+
+  for (const grammarFile of siblingGrammarFiles) {
+    contextSelections.push({
+      filePath: grammarFile,
+      kind: 'sibling-grammar',
+      languageId: 'langium',
+      detail: 'Additional workspace grammar file'
+    });
+  }
+
+  const contextFiles = dedupeSelections(contextSelections);
+  const relatedFiles = contextFiles
+    .filter((file) => file.filePath !== activeGrammarFile)
+    .map((file) => file.filePath);
+  const importedFileCount = contextFiles.filter(
+    (file) => file.kind === 'imported-grammar'
+  ).length;
+  const supplementalFileCount = contextFiles.filter(
+    (file) => file.kind === 'config' || file.kind === 'package-json'
+  ).length;
+
+  return {
+    activeGrammarFile,
+    relatedFiles,
+    contextFiles,
+    notes: [
+      activeGrammarFile
+        ? 'Langium adapter selected the active grammar from the current editor or langium-config.json.'
+        : 'Langium adapter could not determine a primary grammar file.',
+      importedFileCount > 0
+        ? `Included ${importedFileCount} imported grammar file(s) by following Langium import statements.`
+        : 'No imported grammar files were discovered from the active grammar.',
+      supplementalFileCount > 0
+        ? `Included ${supplementalFileCount} supplemental metadata file(s) for Langium configuration and workspace scripts.`
+        : 'No supplemental Langium metadata files were added to the context.'
+    ]
+  };
+}

@@ -1,0 +1,82 @@
+{
+  "fixtures": [
+    {
+      "name": "configured-command",
+      "workspaceRoot": "test-fixtures/langium/configured-command",
+      "activeFile": "src/language/configured.langium",
+      "detection": {
+        "minimumConfidence": 100,
+        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "package-json", "dependency", "script"]
+      },
+      "validation": {
+        "configuredCommand": "node ./scripts/validate-configured.js",
+        "source": "user-configured",
+        "commandLine": "node ./scripts/validate-configured.js"
+      },
+      "context": {
+        "activeGrammarFile": "src/language/configured.langium",
+        "contextKinds": ["active-grammar", "config", "package-json"],
+        "requiredFiles": ["src/language/configured.langium", "langium-config.json", "package.json"],
+        "relatedFileCount": 2
+      }
+    },
+    {
+      "name": "package-script",
+      "workspaceRoot": "test-fixtures/langium/package-script",
+      "activeFile": "src/language/package-script.langium",
+      "detection": {
+        "minimumConfidence": 100,
+        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "package-json", "dependency", "script"]
+      },
+      "validation": {
+        "source": "package-script",
+        "commandLine": "npm run validate",
+        "scriptName": "validate"
+      },
+      "context": {
+        "activeGrammarFile": "src/language/package-script.langium",
+        "contextKinds": ["active-grammar", "config", "package-json"],
+        "requiredFiles": ["src/language/package-script.langium", "langium-config.json", "package.json"],
+        "relatedFileCount": 2
+      }
+    },
+    {
+      "name": "missing-command",
+      "workspaceRoot": "test-fixtures/langium/missing-command",
+      "activeFile": "src/language/missing-command.langium",
+      "detection": {
+        "minimumConfidence": 100,
+        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "package-json", "dependency", "script"]
+      },
+      "validation": {
+        "source": "missing"
+      },
+      "context": {
+        "activeGrammarFile": "src/language/missing-command.langium",
+        "contextKinds": ["active-grammar", "config", "package-json"],
+        "requiredFiles": ["src/language/missing-command.langium", "langium-config.json", "package.json"],
+        "relatedFileCount": 2
+      }
+    },
+    {
+      "name": "import-context",
+      "workspaceRoot": "test-fixtures/langium/import-context",
+      "activeFile": "src/language/main.langium",
+      "detection": {
+        "minimumConfidence": 100,
+        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "package-json", "dependency", "script"]
+      },
+      "validation": {
+        "source": "package-script",
+        "commandLine": "npm run validate",
+        "scriptName": "validate"
+      },
+      "context": {
+        "activeGrammarFile": "src/language/main.langium",
+        "contextKinds": ["active-grammar", "imported-grammar", "config", "package-json"],
+        "requiredFiles": ["src/language/main.langium", "src/language/shared.langium", "src/language/tokens.langium", "langium-config.json", "package.json"],
+        "relatedFileCount": 4
+      }
+    }
+  ]
+}

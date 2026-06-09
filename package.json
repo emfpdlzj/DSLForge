@@ -78,8 +78,9 @@
     "watch": "tsc -watch -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:diagnostics": "npm run build && node dist/test/diagnosticsFixtureRunner.js",
+    "test:projects": "npm run build && node dist/test/projectFixtureRunner.js",
     "clean": "rm -rf dist",
-    "test": "npm run test:diagnostics"
+    "test": "npm run build && node dist/test/diagnosticsFixtureRunner.js && node dist/test/projectFixtureRunner.js"
   },
   "repository": {
     "type": "git",
