@@ -1,10 +1,47 @@
 {
   "name": "llm-grammer",
-  "version": "1.0.0",
-  "description": "",
+  "displayName": "LLM Grammer",
+  "description": "Langium-compatible assistant for DSL authors in Visual Studio Code.",
+  "version": "0.0.1",
+  "publisher": "emfpdlzj",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [],
   "main": "dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "commands": [
+      {
+        "command": "llmGrammer.createDslScaffold",
+        "title": "LLM Grammer: Create DSL Scaffold",
+        "category": "LLM Grammer"
+      },
+      {
+        "command": "llmGrammer.generateSampleDsl",
+        "title": "LLM Grammer: Generate Sample DSL",
+        "category": "LLM Grammer"
+      },
+      {
+        "command": "llmGrammer.validateCurrentGrammar",
+        "title": "LLM Grammer: Validate Current Grammar",
+        "category": "LLM Grammer"
+      },
+      {
+        "command": "llmGrammer.explainCurrentGrammar",
+        "title": "LLM Grammer: Explain Current Grammar",
+        "category": "LLM Grammer"
+      }
+    ]
+  },
   "scripts": {
+    "vscode:prepublish": "npm run build",
     "build": "tsc -p tsconfig.json",
+    "watch": "tsc -watch -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "clean": "rm -rf dist",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,7 +50,6 @@
     "type": "git",
     "url": "git+https://github.com/emfpdlzj/llm-grammer.git"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
@@ -22,6 +58,8 @@
   },
   "homepage": "https://github.com/emfpdlzj/llm-grammer#readme",
   "devDependencies": {
+    "@types/node": "^24.13.1",
+    "@types/vscode": "^1.120.0",
     "typescript": "^6.0.3"
   }
 }

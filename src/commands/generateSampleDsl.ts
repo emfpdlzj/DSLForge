@@ -1,5 +1,9 @@
+import * as vscode from 'vscode';
+
 export const GENERATE_SAMPLE_DSL_COMMAND = 'llmGrammer.generateSampleDsl';
 
-export function generateSampleDsl(): void {
-  // Command wiring will be added when the VS Code extension shell is in place.
+export function generateSampleDsl(): vscode.Disposable {
+  return vscode.commands.registerCommand(GENERATE_SAMPLE_DSL_COMMAND, async () => {
+    await vscode.window.showInformationMessage('Generate Sample DSL is not implemented yet.');
+  });
 }

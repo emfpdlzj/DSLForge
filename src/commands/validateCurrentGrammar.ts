@@ -1,5 +1,9 @@
+import * as vscode from 'vscode';
+
 export const VALIDATE_CURRENT_GRAMMAR_COMMAND = 'llmGrammer.validateCurrentGrammar';
 
-export function validateCurrentGrammar(): void {
-  // Command wiring will be added when the VS Code extension shell is in place.
+export function validateCurrentGrammar(): vscode.Disposable {
+  return vscode.commands.registerCommand(VALIDATE_CURRENT_GRAMMAR_COMMAND, async () => {
+    await vscode.window.showInformationMessage('Validate Current Grammar is not implemented yet.');
+  });
 }
