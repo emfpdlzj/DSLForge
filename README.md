@@ -41,7 +41,7 @@ Until then, you can evaluate it locally:
 
 1. run `npm install`
 2. run `npm exec -- vsce package`
-3. install the generated `dslforge-0.0.1.vsix` in VS Code
+3. install the generated `dslforge-0.2.0.vsix` in VS Code
 
 ## One-Minute Flow
 

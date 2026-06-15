@@ -125,7 +125,7 @@ Audit run on 2026-06-14:
   - passed
 - `npm exec -- vsce package`
   - passed
-  - output package: `dslforge-0.0.1.vsix`
+  - output package: `dslforge-0.2.0.vsix`
   - packaged size after README screenshot assets: `2.51 MB`
 - `npm exec -- vsce ls`
   - passed

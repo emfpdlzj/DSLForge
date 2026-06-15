@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 0.2.0 - 2026-06-15
 
 - Added wrapper-based validation resolution for `gradlew` and `mvnw` workspaces after `dslforge.validation.command` and supported `package.json` scripts.
 - Added an initial ANTLR4 adapter with project detection, context selection, and adapter registration.
