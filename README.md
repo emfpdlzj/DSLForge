@@ -1,8 +1,8 @@
 # DSLForge
 
-DSLForge is a VS Code extension for DSL authoring workflows across Langium, ANTLR4, and Xtext workspaces.
+DSLForge is a VS Code extension for DSL workflow orchestration across Langium, ANTLR4, and Xtext workspaces.
 
-It is not a generic AI generator. In v0.1, it focuses on the real loop around grammar work: detect the active DSL project, choose the right context, run the workspace's actual validation path, and present diagnostics in a form you can act on.
+It is not a generic AI generator. The current branch focuses on the real loop around grammar work: detect the active DSL project, choose the right context, run the workspace's actual validation path, and present diagnostics in a form you can act on.
 
 ## Current Status
 
@@ -25,6 +25,7 @@ DSLForge is currently a pre-release extension.
   5. setup guidance
 - publishes normalized diagnostics into Problems
 - uses AI only for explicitly AI-scoped authoring tasks
+- exposes grammar actions from editor and Explorer context menus in addition to the Command Palette
 
 ## What DSLForge Does Not Do
 
@@ -121,8 +122,6 @@ Current responsibilities:
 
 Next adapter work after this branch:
 
-- Xtext validation output normalization
-- richer Xtext import and EPackage context selection
 - later target: Generic mode
 
 ## Settings

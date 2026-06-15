@@ -1,7 +1,7 @@
 {
   "name": "dslforge",
   "displayName": "DSLForge",
-  "description": "DSL authoring workflow assistant for Visual Studio Code, starting with Langium.",
+  "description": "Multi-framework DSL workflow assistant for Visual Studio Code.",
   "version": "0.2.0",
   "publisher": "emfpdlzj",
   "engines": {
@@ -28,7 +28,7 @@
     "virtualWorkspaces": false,
     "untrustedWorkspaces": {
       "supported": "limited",
-      "description": "DSLForge can inspect Langium workspaces in Restricted Mode, but validation and AI-backed commands require workspace trust."
+      "description": "DSLForge can inspect supported DSL workspaces in Restricted Mode, but validation and AI-backed commands require workspace trust."
     }
   },
   "activationEvents": [
@@ -44,7 +44,7 @@
         "dslforge.validation.command": {
           "type": "string",
           "default": "",
-          "markdownDescription": "Workspace validation command used first by `DSLForge: Validate Current Grammar`. If empty, DSLForge auto-detects a supported `package.json` script."
+          "markdownDescription": "Workspace validation command used first by `DSLForge: Validate Current Grammar`. If empty, DSLForge auto-detects a supported `package.json` script, `gradlew` task, or `mvnw` goal."
         },
         "dslforge.validation.maxCapturedOutputCharacters": {
           "type": "number",
@@ -71,6 +71,52 @@
           "markdownDescription": "Maximum total number of context characters DSLForge sends to AI-backed commands across all selected files."
         }
       }
+    },
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "dslforge.validateCurrentGrammar",
+          "when": "resourceScheme == file && resourceExtname == .langium || resourceScheme == file && resourceExtname == .g4 || resourceScheme == file && resourceExtname == .xtext",
+          "group": "dslforge@1"
+        },
+        {
+          "command": "dslforge.explainCurrentGrammar",
+          "when": "resourceScheme == file && resourceExtname == .langium || resourceScheme == file && resourceExtname == .g4 || resourceScheme == file && resourceExtname == .xtext",
+          "group": "dslforge@2"
+        },
+        {
+          "command": "dslforge.createDslScaffold",
+          "when": "resourceScheme == file && resourceExtname == .langium || resourceScheme == file && resourceExtname == .g4 || resourceScheme == file && resourceExtname == .xtext",
+          "group": "dslforge@3"
+        },
+        {
+          "command": "dslforge.generateSampleDsl",
+          "when": "resourceScheme == file && resourceExtname == .langium || resourceScheme == file && resourceExtname == .g4 || resourceScheme == file && resourceExtname == .xtext",
+          "group": "dslforge@4"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "dslforge.validateCurrentGrammar",
+          "when": "resourceScheme == file && resourceExtname == .langium || resourceScheme == file && resourceExtname == .g4 || resourceScheme == file && resourceExtname == .xtext",
+          "group": "navigation@1"
+        },
+        {
+          "command": "dslforge.explainCurrentGrammar",
+          "when": "resourceScheme == file && resourceExtname == .langium || resourceScheme == file && resourceExtname == .g4 || resourceScheme == file && resourceExtname == .xtext",
+          "group": "navigation@2"
+        },
+        {
+          "command": "dslforge.createDslScaffold",
+          "when": "resourceScheme == file && resourceExtname == .langium || resourceScheme == file && resourceExtname == .g4 || resourceScheme == file && resourceExtname == .xtext",
+          "group": "navigation@3"
+        },
+        {
+          "command": "dslforge.generateSampleDsl",
+          "when": "resourceScheme == file && resourceExtname == .langium || resourceScheme == file && resourceExtname == .g4 || resourceScheme == file && resourceExtname == .xtext",
+          "group": "navigation@4"
+        }
+      ]
     },
     "commands": [
       {
