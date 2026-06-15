@@ -6,12 +6,10 @@
 .tmp-vsix-user/**
 .vscode/**
 docs/**
-scripts/**
 node_modules/**
 src/**
 test-fixtures/**
 tsconfig.json
 dist/test/**
-media/screenshots/**/*.svg
 **/*.map
 *.vsix

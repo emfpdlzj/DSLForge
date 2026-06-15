@@ -98,7 +98,6 @@
   "scripts": {
     "vscode:prepublish": "npm run build",
     "build": "tsc -p tsconfig.json",
-    "generate:screenshots": "node ./scripts/generate-marketplace-screenshots.mjs",
     "watch": "tsc -watch -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:diagnostics": "npm run build && node dist/test/diagnosticsFixtureRunner.js",

@@ -30,16 +30,15 @@ Completed in this audit:
 - `.agents/` and `AGENTS.md` are ignored for future commits
 - `package.json` now includes preview metadata, keywords, and explicit license reference
 - `CHANGELOG.md` now exists for the first release
-- Marketplace screenshots were generated under `media/screenshots/`
 - README now includes installation guidance, a one-minute flow, and explicit Langium/AI limits
 
 Still required before publish:
 
+- capture and add Marketplace screenshots
 - decide whether to keep `preview: true` for the first public release
 - fix `origin` remote to the intended public repository
 - confirm publisher access and Marketplace login path
 - run one final local VSIX install smoke on the exact package to publish
-- optionally replace generated Marketplace visuals with live UI captures later
 
 ## Blocking Checks
 

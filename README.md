@@ -4,8 +4,6 @@ DSLForge is a VS Code extension for DSL authoring workflows, starting with Langi
 
 It is not a generic AI generator. In v0.1, it focuses on the real loop around grammar work: detect the active DSL project, choose the right context, run the workspace's actual validation path, and present diagnostics in a form you can act on.
 
-![Validate Current Grammar](media/screenshots/validation-configured.png)
-
 ## Current Status
 
 DSLForge is currently a pre-release extension.
@@ -32,32 +30,6 @@ DSLForge is currently a pre-release extension.
 - it does not try to be a generic AI coding copilot
 - it does not fake a validation engine when the workspace has not defined one
 - it does not fake AI output when no supported model environment is available
-
-## Screenshots
-
-### Validation Through The Real Workspace Command
-
-`Validate Current Grammar` prefers the user-configured command before trying `package.json` scripts.
-
-![Configured validation path](media/screenshots/validation-configured.png)
-
-### Validation Setup Guidance Instead Of Fake Fallbacks
-
-When no configured command or supported script exists, DSLForge stops and points to the real setup actions.
-
-![Validation setup guidance](media/screenshots/validation-guidance.png)
-
-### AI Gate Blocks Cleanly When Model Access Is Missing
-
-AI-scoped commands stop immediately and explain what must be configured.
-
-![AI gate blocked](media/screenshots/ai-gate-blocked.png)
-
-### Import-Aware Context Selection
-
-DSLForge uses the active grammar and its import chain instead of sending arbitrary workspace files.
-
-![Import-aware context selection](media/screenshots/import-context-selection.png)
 
 ## Install
 
@@ -165,7 +137,6 @@ Useful commands:
 - `npm run test:diagnostics`
 - `npm run test:projects`
 - `npm run test:manifest`
-- `npm run generate:screenshots`
 - `npm exec -- vsce package`
 
 Release notes live in [CHANGELOG.md](CHANGELOG.md).
