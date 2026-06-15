@@ -34,14 +34,27 @@ Completed in this audit:
 - current branch packaging still succeeds after the reviewed AI preview apply flow changes
 - reviewed AI preview apply logic now has dedicated fixture coverage for file-target parsing, bundle selection, and conflict detection
 
-Still required before publish:
+## Remaining Release-Critical Work
 
-- capture and add Marketplace screenshots
+- complete manual VS Code smoke for the Xtext fixtures and AI preview/apply path
+- run one final local VSIX install smoke on the exact package to publish
 - decide whether to keep `preview: true` for the first public release
 - fix `origin` remote to the intended public repository
 - confirm publisher access and Marketplace login path
-- run one final local VSIX install smoke on the exact package to publish
-- complete manual VS Code smoke for the Xtext fixtures and AI preview/apply path
+- review the exact release commit state before `vsce publish`
+- publish intentionally with the confirmed publisher account
+
+## Deferred Or Optional For This Workstream
+
+- Marketplace screenshots are deferred by current user instruction and are not treated as an active release blocker unless release policy changes.
+- Extra README copy polish is optional as long as the current opening section stays accurate and concrete.
+- Additional launch collateral beyond the existing [docs/marketplace-launch.md](/private/tmp/DSLForge-xtext-validation-normalization/docs/marketplace-launch.md:1) pack is optional.
+
+## Post-Publish Follow-Up
+
+- announce the release through the intended promotion channels
+- re-enable and capture Marketplace screenshots later if the release process requires them
+- collect first-user feedback and fold any follow-up items back into [docs/development-todo.md](/private/tmp/DSLForge-xtext-validation-normalization/docs/development-todo.md:1)
 
 ## Blocking Checks
 
@@ -61,16 +74,12 @@ These items must be true before `vsce publish`:
 - AI commands stop with guidance when no supported VS Code model environment is available
 - README and changelog images use valid non-SVG Marketplace-safe URLs if remote images are added
 
-## Marketplace Content Checklist
+## Content Review Before Publish
 
 - Confirm extension title and short description are final
 - Confirm `keywords` match real discovery terms
 - Review [docs/marketplace-launch.md](/private/tmp/DSLForge-xtext-validation-normalization/docs/marketplace-launch.md:1) and finalize one short description candidate plus the opening paragraph
 - Review [docs/onboarding-quickstart.md](/private/tmp/DSLForge-xtext-validation-normalization/docs/onboarding-quickstart.md:1) and keep it aligned with the README quick-start flow
-- Add at least three screenshots:
-  - validation success or failure with diagnostics surfaced
-  - AI gate blocked state with setup guidance
-  - markdown preview result from one AI command
 - Keep README opening section short and concrete:
   - what DSLForge is
   - currently documented adapter scope
@@ -159,10 +168,11 @@ Earlier audit notes on 2026-06-14:
 
 ## Recommended Release Order
 
-1. Finish README copy and capture screenshots.
-2. Fix repository remote alignment.
+1. Finish the remaining manual VS Code smoke for Xtext and AI preview/apply.
+2. Fix repository remote alignment and confirm Marketplace publisher access.
 3. Re-run technical verification on the exact release candidate.
-4. Review `git status` and staged diff.
+4. Review `git status` and staged diff for the intended release commit.
 5. Package with `npm exec -- vsce package`.
 6. Install the generated VSIX once more.
 7. Publish intentionally with the confirmed publisher account.
+8. Run promotion as a post-publish activity.
