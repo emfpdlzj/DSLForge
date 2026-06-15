@@ -1,6 +1,6 @@
 # DSLForge
 
-DSLForge is a VS Code extension for DSL authoring workflows, starting with Langium.
+DSLForge is a VS Code extension for DSL authoring workflows, starting with Langium and expanding to ANTLR4.
 
 It is not a generic AI generator. In v0.1, it focuses on the real loop around grammar work: detect the active DSL project, choose the right context, run the workspace's actual validation path, and present diagnostics in a form you can act on.
 
@@ -8,19 +8,21 @@ It is not a generic AI generator. In v0.1, it focuses on the real loop around gr
 
 DSLForge is currently a pre-release extension.
 
-- v0.1 supports Langium only
+- current branch work supports Langium and an in-progress ANTLR4 adapter
 - `Validate Current Grammar` is intentionally non-AI
 - AI commands require GitHub Copilot or another supported VS Code model environment
 - if AI access is unavailable, DSLForge stops and shows guidance instead of inventing a fake fallback
 
 ## What DSLForge Does
 
-- detects the current Langium workspace and grammar context
-- follows import-aware grammar context selection
+- detects the current Langium or ANTLR4 workspace and grammar context
+- follows import-aware grammar context selection for Langium and reference-aware context selection for ANTLR4
 - resolves validation from the real workspace in this order:
   1. `dslforge.validation.command`
   2. auto-detected supported `package.json` script
-  3. setup guidance
+  3. auto-detected `gradlew` task
+  4. auto-detected `mvnw` goal
+  5. setup guidance
 - publishes normalized diagnostics into Problems
 - uses AI only for explicitly AI-scoped authoring tasks
 
@@ -43,10 +45,10 @@ Until then, you can evaluate it locally:
 
 ## One-Minute Flow
 
-1. Open a Langium workspace.
+1. Open a Langium or ANTLR4 workspace.
 2. Open the grammar file you are working on.
 3. Run `DSLForge: Validate Current Grammar`.
-4. If DSLForge cannot resolve a validation command, set `dslforge.validation.command` or add a supported `package.json` script.
+4. If DSLForge cannot resolve a validation command, set `dslforge.validation.command` or add a supported `package.json` script, `gradlew` task, or `mvnw` goal.
 5. Use the AI commands only if VS Code already has a supported model environment available.
 
 Recommended first local check from this repository:
@@ -100,9 +102,12 @@ If model access is unavailable, DSLForge:
 - records the AI gate result in the Output channel
 - does not create a fake preview document
 
-## Langium-Only Scope In v0.1
+## Adapter Scope
 
-The first release supports Langium only.
+Current implemented adapters in this branch:
+
+- Langium
+- ANTLR4
 
 Current responsibilities:
 
@@ -113,9 +118,9 @@ Current responsibilities:
 
 Planned adapter sequence:
 
-- v0.2: ANTLR4 adapter
-- v0.3: Xtext adapter
-- v0.4: Generic mode
+- current v0.2 branch: ANTLR4 adapter
+- next target: Xtext adapter
+- later target: Generic mode
 
 ## Settings
 

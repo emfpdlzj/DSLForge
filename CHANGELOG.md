@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Added wrapper-based validation resolution for `gradlew` and `mvnw` workspaces after `dslforge.validation.command` and supported `package.json` scripts.
+- Added an initial ANTLR4 adapter with project detection, context selection, and adapter registration.
+- Added ANTLR4-specific validation diagnostics interpretation and regression fixtures.
+
 ## 0.0.1 - 2026-06-14
 
 - Renamed the extension from LangForge to DSLForge.
