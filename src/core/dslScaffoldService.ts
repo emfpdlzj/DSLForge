@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { aiPreviewApplyService } from './aiPreviewApplyService';
 import {
   appendAiContractReport,
   appendGrammarAiReport,
@@ -95,6 +96,11 @@ export class DslScaffoldService {
 
     await vscode.window.showTextDocument(document, {
       preview: false
+    });
+    aiPreviewApplyService.registerPreviewDocument(document, {
+      featureName: 'Create DSL Scaffold',
+      outputTitle: scaffoldContract.outputTitle,
+      workspaceRoot: projectContext.workspaceFolder.uri.fsPath
     });
   }
 }

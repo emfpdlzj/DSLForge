@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { aiPreviewApplyService } from './aiPreviewApplyService';
 import {
   appendAiContractReport,
   appendGrammarAiReport,
@@ -96,6 +97,11 @@ export class SampleDslService {
 
     await vscode.window.showTextDocument(document, {
       preview: false
+    });
+    aiPreviewApplyService.registerPreviewDocument(document, {
+      featureName: 'Generate Sample DSL',
+      outputTitle: sampleDslContract.outputTitle,
+      workspaceRoot: projectContext.workspaceFolder.uri.fsPath
     });
   }
 }

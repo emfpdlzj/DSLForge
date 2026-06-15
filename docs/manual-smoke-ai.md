@@ -11,13 +11,17 @@ The goal is to verify four things:
 1. AI gate blocks correctly when no supported model environment is available
 2. AI gate blocks correctly when a model exists but request access is not granted
 3. import-aware context selection reaches the model
-4. result documents follow the expected output contract and stay preview-only
+4. result documents follow the expected output contract and stay preview-only until a reviewed apply is explicitly completed
 
 ## Workspace Fixture
 
 Use this workspace unless a case explicitly says otherwise:
 
 - `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/langium/import-context`
+
+Additional Xtext workspace for context-sensitive AI smoke:
+
+- `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/xtext/import-context`
 
 Open this file before running commands:
 
@@ -42,6 +46,7 @@ Expected selected context set for AI commands:
 Use the dedicated extension host configuration in [.vscode/launch.json](/Users/emfpdlzj/Desktop/DSLForge/.vscode/launch.json:1):
 
 - `Run DSLForge: import-context fixture`
+- `Run DSLForge: xtext-import-context fixture`
 
 ## Case 1: Missing Model Environment
 
@@ -233,6 +238,71 @@ If contract status is `normalized`, verify:
 - all required sections are still present
 - any drift is visible in the `DSLForge ... Contract` output block
 
+## Case 6: Reviewed Apply Flow
+
+Precondition:
+
+- a supported chat model is available
+- request access is granted
+- one AI preview document is already open from Case 3, 4, or 5
+
+Procedure:
+
+1. Focus the AI preview markdown document
+2. Run `DSLForge: Apply AI Preview to Workspace`
+3. Choose either `Preview Body Only` or a fenced `Code Block`
+4. Accept or adjust the suggested target path
+5. Review the opened draft or diff
+6. Run `DSLForge: Complete AI Preview Apply`
+
+Expected behavior:
+
+- apply does not write any workspace file before the explicit complete step
+- DSLForge opens a draft or diff review surface first
+- Output includes `DSLForge AI Apply prepared`
+- the complete step requires explicit confirmation before write
+- Output includes `DSLForge AI Apply completed`
+
+Acceptance criteria:
+
+- the selected content is written only after the explicit completion step
+- if the target file changed after review preparation, DSLForge blocks the write and asks for a new apply pass
+- the final target file opens in the editor after completion
+
+## Case 7: Xtext AI Context Coverage
+
+Precondition:
+
+- a supported chat model is available
+- request access is granted
+
+Procedure:
+
+1. Launch `Run DSLForge: xtext-import-context fixture`
+2. Open `src/main/java/com/acme/Main.xtext`
+3. Run each AI command once:
+4. `DSLForge: Explain Current Grammar`
+5. `DSLForge: Create DSL Scaffold`
+6. `DSLForge: Generate Sample DSL`
+
+Expected behavior:
+
+- Output includes the active Xtext grammar, the mixed-in grammar, the referenced `.ecore` file, and the `.mwe2` workflow file
+- `Create DSL Scaffold` does not default to Langium-specific framing when Xtext signals are present
+- `Explain Current Grammar` mentions mixed-in grammars, imported namespaces, or EPackage assumptions when relevant
+- `Generate Sample DSL` stays grounded in the visible Xtext grammar rather than generic DSL filler
+
+Acceptance criteria:
+
+- the context file list includes:
+  - `src/main/java/com/acme/Main.xtext`
+  - `src/main/java/com/acme/Common.xtext`
+  - `model/shared.ecore`
+  - `GenerateMain.mwe2`
+  - `build.gradle`
+- scaffold output stays Xtext-oriented
+- explanation and samples reference visible namespace or cross-reference evidence when relevant
+
 ## Failure Criteria
 
 Treat the smoke test as failed if any of these happen:
@@ -242,4 +312,5 @@ Treat the smoke test as failed if any of these happen:
 - imported grammar files are missing from the successful-run context file list
 - required contract sections are absent from the final document
 - scaffold output implies that files were written automatically
+- AI preview content writes to the workspace before explicit apply confirmation
 - sample DSL output is not copyable as fenced code blocks

@@ -19,6 +19,9 @@ Use one of the dedicated VS Code extension launch configurations in `.vscode/lau
 - `Run DSLForge: package-script fixture`
 - `Run DSLForge: missing-command fixture`
 - `Run DSLForge: import-context fixture`
+- `Run DSLForge: xtext-gradle-wrapper fixture`
+- `Run DSLForge: xtext-maven-wrapper fixture`
+- `Run DSLForge: xtext-import-context fixture`
 
 ## Case 1: Configured Command
 
@@ -90,3 +93,4 @@ Expected behavior:
 5. For the missing-command fixture, open Quick Fix on line 1 and verify both actions appear.
 6. For the import-context fixture, verify that the Output panel includes imported grammar files from the active grammar chain.
 7. For the Xtext fixtures, open the `.xtext` grammar before running the command and verify that the Output panel includes the `.mwe2` workflow file together with the Gradle or Maven build file.
+8. For the Xtext import-context fixture, verify that the Output panel includes the mixed-in grammar and the referenced `.ecore` file in addition to the `.mwe2` workflow and build file.

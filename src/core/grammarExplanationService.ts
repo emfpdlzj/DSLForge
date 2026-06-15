@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { aiPreviewApplyService } from './aiPreviewApplyService';
 import {
   appendAiContractReport,
   appendGrammarAiReport,
@@ -94,6 +95,11 @@ export class GrammarExplanationService {
 
     await vscode.window.showTextDocument(document, {
       preview: false
+    });
+    aiPreviewApplyService.registerPreviewDocument(document, {
+      featureName: 'Explain Current Grammar',
+      outputTitle: explanationContract.outputTitle,
+      workspaceRoot: projectContext.workspaceFolder.uri.fsPath
     });
   }
 }

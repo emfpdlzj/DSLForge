@@ -26,6 +26,7 @@ DSLForge is currently a pre-release extension.
 - publishes normalized diagnostics into Problems
 - uses AI only for explicitly AI-scoped authoring tasks
 - exposes grammar actions from editor and Explorer context menus in addition to the Command Palette
+- lets reviewed AI preview documents move toward workspace files through an explicit diff-and-apply flow
 
 ## What DSLForge Does Not Do
 

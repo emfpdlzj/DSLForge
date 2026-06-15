@@ -115,6 +115,28 @@
           "command": "dslforge.generateSampleDsl",
           "when": "resourceScheme == file && resourceExtname == .langium || resourceScheme == file && resourceExtname == .g4 || resourceScheme == file && resourceExtname == .xtext",
           "group": "navigation@4"
+        },
+        {
+          "command": "dslforge.applyAiPreviewToWorkspace",
+          "when": "dslforge.aiPreviewDocument",
+          "group": "navigation@5"
+        },
+        {
+          "command": "dslforge.completeAiPreviewApply",
+          "when": "dslforge.aiPreviewDraft",
+          "group": "navigation@6"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "dslforge.applyAiPreviewToWorkspace",
+          "when": "dslforge.aiPreviewDocument",
+          "group": "navigation@10"
+        },
+        {
+          "command": "dslforge.completeAiPreviewApply",
+          "when": "dslforge.aiPreviewDraft",
+          "group": "navigation@11"
         }
       ]
     },
@@ -137,6 +159,16 @@
       {
         "command": "dslforge.explainCurrentGrammar",
         "title": "Explain Current Grammar",
+        "category": "DSLForge"
+      },
+      {
+        "command": "dslforge.applyAiPreviewToWorkspace",
+        "title": "Apply AI Preview to Workspace",
+        "category": "DSLForge"
+      },
+      {
+        "command": "dslforge.completeAiPreviewApply",
+        "title": "Complete AI Preview Apply",
         "category": "DSLForge"
       }
     ]

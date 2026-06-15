@@ -67,7 +67,9 @@ function run(): void {
     'dslforge.validateCurrentGrammar',
     'dslforge.explainCurrentGrammar',
     'dslforge.createDslScaffold',
-    'dslforge.generateSampleDsl'
+    'dslforge.generateSampleDsl',
+    'dslforge.applyAiPreviewToWorkspace',
+    'dslforge.completeAiPreviewApply'
   ]) {
     assert(commands.includes(commandId), `missing command contribution: ${commandId}`);
   }
