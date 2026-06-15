@@ -160,13 +160,13 @@ Expected document header:
 
 - `DSLForge DSL Scaffold Proposal`
 - `Preview only: DSLForge has not written any files.`
-- `Contract sections: Scaffold Overview, Suggested Files, package.json Scripts, Starter Grammar, Implementation Notes, Next Steps`
+- `Contract sections: Scaffold Overview, Suggested Files, Suggested Commands, Starter Grammar, Implementation Notes, Next Steps`
 
 Expected document sections:
 
 - `## Scaffold Overview`
 - `## Suggested Files`
-- `## package.json Scripts`
+- `## Suggested Commands`
 - `## Starter Grammar`
 - `## Implementation Notes`
 - `## Next Steps`
@@ -175,8 +175,40 @@ Acceptance criteria:
 
 - output is proposal-oriented and does not pretend files were already created
 - file suggestions are practical for Langium-first v0.1
-- `package.json Scripts` contains concrete script names/commands
+- `Suggested Commands` contains concrete commands or scripts
 - `Starter Grammar` includes fenced code blocks
+
+## Case 4B: Create DSL Scaffold In Bootstrap Mode
+
+Precondition:
+
+- a supported chat model is available
+- request access is granted
+- a trusted workspace folder is open even if it does not contain a detected `.langium` or `.g4` grammar yet
+
+Procedure:
+
+1. Open a non-DSL workspace folder or a new empty project folder
+2. Run `DSLForge: Create DSL Scaffold`
+
+Expected behavior:
+
+- Output includes `DSLForge AI Gate Create DSL Scaffold`
+- Output includes `DSLForge Create DSL Scaffold`
+- Output includes `mode: bootstrap workspace scaffold`
+- a new markdown document opens
+
+Expected document header:
+
+- `DSLForge DSL Scaffold Proposal`
+- `Mode: bootstrap workspace scaffold`
+- `Framework hint:`
+
+Acceptance criteria:
+
+- the proposal makes assumptions explicit instead of pretending the framework is already decided
+- the suggested commands reflect detected package manager or build-tool signals when present
+- if no strong framework signal exists, the proposal defaults to a pragmatic Langium-first TypeScript layout
 
 ## Case 5: Generate Sample DSL
 
