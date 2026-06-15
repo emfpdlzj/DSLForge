@@ -6,12 +6,11 @@ This checklist is for the first public VS Code Marketplace release of `DSLForge`
 
 ## Release Goal
 
-Ship `DSLForge` as a DSL authoring workflow assistant with Langium-first release packaging and active ANTLR4 branch work.
+Ship `DSLForge` as a DSL authoring workflow assistant with Langium, ANTLR4, and Xtext workspace support.
 
 Non-goals for this release:
 
 - generic AI code generation
-- Xtext support
 - fake fallback behavior for AI commands
 
 ## Current Audit Summary
@@ -85,6 +84,8 @@ These items must be true before `vsce publish`:
   - package script fixture
   - gradle wrapper fixture
   - maven wrapper fixture
+  - Xtext gradle wrapper fixture
+  - Xtext maven wrapper fixture
   - missing command fixture
 - Verify AI command gate paths:
   - missing model environment

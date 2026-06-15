@@ -1,6 +1,6 @@
 # DSLForge Validation Smoke Test
 
-This document fixes the three Langium validation-resolution paths used by `DSLForge: Validate Current Grammar`.
+This document fixes the validation-resolution paths used by `DSLForge: Validate Current Grammar` across Langium and Xtext fixtures.
 
 ## Fixtures
 
@@ -8,6 +8,8 @@ This document fixes the three Langium validation-resolution paths used by `DSLFo
 - package script: `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/langium/package-script`
 - missing command: `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/langium/missing-command`
 - import context: `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/langium/import-context`
+- xtext gradle wrapper: `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/xtext/gradle-wrapper`
+- xtext maven wrapper: `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/xtext/maven-wrapper`
 
 ## Launch
 
@@ -87,3 +89,4 @@ Expected behavior:
 4. Check the notification message, Output panel, and Problems view.
 5. For the missing-command fixture, open Quick Fix on line 1 and verify both actions appear.
 6. For the import-context fixture, verify that the Output panel includes imported grammar files from the active grammar chain.
+7. For the Xtext fixtures, open the `.xtext` grammar before running the command and verify that the Output panel includes the `.mwe2` workflow file together with the Gradle or Maven build file.
