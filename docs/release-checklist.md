@@ -32,6 +32,7 @@ Completed in this audit:
 - `docs/marketplace-launch.md` now includes launch copy, a short demo flow, and supported workspace examples
 - `docs/onboarding-quickstart.md` now provides a short onboarding path for supported workspaces
 - current branch packaging still succeeds after the reviewed AI preview apply flow changes
+- reviewed AI preview apply logic now has dedicated fixture coverage for file-target parsing, bundle selection, and conflict detection
 
 Still required before publish:
 
@@ -129,6 +130,8 @@ Audit run on 2026-06-15:
 - `npm exec -- vsce ls`
   - passed
   - packaged file list includes `dist/core/aiPreviewApplyService.js`
+- `npm run test:ai-preview-apply`
+  - passed
 - `npm exec -- vsce package`
   - passed
   - output package: `dslforge-0.2.0.vsix`

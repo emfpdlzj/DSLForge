@@ -32,5 +32,5 @@ Last updated: 2026-06-15
 ## Backlog Added During Implementation
 
 - [x] Add manual AI smoke coverage for an Xtext fixture so scaffold/sample/explanation prompts are verified against MWE2, imported grammars, and EPackage context.
-- [ ] Extend the reviewed apply flow toward multi-file scaffold application and add focused smoke coverage for overwrite/conflict cases.
+- [x] Extend the reviewed apply flow toward multi-file scaffold application and add focused smoke coverage for overwrite/conflict cases.
 - [ ] Capture actual Marketplace screenshot image files only if the release process later re-enables screenshot work.
