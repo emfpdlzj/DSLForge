@@ -8,6 +8,8 @@ import { buildLangiumContextSelection } from '../langium/contextSelection';
 import { readWorkspacePackageInfo } from '../core/workspacePackage';
 import { readWorkspaceBuildToolInfo } from '../core/workspaceBuildTool';
 import { resolveValidationPlanCore } from '../core/validationPlan';
+import { buildXtextContextSelection } from '../xtext/contextSelection';
+import { detectXtextProject } from '../xtext/projectDetection';
 
 interface DetectionExpectation {
   minimumConfidence: number;
@@ -17,6 +19,8 @@ interface DetectionExpectation {
 interface ValidationExpectation {
   configuredCommand?: string;
   preferredCommandNames?: string[];
+  preferredGradleTaskNames?: string[];
+  preferredMavenGoalNames?: string[];
   source:
     | 'user-configured'
     | 'package-script'
@@ -36,7 +40,7 @@ interface ContextExpectation {
 
 interface ProjectFixtureCase {
   name: string;
-  framework: 'langium' | 'antlr4';
+  framework: 'langium' | 'antlr4' | 'xtext';
   workspaceRoot: string;
   activeFile?: string;
   detection: DetectionExpectation;
@@ -48,8 +52,28 @@ interface ProjectFixtureManifest {
   fixtures: ProjectFixtureCase[];
 }
 
-async function collectGrammarFiles(workspaceRoot: string): Promise<string[]> {
-  return collectFilesWithExtension(workspaceRoot, '.langium');
+function getGrammarExtension(framework: ProjectFixtureCase['framework']): string {
+  switch (framework) {
+    case 'antlr4':
+      return '.g4';
+    case 'xtext':
+      return '.xtext';
+    case 'langium':
+    default:
+      return '.langium';
+  }
+}
+
+function getAdapterDisplayName(framework: ProjectFixtureCase['framework']): string {
+  switch (framework) {
+    case 'antlr4':
+      return 'ANTLR4';
+    case 'xtext':
+      return 'Xtext';
+    case 'langium':
+    default:
+      return 'Langium';
+  }
 }
 
 async function collectFilesWithExtension(
@@ -100,21 +124,35 @@ async function runDetectionCase(fixture: ProjectFixtureCase): Promise<void> {
   const workspaceRoot = path.resolve(process.cwd(), fixture.workspaceRoot);
   const grammarFiles = await collectFilesWithExtension(
     workspaceRoot,
-    fixture.framework === 'antlr4' ? '.g4' : '.langium'
+    getGrammarExtension(fixture.framework)
   );
   const activeFile = resolveFixturePath(workspaceRoot, fixture.activeFile);
-  const detection =
-    fixture.framework === 'antlr4'
-      ? await detectAntlr4Project({
-          workspaceRoot,
-          activeFile,
-          grammarFiles
-        })
-      : await detectLangiumProject({
-          workspaceRoot,
-          activeFile,
-          grammarFiles
-        });
+  let detection;
+
+  switch (fixture.framework) {
+    case 'antlr4':
+      detection = await detectAntlr4Project({
+        workspaceRoot,
+        activeFile,
+        grammarFiles
+      });
+      break;
+    case 'xtext':
+      detection = await detectXtextProject({
+        workspaceRoot,
+        activeFile,
+        grammarFiles
+      });
+      break;
+    case 'langium':
+    default:
+      detection = await detectLangiumProject({
+        workspaceRoot,
+        activeFile,
+        grammarFiles
+      });
+      break;
+  }
 
   assert.ok(detection, `${fixture.name}: detection should succeed`);
   assert.ok(
@@ -135,7 +173,7 @@ async function runValidationCase(fixture: ProjectFixtureCase): Promise<void> {
   const packageInfo = await readWorkspacePackageInfo(workspaceRoot);
   const plan = resolveValidationPlanCore({
     configuredCommand: fixture.validation.configuredCommand,
-    adapterDisplayName: fixture.framework === 'antlr4' ? 'ANTLR4' : 'Langium',
+    adapterDisplayName: getAdapterDisplayName(fixture.framework),
     preferredScriptNames:
       fixture.validation.preferredCommandNames ?? [
         'validate',
@@ -143,6 +181,8 @@ async function runValidationCase(fixture: ProjectFixtureCase): Promise<void> {
         'langium:check',
         'build'
       ],
+    preferredGradleTaskNames: fixture.validation.preferredGradleTaskNames,
+    preferredMavenGoalNames: fixture.validation.preferredMavenGoalNames,
     packageInfo,
     buildToolInfo: await readWorkspaceBuildToolInfo(workspaceRoot)
   });
@@ -178,21 +218,35 @@ async function runContextCase(fixture: ProjectFixtureCase): Promise<void> {
   const workspaceRoot = path.resolve(process.cwd(), fixture.workspaceRoot);
   const grammarFiles = await collectFilesWithExtension(
     workspaceRoot,
-    fixture.framework === 'antlr4' ? '.g4' : '.langium'
+    getGrammarExtension(fixture.framework)
   );
   const activeFile = resolveFixturePath(workspaceRoot, fixture.activeFile);
-  const context =
-    fixture.framework === 'antlr4'
-      ? await buildAntlr4ContextSelection({
-          workspaceRoot,
-          activeFile,
-          grammarFiles
-        })
-      : await buildLangiumContextSelection({
-          workspaceRoot,
-          activeFile,
-          grammarFiles
-        });
+  let context;
+
+  switch (fixture.framework) {
+    case 'antlr4':
+      context = await buildAntlr4ContextSelection({
+        workspaceRoot,
+        activeFile,
+        grammarFiles
+      });
+      break;
+    case 'xtext':
+      context = await buildXtextContextSelection({
+        workspaceRoot,
+        activeFile,
+        grammarFiles
+      });
+      break;
+    case 'langium':
+    default:
+      context = await buildLangiumContextSelection({
+        workspaceRoot,
+        activeFile,
+        grammarFiles
+      });
+      break;
+  }
 
   assert.equal(
     context.activeGrammarFile,

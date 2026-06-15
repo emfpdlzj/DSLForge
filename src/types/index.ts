@@ -1,4 +1,4 @@
-export type FrameworkId = 'langium' | 'antlr4';
+export type FrameworkId = 'langium' | 'antlr4' | 'xtext';
 
 export type ValidationCommandSource =
   | 'user-configured'
@@ -50,6 +50,7 @@ export type GrammarContextFileKind =
 export type GrammarContextLanguageId =
   | 'langium'
   | 'antlr'
+  | 'xtext'
   | 'json'
   | 'xml'
   | 'plaintext';

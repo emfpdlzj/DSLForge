@@ -38,6 +38,13 @@ export interface AiDocumentContractValidation {
   normalized: boolean;
 }
 
+export interface FrameworkPromptProfile {
+  frameworkLabel: string;
+  explanationFocus: string[];
+  scaffoldFocus: string[];
+  sampleFocus: string[];
+}
+
 const MAX_CONTEXT_FILES = 5;
 const MAX_CHARACTERS_PER_FILE = 8000;
 const MAX_TOTAL_CHARACTERS = 20000;
@@ -156,6 +163,62 @@ export function buildGrammarContextBlock(context: GrammarModelContext): string {
         '```'
     )
     .join('\n\n');
+}
+
+export function getFrameworkPromptProfile(
+  projectContext: ResolvedProjectContext
+): FrameworkPromptProfile {
+  switch (projectContext.detection.framework) {
+    case 'antlr4':
+      return {
+        frameworkLabel: 'ANTLR4',
+        explanationFocus: [
+          'Mention lexer/parser rule split, token vocabulary reuse, and validation entry points when visible.',
+          'If the workspace shows Gradle, Maven, or package-script execution paths, keep the explanation aligned with those paths.'
+        ],
+        scaffoldFocus: [
+          'Prefer ANTLR4-oriented scaffold guidance over Langium or Xtext-specific project structure.',
+          'If context shows Gradle, Maven, or package.json validation paths, preserve that toolchain instead of inventing a different one.'
+        ],
+        sampleFocus: [
+          'Generate samples that fit ANTLR4 grammar structure and token expectations visible in the context.',
+          'Call out lexer/parser ambiguities or missing entry rules when that affects sample validity.'
+        ]
+      };
+    case 'xtext':
+      return {
+        frameworkLabel: 'Xtext',
+        explanationFocus: [
+          'Mention mixed-in grammars, imported EPackages, and MWE2/build workflow implications when visible.',
+          'Keep the explanation grounded in the visible Xtext grammar and workspace toolchain.'
+        ],
+        scaffoldFocus: [
+          'Prefer Xtext-oriented scaffold guidance over Langium-oriented suggestions when Xtext signals are present.',
+          'If context shows MWE2 workflows, Gradle, Maven, or imported EPackages, keep the proposal aligned with those artifacts.'
+        ],
+        sampleFocus: [
+          'Generate samples that reflect Xtext grammar rules, imported namespaces, and visible cross-reference shape.',
+          'Call out unresolved namespace or model assumptions when imports or EPackages appear incomplete.'
+        ]
+      };
+    case 'langium':
+    default:
+      return {
+        frameworkLabel: 'Langium',
+        explanationFocus: [
+          'Mention imports, terminals, and Langium-specific authoring implications when visible.',
+          'Keep the explanation grounded in the visible grammar and package-script workflow.'
+        ],
+        scaffoldFocus: [
+          'Prefer practical Langium project structure and authoring workflow guidance.',
+          'If the workspace already shows package scripts or Langium config, preserve that structure in the proposal.'
+        ],
+        sampleFocus: [
+          'Generate samples that reflect Langium grammar structure, imports, and visible terminals.',
+          'Call out ambiguities or missing constraints when the visible rules do not fully constrain the language.'
+        ]
+      };
+  }
 }
 
 export function buildAiContractPrompt(

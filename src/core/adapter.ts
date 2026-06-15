@@ -21,6 +21,8 @@ export interface AdapterValidationPlanningInput {
 
 export interface AdapterValidationPreferences {
   preferredScriptNames: string[];
+  preferredGradleTaskNames?: string[];
+  preferredMavenGoalNames?: string[];
   rationale: string[];
 }
 

@@ -63,6 +63,8 @@ function getValidationPreferences(
 ): Promise<AdapterValidationPreferences> {
   return Promise.resolve({
     preferredScriptNames: ['validate', 'langium:validate', 'langium:check', 'build'],
+    preferredGradleTaskNames: ['build', 'check'],
+    preferredMavenGoalNames: ['package', 'test', 'validate', 'verify'],
     rationale: [
       `Adapter selected: ${input.project.displayName}`,
       `Workspace root: ${input.project.context.workspaceRoot}`,

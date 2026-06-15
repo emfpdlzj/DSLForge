@@ -186,6 +186,75 @@
         "requiredFiles": ["src/main/antlr4/com/acme/Rules.g4", "pom.xml"],
         "relatedFileCount": 1
       }
+    },
+    {
+      "name": "xtext-gradle-wrapper",
+      "framework": "xtext",
+      "workspaceRoot": "test-fixtures/xtext/gradle-wrapper",
+      "activeFile": "src/main/java/com/acme/Orders.xtext",
+      "detection": {
+        "minimumConfidence": 100,
+        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "build-file", "wrapper", "dependency"]
+      },
+      "validation": {
+        "preferredGradleTaskNames": ["generateXtext", "build", "check"],
+        "source": "gradle-wrapper",
+        "commandLine": "./gradlew generateXtext"
+      },
+      "context": {
+        "activeGrammarFile": "src/main/java/com/acme/Orders.xtext",
+        "contextKinds": ["active-grammar", "config", "build-file"],
+        "requiredFiles": ["src/main/java/com/acme/Orders.xtext", "GenerateOrders.mwe2", "build.gradle"],
+        "relatedFileCount": 2
+      }
+    },
+    {
+      "name": "xtext-maven-wrapper",
+      "framework": "xtext",
+      "workspaceRoot": "test-fixtures/xtext/maven-wrapper",
+      "activeFile": "src/main/java/com/acme/Rules.xtext",
+      "detection": {
+        "minimumConfidence": 100,
+        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "build-file", "wrapper", "dependency"]
+      },
+      "validation": {
+        "preferredMavenGoalNames": ["generate-sources", "package", "test"],
+        "source": "maven-wrapper",
+        "commandLine": "./mvnw generate-sources"
+      },
+      "context": {
+        "activeGrammarFile": "src/main/java/com/acme/Rules.xtext",
+        "contextKinds": ["active-grammar", "config", "build-file"],
+        "requiredFiles": ["src/main/java/com/acme/Rules.xtext", "GenerateRules.mwe2", "pom.xml"],
+        "relatedFileCount": 2
+      }
+    },
+    {
+      "name": "xtext-import-context",
+      "framework": "xtext",
+      "workspaceRoot": "test-fixtures/xtext/import-context",
+      "activeFile": "src/main/java/com/acme/Main.xtext",
+      "detection": {
+        "minimumConfidence": 100,
+        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "build-file", "wrapper", "dependency"]
+      },
+      "validation": {
+        "preferredGradleTaskNames": ["generateXtext", "build", "check"],
+        "source": "gradle-wrapper",
+        "commandLine": "./gradlew generateXtext"
+      },
+      "context": {
+        "activeGrammarFile": "src/main/java/com/acme/Main.xtext",
+        "contextKinds": ["active-grammar", "imported-grammar", "config", "build-file"],
+        "requiredFiles": [
+          "src/main/java/com/acme/Main.xtext",
+          "src/main/java/com/acme/Common.xtext",
+          "model/shared.ecore",
+          "GenerateMain.mwe2",
+          "build.gradle"
+        ],
+        "relatedFileCount": 4
+      }
     }
   ]
 }

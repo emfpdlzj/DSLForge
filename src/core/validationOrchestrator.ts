@@ -46,7 +46,9 @@ export class ValidationOrchestrator {
       workspaceRoot: projectContext.workspaceFolder.uri.fsPath,
       workspaceUri: projectContext.workspaceFolder.uri,
       adapterDisplayName: projectContext.adapter.displayName,
-      preferredScriptNames: preferences.preferredScriptNames
+      preferredScriptNames: preferences.preferredScriptNames,
+      preferredGradleTaskNames: preferences.preferredGradleTaskNames,
+      preferredMavenGoalNames: preferences.preferredMavenGoalNames
     });
     plan.rationale.push(...preferences.rationale);
 

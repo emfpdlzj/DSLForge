@@ -1,0 +1,9 @@
+grammar com.acme.Rules with org.eclipse.xtext.common.Terminals
+
+generate rules "http://acme.com/rules"
+
+Model:
+  rules+=Rule*;
+
+Rule:
+  'rule' name=ID ';';

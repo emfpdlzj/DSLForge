@@ -7,8 +7,13 @@ import { SampleDslService } from './sampleDslService';
 import { ValidationOrchestrator } from './validationOrchestrator';
 import { antlr4Adapter } from '../antlr4/adapter';
 import { langiumAdapter } from '../langium/adapter';
+import { xtextAdapter } from '../xtext/adapter';
 
-const adapterRegistry = new AdapterRegistry([langiumAdapter, antlr4Adapter]);
+const adapterRegistry = new AdapterRegistry([
+  langiumAdapter,
+  antlr4Adapter,
+  xtextAdapter
+]);
 
 export const projectService = new ProjectService(adapterRegistry);
 export const validationOrchestrator = new ValidationOrchestrator();
