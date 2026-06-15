@@ -1,6 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { strict as assert } from 'node:assert';
+import { interpretAntlr4ValidationOutput } from '../antlr4/validationDiagnostics';
 import { parseValidationIssues, dedupeValidationIssues } from '../core/validationIssueParser';
 import { interpretLangiumValidationOutput } from '../langium/validationDiagnostics';
 import type { ProjectDetectionResult, ValidationIssue } from '../types';
@@ -17,8 +18,10 @@ interface ExpectedIssue {
 
 interface DiagnosticsFixture {
   name: string;
-  parser: 'generic' | 'langium';
+  parser: 'generic' | 'langium' | 'antlr4';
   logFile: string;
+  workspaceRoot?: string;
+  activeGrammarFile?: string;
   defaultSource?: string;
   expectedIssues: ExpectedIssue[];
 }
@@ -39,6 +42,26 @@ function createLangiumProject(workspaceRoot: string): ProjectDetectionResult {
       framework: 'langium',
       workspaceRoot,
       grammarFiles: [],
+      signals: []
+    }
+  };
+}
+
+function createAntlr4Project(
+  workspaceRoot: string,
+  activeGrammarFile?: string
+): ProjectDetectionResult {
+  return {
+    adapterId: 'antlr4',
+    framework: 'antlr4',
+    displayName: 'ANTLR4',
+    confidence: 1,
+    context: {
+      adapterId: 'antlr4',
+      framework: 'antlr4',
+      workspaceRoot,
+      activeFile: activeGrammarFile,
+      grammarFiles: activeGrammarFile ? [activeGrammarFile] : [],
       signals: []
     }
   };
@@ -89,13 +112,16 @@ async function runFixture(
   manifest: FixtureManifest,
   fixture: DiagnosticsFixture
 ): Promise<void> {
-  const workspaceRoot = path.resolve(process.cwd(), manifest.workspaceRoot);
+  const effectiveWorkspaceRoot = path.resolve(
+    process.cwd(),
+    fixture.workspaceRoot ?? manifest.workspaceRoot
+  );
   const logPath = path.resolve(process.cwd(), fixture.logFile);
   const rawOutput = await fs.readFile(logPath, 'utf8');
   const issues =
     fixture.parser === 'langium'
       ? interpretLangiumValidationOutput({
-          project: createLangiumProject(workspaceRoot),
+          project: createLangiumProject(effectiveWorkspaceRoot),
           context: {
             activeGrammarFile: undefined,
             relatedFiles: [],
@@ -104,9 +130,29 @@ async function runFixture(
           },
           rawOutput
         })
+      : fixture.parser === 'antlr4'
+        ? interpretAntlr4ValidationOutput({
+            project: createAntlr4Project(
+              effectiveWorkspaceRoot,
+              resolveExpectedFilePath(
+                effectiveWorkspaceRoot,
+                fixture.activeGrammarFile
+              )
+            ),
+            context: {
+              activeGrammarFile: resolveExpectedFilePath(
+                effectiveWorkspaceRoot,
+                fixture.activeGrammarFile
+              ),
+              relatedFiles: [],
+              contextFiles: [],
+              notes: []
+            },
+            rawOutput
+          })
       : dedupeValidationIssues(
           parseValidationIssues(rawOutput, {
-            workspaceRoot,
+            workspaceRoot: effectiveWorkspaceRoot,
             defaultSource: fixture.defaultSource
           })
         );
@@ -120,7 +166,10 @@ async function runFixture(
   for (const expectedIssue of fixture.expectedIssues) {
     const matched = findMatchingIssue(issues, {
       ...expectedIssue,
-      filePath: resolveExpectedFilePath(workspaceRoot, expectedIssue.filePath)
+      filePath: resolveExpectedFilePath(
+        effectiveWorkspaceRoot,
+        expectedIssue.filePath
+      )
     });
     assert.ok(
       matched,

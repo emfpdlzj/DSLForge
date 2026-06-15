@@ -54,6 +54,41 @@
           "messageIncludes": "Failed to read langium-config.json because the JSON is invalid"
         }
       ]
+    },
+    {
+      "name": "antlr4-located-error",
+      "parser": "antlr4",
+      "workspaceRoot": "test-fixtures/antlr4/package-script",
+      "activeGrammarFile": "src/grammar/Expr.g4",
+      "logFile": "test-fixtures/diagnostics/antlr4-located-error.log",
+      "expectedIssues": [
+        {
+          "severity": "error",
+          "source": "ANTLR4",
+          "code": "ANTLR50",
+          "filePath": "src/grammar/Expr.g4",
+          "line": 3,
+          "column": 1,
+          "messageIncludes": "syntax error: missing ';' at 'options'"
+        }
+      ]
+    },
+    {
+      "name": "antlr4-active-file-error",
+      "parser": "antlr4",
+      "workspaceRoot": "test-fixtures/antlr4/package-script",
+      "activeGrammarFile": "src/grammar/Expr.g4",
+      "logFile": "test-fixtures/diagnostics/antlr4-active-file-error.log",
+      "expectedIssues": [
+        {
+          "severity": "error",
+          "source": "ANTLR4",
+          "filePath": "src/grammar/Expr.g4",
+          "line": 5,
+          "column": 1,
+          "messageIncludes": "token recognition error at: '$'"
+        }
+      ]
     }
   ]
 }

@@ -9,6 +9,7 @@ import type {
 import { createProjectContext } from '../core/projectContext';
 import { buildAntlr4ContextSelection } from './contextSelection';
 import { detectAntlr4Project } from './projectDetection';
+import { interpretAntlr4ValidationOutput } from './validationDiagnostics';
 import type { GrammarContextSelection, ProjectDetectionResult } from '../types';
 
 async function collectGrammarFiles(workspaceRoot: string): Promise<string[]> {
@@ -83,5 +84,7 @@ export const antlr4Adapter: DslAdapter = {
   displayName: 'ANTLR4',
   detect,
   selectContext,
-  getValidationPreferences
+  getValidationPreferences,
+  interpretValidationOutput: async (input) =>
+    interpretAntlr4ValidationOutput(input)
 };
