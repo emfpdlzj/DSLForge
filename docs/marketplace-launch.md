@@ -3,6 +3,7 @@
 Last updated: 2026-06-15
 
 This document collects the copy and onboarding material needed for the first Marketplace-facing release.
+The current workstream excludes screenshot capture, so screenshot items remain planning material rather than completed assets.
 
 ## Positioning Copy
 
@@ -35,6 +36,10 @@ This document collects the copy and onboarding material needed for the first Mar
 3. Review normalized diagnostics in Problems and the Output panel.
 4. Run one AI command such as `Explain Current Grammar`.
 5. If the preview is useful, run `DSLForge: Apply AI Preview to Workspace`, review the draft, and explicitly complete the apply.
+
+Companion onboarding doc:
+
+- [docs/onboarding-quickstart.md](/private/tmp/DSLForge-xtext-validation-normalization/docs/onboarding-quickstart.md:1)
 
 ## Supported Workspace Examples
 

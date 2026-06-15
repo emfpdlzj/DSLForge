@@ -21,7 +21,7 @@ Last updated: 2026-06-15
 - [x] Align extension messaging across README, package metadata, and restricted-mode copy so DSLForge is described consistently as a multi-framework DSL workflow assistant, not a Langium-first product.
 - [x] Add product-facing UI entry points beyond Command Palette, such as Explorer/context menu actions, a status bar entry, or a validation plan preview surface.
 - [x] Define and implement a safe apply flow for AI output so scaffold/sample/explanation results can evolve from preview-only documents toward reviewed edits or generated files.
-- [ ] Prepare Marketplace launch assets and onboarding material. Copy, demo flow, and supported workspace examples are drafted; screenshots remain deferred.
+- [x] Prepare Marketplace launch copy, demo flow, and onboarding material for the current branch. Screenshot assets remain deferred.
 
 ## Product Positioning Notes
 

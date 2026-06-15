@@ -1,6 +1,6 @@
 # DSLForge Release Checklist
 
-Last updated: 2026-06-14
+Last updated: 2026-06-15
 
 This checklist is for the first public VS Code Marketplace release of `DSLForge`.
 
@@ -29,6 +29,9 @@ Completed in this audit:
 - `package.json` now includes preview metadata, keywords, and explicit license reference
 - `CHANGELOG.md` now exists for the first release
 - README now includes installation guidance, a one-minute flow, and explicit adapter/AI limits
+- `docs/marketplace-launch.md` now includes launch copy, a short demo flow, and supported workspace examples
+- `docs/onboarding-quickstart.md` now provides a short onboarding path for supported workspaces
+- current branch packaging still succeeds after the reviewed AI preview apply flow changes
 
 Still required before publish:
 
@@ -37,6 +40,7 @@ Still required before publish:
 - fix `origin` remote to the intended public repository
 - confirm publisher access and Marketplace login path
 - run one final local VSIX install smoke on the exact package to publish
+- complete manual VS Code smoke for the Xtext fixtures and AI preview/apply path
 
 ## Blocking Checks
 
@@ -61,6 +65,7 @@ These items must be true before `vsce publish`:
 - Confirm extension title and short description are final
 - Confirm `keywords` match real discovery terms
 - Review [docs/marketplace-launch.md](/private/tmp/DSLForge-xtext-validation-normalization/docs/marketplace-launch.md:1) and finalize one short description candidate plus the opening paragraph
+- Review [docs/onboarding-quickstart.md](/private/tmp/DSLForge-xtext-validation-normalization/docs/onboarding-quickstart.md:1) and keep it aligned with the README quick-start flow
 - Add at least three screenshots:
   - validation success or failure with diagnostics surfaced
   - AI gate blocked state with setup guidance
@@ -92,6 +97,7 @@ These items must be true before `vsce publish`:
   - missing model environment
   - model present but no request access
 - Verify one successful AI preview path if model access is available
+- Verify the reviewed AI preview apply flow in VS Code before release
 
 ## Git And Repo Checklist
 
@@ -114,7 +120,21 @@ These items must be true before `vsce publish`:
 
 ## Execution Log
 
-Audit run on 2026-06-14:
+Audit run on 2026-06-15:
+
+- `npm run typecheck`
+  - passed
+- `npm run test`
+  - passed
+- `npm exec -- vsce ls`
+  - passed
+  - packaged file list includes `dist/core/aiPreviewApplyService.js`
+- `npm exec -- vsce package`
+  - passed
+  - output package: `dslforge-0.2.0.vsix`
+  - packaged size: `167 KB`
+
+Earlier audit notes on 2026-06-14:
 
 - `git status --short`
   - `D  .agents/AGENTS.md`
