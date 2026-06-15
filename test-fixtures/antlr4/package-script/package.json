@@ -1,0 +1,11 @@
+{
+  "name": "dslforge-antlr4-package-script",
+  "private": true,
+  "devDependencies": {
+    "antlr4ts-cli": "^0.5.0-alpha.4"
+  },
+  "scripts": {
+    "validate": "node ./scripts/validate.js",
+    "antlr:generate": "antlr4ts -visitor ./src/grammar/*.g4"
+  }
+}

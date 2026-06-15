@@ -1,4 +1,4 @@
-export type FrameworkId = 'langium';
+export type FrameworkId = 'langium' | 'antlr4';
 
 export type ValidationCommandSource =
   | 'user-configured'
@@ -14,6 +14,8 @@ export interface ProjectSignal {
     | 'grammar-file'
     | 'package-json'
     | 'config-file'
+    | 'build-file'
+    | 'wrapper'
     | 'dependency'
     | 'script';
   value: string;
@@ -42,9 +44,15 @@ export type GrammarContextFileKind =
   | 'imported-grammar'
   | 'sibling-grammar'
   | 'config'
+  | 'build-file'
   | 'package-json';
 
-export type GrammarContextLanguageId = 'langium' | 'json' | 'plaintext';
+export type GrammarContextLanguageId =
+  | 'langium'
+  | 'antlr'
+  | 'json'
+  | 'xml'
+  | 'plaintext';
 
 export interface GrammarContextFileSelection {
   filePath: string;
