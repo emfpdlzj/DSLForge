@@ -7,11 +7,21 @@
   "engines": {
     "vscode": "^1.120.0"
   },
+  "preview": true,
   "categories": [
     "Programming Languages",
     "Other"
   ],
-  "keywords": [],
+  "keywords": [
+    "dsl",
+    "langium",
+    "grammar",
+    "language-engineering",
+    "language-workbench",
+    "antlr",
+    "xtext",
+    "vscode"
+  ],
   "main": "./dist/extension.js",
   "icon": "media/icon.png",
   "capabilities": {
@@ -88,6 +98,7 @@
   "scripts": {
     "vscode:prepublish": "npm run build",
     "build": "tsc -p tsconfig.json",
+    "generate:screenshots": "node ./scripts/generate-marketplace-screenshots.mjs",
     "watch": "tsc -watch -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:diagnostics": "npm run build && node dist/test/diagnosticsFixtureRunner.js",
@@ -101,7 +112,7 @@
     "url": "git+https://github.com/emfpdlzj/DSLForge.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "SEE LICENSE IN LICENSE",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/emfpdlzj/DSLForge/issues"
