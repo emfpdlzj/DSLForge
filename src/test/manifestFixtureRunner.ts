@@ -17,6 +17,16 @@ interface PackageJson {
       title?: string;
       category?: string;
     }>;
+    menus?: {
+      'editor/context'?: Array<{
+        command?: string;
+        when?: string;
+      }>;
+      'editor/title'?: Array<{
+        command?: string;
+        when?: string;
+      }>;
+    };
   };
 }
 
@@ -73,6 +83,26 @@ function run(): void {
   ]) {
     assert(commands.includes(commandId), `missing command contribution: ${commandId}`);
   }
+
+  const editorContextMenus = packageJson.contributes?.menus?.['editor/context'] ?? [];
+  const editorTitleMenus = packageJson.contributes?.menus?.['editor/title'] ?? [];
+
+  assert(
+    editorContextMenus.some(
+      (item) =>
+        item.command === 'dslforge.applyAiPreviewToWorkspace' &&
+        item.when?.includes('dslforge.aiPreviewDocument')
+    ),
+    'applyAiPreviewToWorkspace must be present in editor context menus with preview gating'
+  );
+  assert(
+    editorTitleMenus.some(
+      (item) =>
+        item.command === 'dslforge.completeAiPreviewApply' &&
+        item.when?.includes('dslforge.aiPreviewDraft')
+    ),
+    'completeAiPreviewApply must be present in editor title menus with draft gating'
+  );
 
   console.log('manifest fixture checks passed');
 }

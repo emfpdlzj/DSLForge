@@ -1,4 +1,3 @@
-import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
 import {
@@ -6,6 +5,12 @@ import {
   appendOutputLine,
   showOutputChannel
 } from './outputChannel';
+import {
+  buildBundleReviewMarkdown,
+  buildSelectionSuggestions,
+  collectConflictingTargets,
+  type PreviewBundleTarget
+} from './aiPreviewApplyModel';
 
 export const APPLY_AI_PREVIEW_TO_WORKSPACE_COMMAND =
   'dslforge.applyAiPreviewToWorkspace';
@@ -19,36 +24,19 @@ interface AiPreviewDocumentRegistration {
 }
 
 interface PendingAiPreviewApplySession {
-  draftUri: vscode.Uri;
-  targetUri: vscode.Uri;
+  reviewUri: vscode.Uri;
   workspaceRoot: string;
   featureName: string;
   selectionLabel: string;
-  content: string;
+  targets: PendingAiPreviewApplyTarget[];
+}
+
+interface PendingAiPreviewApplyTarget {
+  targetUri: vscode.Uri;
   targetRelativePath: string;
+  content: string;
+  sourceLabel: string;
   targetSnapshot?: string;
-}
-
-interface PreviewSelection {
-  label: string;
-  description: string;
-  detail?: string;
-  content: string;
-  suggestedRelativePath: string;
-}
-
-interface CodeBlockSelection {
-  heading?: string;
-  languageId: string;
-  content: string;
-}
-
-function slugify(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .replace(/-{2,}/g, '-');
 }
 
 function toDocumentKey(uri: vscode.Uri): string {
@@ -60,146 +48,6 @@ function buildDocumentRange(document: vscode.TextDocument): vscode.Range {
   const lastCharacter = document.lineAt(lastLine).text.length;
 
   return new vscode.Range(0, 0, lastLine, lastCharacter);
-}
-
-function getSectionHeading(line: string): string | undefined {
-  const match = /^##\s+(?<heading>.+?)\s*$/.exec(line.trim());
-  return match?.groups?.heading?.trim();
-}
-
-function extractBodyMarkdown(markdown: string): string {
-  const lines = markdown.split(/\r?\n/);
-  const bodyStartIndex = lines.findIndex((line) => line.trim().startsWith('## '));
-
-  if (bodyStartIndex < 0) {
-    return markdown.trim();
-  }
-
-  return lines.slice(bodyStartIndex).join('\n').trim();
-}
-
-function extractCodeBlockSelections(markdown: string): CodeBlockSelection[] {
-  const lines = markdown.split(/\r?\n/);
-  const selections: CodeBlockSelection[] = [];
-  let currentHeading: string | undefined;
-  let inCodeBlock = false;
-  let currentLanguageId = '';
-  let currentCodeLines: string[] = [];
-
-  for (const line of lines) {
-    const heading = getSectionHeading(line);
-
-    if (!inCodeBlock && heading) {
-      currentHeading = heading;
-      continue;
-    }
-
-    const fenceMatch = /^```(?<languageId>[a-zA-Z0-9_-]*)\s*$/.exec(line.trim());
-
-    if (fenceMatch) {
-      if (inCodeBlock) {
-        selections.push({
-          heading: currentHeading,
-          languageId: currentLanguageId,
-          content: currentCodeLines.join('\n').trimEnd()
-        });
-        inCodeBlock = false;
-        currentLanguageId = '';
-        currentCodeLines = [];
-      } else {
-        inCodeBlock = true;
-        currentLanguageId = fenceMatch.groups?.languageId?.trim() ?? '';
-      }
-
-      continue;
-    }
-
-    if (inCodeBlock) {
-      currentCodeLines.push(line);
-    }
-  }
-
-  return selections.filter((selection) => selection.content.length > 0);
-}
-
-function extensionForLanguageId(languageId: string): string {
-  switch (languageId.toLowerCase()) {
-    case 'json':
-      return '.json';
-    case 'xml':
-      return '.xml';
-    case 'markdown':
-      return '.md';
-    case 'langium':
-      return '.langium';
-    case 'antlr':
-      return '.g4';
-    case 'xtext':
-      return '.xtext';
-    case 'typescript':
-      return '.ts';
-    case 'javascript':
-      return '.js';
-    case 'shell':
-    case 'bash':
-    case 'sh':
-      return '.sh';
-    default:
-      return '.txt';
-  }
-}
-
-function buildSelectionSuggestions(
-  registration: AiPreviewDocumentRegistration,
-  markdown: string
-): PreviewSelection[] {
-  const documentSlug = slugify(registration.outputTitle || registration.featureName);
-  const selections: PreviewSelection[] = [
-    {
-      label: 'Entire Preview Document',
-      description: 'Write the full markdown preview, including the DSLForge header.',
-      content: markdown.trim(),
-      suggestedRelativePath: `docs/${documentSlug}.md`
-    }
-  ];
-  const bodyMarkdown = extractBodyMarkdown(markdown);
-
-  if (bodyMarkdown.length > 0 && bodyMarkdown !== markdown.trim()) {
-    selections.push({
-      label: 'Preview Body Only',
-      description: 'Write the markdown body without the generated DSLForge header block.',
-      content: bodyMarkdown,
-      suggestedRelativePath: `docs/${documentSlug}.md`
-    });
-  }
-
-  const codeBlockSelections = extractCodeBlockSelections(markdown);
-
-  for (const [index, selection] of codeBlockSelections.entries()) {
-    const extension = extensionForLanguageId(selection.languageId);
-    const featureSlug = slugify(registration.featureName);
-    const folderName =
-      registration.featureName.includes('Sample DSL')
-        ? 'examples'
-        : registration.featureName.includes('Scaffold')
-          ? 'drafts'
-          : 'docs';
-    const description = selection.heading
-      ? `Code block from ${selection.heading}`
-      : 'Code block from preview document';
-
-    selections.push({
-      label: `Code Block ${index + 1}`,
-      description,
-      detail: selection.languageId
-        ? `language: ${selection.languageId}`
-        : 'language: plain text',
-      content: selection.content,
-      suggestedRelativePath: `${folderName}/${featureSlug}-${index + 1}${extension}`
-    });
-  }
-
-  return selections;
 }
 
 async function readTextFile(targetUri: vscode.Uri): Promise<string | undefined> {
@@ -285,7 +133,8 @@ export class AiPreviewApplyService {
     }
 
     const selections = buildSelectionSuggestions(
-      registration,
+      registration.featureName,
+      registration.outputTitle,
       activeDocument.getText()
     );
     const selected = await vscode.window.showQuickPick(
@@ -306,6 +155,13 @@ export class AiPreviewApplyService {
       return;
     }
 
+    const bundleTargets = selected.bundleTargets;
+
+    if (bundleTargets && bundleTargets.length > 0) {
+      await this.prepareBundleApply(registration, bundleTargets, selected.label);
+      return;
+    }
+
     const targetRelativePath = await vscode.window.showInputBox({
       prompt: 'Target workspace-relative path',
       value: selected.suggestedRelativePath,
@@ -316,7 +172,7 @@ export class AiPreviewApplyService {
       }
     });
 
-    if (!targetRelativePath) {
+    if (!targetRelativePath || !selected.content) {
       return;
     }
 
@@ -335,19 +191,28 @@ export class AiPreviewApplyService {
     const draftDocument = await this.prepareDraftDocument(targetUri, selected.content);
     const targetSnapshot = await readTextFile(targetUri);
     const session: PendingAiPreviewApplySession = {
-      draftUri: draftDocument.uri,
-      targetUri,
+      reviewUri: draftDocument.uri,
       workspaceRoot: registration.workspaceRoot,
       featureName: registration.featureName,
       selectionLabel: selected.label,
-      content: selected.content,
-      targetRelativePath,
-      targetSnapshot
+      targets: [
+        {
+          targetUri,
+          targetRelativePath,
+          content: selected.content,
+          sourceLabel: selected.label,
+          targetSnapshot
+        }
+      ]
     };
 
     this.pendingSessions.set(toDocumentKey(draftDocument.uri), session);
     await this.refreshContextKeys();
-    await this.openReviewSurface(targetUri, draftDocument.uri, targetSnapshot);
+    await this.openSingleTargetReviewSurface(
+      targetUri,
+      draftDocument.uri,
+      targetSnapshot
+    );
     this.appendApplyReport('prepared', session);
     void vscode.window.showInformationMessage(
       `Review the draft for ${targetRelativePath}, then run DSLForge: Complete AI Preview Apply to write it.`
@@ -364,20 +229,26 @@ export class AiPreviewApplyService {
       return;
     }
 
-    const currentTargetContent = await readTextFile(session.targetUri);
+    const conflictingTargets = collectConflictingTargets(
+      await Promise.all(
+        session.targets.map(async (target) => ({
+          targetRelativePath: target.targetRelativePath,
+          targetSnapshot: target.targetSnapshot,
+          currentContent: await readTextFile(target.targetUri)
+        }))
+      )
+    );
 
-    if (
-      typeof session.targetSnapshot !== 'undefined' &&
-      currentTargetContent !== session.targetSnapshot
-    ) {
+    if (conflictingTargets.length > 0) {
       await vscode.window.showWarningMessage(
-        `The target file changed after the draft was prepared. Re-run Apply AI Preview to Workspace for ${session.targetRelativePath}.`
+        `The target file changed after the draft was prepared: ${conflictingTargets.join(', ')}. Re-run Apply AI Preview to Workspace.`
       );
       return;
     }
 
     const selection = await vscode.window.showWarningMessage(
-      `Apply the reviewed AI draft to ${session.targetRelativePath}? This will ${typeof session.targetSnapshot === 'undefined' ? 'create' : 'overwrite'} the workspace file.`,
+      `Apply the reviewed AI draft to ${session.targets.length === 1 ? session.targets[0].targetRelativePath : `${session.targets.length} workspace files`}?
+This will ${session.targets.some((target) => typeof target.targetSnapshot !== 'undefined') ? 'overwrite at least one existing file' : 'create new workspace files'}.`,
       { modal: true },
       'Apply Draft'
     );
@@ -386,19 +257,23 @@ export class AiPreviewApplyService {
       return;
     }
 
-    await vscode.workspace.fs.createDirectory(
-      vscode.Uri.file(path.dirname(session.targetUri.fsPath))
-    );
-    await vscode.workspace.fs.writeFile(
-      session.targetUri,
-      new TextEncoder().encode(session.content)
-    );
+    for (const target of session.targets) {
+      await vscode.workspace.fs.createDirectory(
+        vscode.Uri.file(path.dirname(target.targetUri.fsPath))
+      );
+      await vscode.workspace.fs.writeFile(
+        target.targetUri,
+        new TextEncoder().encode(target.content)
+      );
+    }
 
-    this.pendingSessions.delete(toDocumentKey(session.draftUri));
+    this.pendingSessions.delete(toDocumentKey(session.reviewUri));
     await this.refreshContextKeys();
     this.appendApplyReport('completed', session);
 
-    const document = await vscode.workspace.openTextDocument(session.targetUri);
+    const document = await vscode.workspace.openTextDocument(
+      session.targets[0].targetUri
+    );
     await vscode.window.showTextDocument(document, {
       preview: false
     });
@@ -425,9 +300,17 @@ export class AiPreviewApplyService {
 
     const selected = await vscode.window.showQuickPick(
       [...this.pendingSessions.values()].map((session) => ({
-        label: session.targetRelativePath,
+        label:
+          session.targets.length === 1
+            ? session.targets[0].targetRelativePath
+            : `${session.targets.length} files`,
         description: session.selectionLabel,
-        detail: session.featureName,
+        detail:
+          session.targets.length === 1
+            ? session.featureName
+            : `${session.featureName}: ${session.targets
+                .map((target) => target.targetRelativePath)
+                .join(', ')}`,
         session
       })),
       {
@@ -456,7 +339,60 @@ export class AiPreviewApplyService {
     return document;
   }
 
-  private async openReviewSurface(
+  private async prepareBundleApply(
+    registration: AiPreviewDocumentRegistration,
+    bundleTargets: PreviewBundleTarget[],
+    selectionLabel: string
+  ): Promise<void> {
+    const preparedTargets: PendingAiPreviewApplyTarget[] = [];
+
+    for (const bundleTarget of bundleTargets) {
+      const targetUri = resolveWorkspaceTargetPath(
+        registration.workspaceRoot,
+        bundleTarget.targetRelativePath
+      );
+
+      if (!targetUri) {
+        await vscode.window.showErrorMessage(
+          `DSLForge could not resolve bundle target ${bundleTarget.targetRelativePath} inside the workspace.`
+        );
+        return;
+      }
+
+      preparedTargets.push({
+        targetUri,
+        targetRelativePath: bundleTarget.targetRelativePath,
+        content: bundleTarget.content,
+        sourceLabel: bundleTarget.sourceLabel,
+        targetSnapshot: await readTextFile(targetUri)
+      });
+    }
+
+    const reviewDocument = await vscode.workspace.openTextDocument({
+      language: 'markdown',
+      content: buildBundleReviewMarkdown(registration.featureName, bundleTargets)
+    });
+    await vscode.window.showTextDocument(reviewDocument, {
+      preview: false
+    });
+
+    const session: PendingAiPreviewApplySession = {
+      reviewUri: reviewDocument.uri,
+      workspaceRoot: registration.workspaceRoot,
+      featureName: registration.featureName,
+      selectionLabel,
+      targets: preparedTargets
+    };
+
+    this.pendingSessions.set(toDocumentKey(reviewDocument.uri), session);
+    await this.refreshContextKeys();
+    this.appendApplyReport('prepared', session);
+    void vscode.window.showInformationMessage(
+      `Review the scaffold bundle for ${preparedTargets.length} files, then run DSLForge: Complete AI Preview Apply to write them.`
+    );
+  }
+
+  private async openSingleTargetReviewSurface(
     targetUri: vscode.Uri,
     draftUri: vscode.Uri,
     targetSnapshot: string | undefined
@@ -484,11 +420,16 @@ export class AiPreviewApplyService {
     appendOutputDivider(`DSLForge AI Apply ${status}`);
     appendOutputLine(`feature: ${session.featureName}`);
     appendOutputLine(`selection: ${session.selectionLabel}`);
-    appendOutputLine(`target: ${session.targetUri.fsPath}`);
-    appendOutputLine(
-      `mode: ${typeof session.targetSnapshot === 'undefined' ? 'create' : 'replace'}`
-    );
-    appendOutputLine(`content characters: ${session.content.length}`);
+    appendOutputLine(`targets: ${session.targets.length}`);
+
+    for (const target of session.targets) {
+      appendOutputLine(`- target: ${target.targetUri.fsPath}`);
+      appendOutputLine(
+        `  mode: ${typeof target.targetSnapshot === 'undefined' ? 'create' : 'replace'}`
+      );
+      appendOutputLine(`  content characters: ${target.content.length}`);
+    }
+
     showOutputChannel();
   }
 }

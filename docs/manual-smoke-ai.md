@@ -268,6 +268,7 @@ Acceptance criteria:
 - the selected content is written only after the explicit completion step
 - if the target file changed after review preparation, DSLForge blocks the write and asks for a new apply pass
 - the final target file opens in the editor after completion
+- if a scaffold preview contains multiple explicit `File Target:` hints, DSLForge can review them as a bundle before applying
 
 ## Case 7: Xtext AI Context Coverage
 

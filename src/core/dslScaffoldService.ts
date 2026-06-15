@@ -39,6 +39,7 @@ function createScaffoldContract(projectContext: ResolvedProjectContext) {
       'This is a preview proposal, not an instruction to write files automatically.',
       'Keep file suggestions practical and minimal for an early implementation milestone.',
       'Include fenced code blocks for important starter file contents.',
+      'When a fenced code block represents a proposed file, add a preceding line in the form `File Target: relative/path`.',
       'Suggested Files should explain each file purpose in one sentence.',
       'package.json Scripts should propose concrete script names and commands.',
       ...profile.scaffoldFocus
