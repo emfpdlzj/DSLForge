@@ -6,12 +6,11 @@ This checklist is for the first public VS Code Marketplace release of `DSLForge`
 
 ## Release Goal
 
-Ship `DSLForge` as a Langium-first DSL authoring workflow assistant.
+Ship `DSLForge` as a DSL authoring workflow assistant with Langium-first release packaging and active ANTLR4 branch work.
 
 Non-goals for this release:
 
 - generic AI code generation
-- ANTLR4 support
 - Xtext support
 - fake fallback behavior for AI commands
 
@@ -30,7 +29,7 @@ Completed in this audit:
 - `.agents/` and `AGENTS.md` are ignored for future commits
 - `package.json` now includes preview metadata, keywords, and explicit license reference
 - `CHANGELOG.md` now exists for the first release
-- README now includes installation guidance, a one-minute flow, and explicit Langium/AI limits
+- README now includes installation guidance, a one-minute flow, and explicit adapter/AI limits
 
 Still required before publish:
 
@@ -52,7 +51,9 @@ These items must be true before `vsce publish`:
 - `Validate Current Grammar` remains non-AI and follows:
   1. `dslforge.validation.command`
   2. supported `package.json` script auto-detection
-  3. setup guidance
+  3. supported `gradlew` task auto-detection
+  4. supported `mvnw` goal auto-detection
+  5. setup guidance
 - AI commands stop with guidance when no supported VS Code model environment is available
 - README and changelog images use valid non-SVG Marketplace-safe URLs if remote images are added
 
@@ -66,7 +67,7 @@ These items must be true before `vsce publish`:
   - markdown preview result from one AI command
 - Keep README opening section short and concrete:
   - what DSLForge is
-  - Langium-only scope in v0.1
+  - currently documented adapter scope
   - validation is non-AI
   - AI commands require supported model access
 - Add an installation or quick-start flow that can be followed in under one minute
@@ -82,6 +83,8 @@ These items must be true before `vsce publish`:
 - Verify validation command paths:
   - configured command fixture
   - package script fixture
+  - gradle wrapper fixture
+  - maven wrapper fixture
   - missing command fixture
 - Verify AI command gate paths:
   - missing model environment
@@ -122,7 +125,7 @@ Audit run on 2026-06-14:
   - passed
 - `npm exec -- vsce package`
   - passed
-  - output package: `dslforge-0.0.1.vsix`
+  - output package: `dslforge-0.2.0.vsix`
   - packaged size after README screenshot assets: `2.51 MB`
 - `npm exec -- vsce ls`
   - passed

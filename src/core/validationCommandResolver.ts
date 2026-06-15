@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import type { ValidationPlan } from '../types';
+import { readWorkspaceBuildToolInfo } from './workspaceBuildTool';
 import { readWorkspacePackageInfo } from './workspacePackage';
 import { resolveValidationPlanCore } from './validationPlan';
 
@@ -21,11 +22,13 @@ export async function resolveValidationPlan(
     .get<string>('validation.command')
     ?.trim();
   const packageInfo = await readWorkspacePackageInfo(input.workspaceRoot);
+  const buildToolInfo = await readWorkspaceBuildToolInfo(input.workspaceRoot);
 
   return resolveValidationPlanCore({
     configuredCommand,
     adapterDisplayName: input.adapterDisplayName,
     preferredScriptNames: input.preferredScriptNames,
-    packageInfo
+    packageInfo,
+    buildToolInfo
   });
 }

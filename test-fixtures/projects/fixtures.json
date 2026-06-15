@@ -2,6 +2,7 @@
   "fixtures": [
     {
       "name": "configured-command",
+      "framework": "langium",
       "workspaceRoot": "test-fixtures/langium/configured-command",
       "activeFile": "src/language/configured.langium",
       "detection": {
@@ -22,6 +23,7 @@
     },
     {
       "name": "package-script",
+      "framework": "langium",
       "workspaceRoot": "test-fixtures/langium/package-script",
       "activeFile": "src/language/package-script.langium",
       "detection": {
@@ -42,6 +44,7 @@
     },
     {
       "name": "missing-command",
+      "framework": "langium",
       "workspaceRoot": "test-fixtures/langium/missing-command",
       "activeFile": "src/language/missing-command.langium",
       "detection": {
@@ -60,6 +63,7 @@
     },
     {
       "name": "import-context",
+      "framework": "langium",
       "workspaceRoot": "test-fixtures/langium/import-context",
       "activeFile": "src/language/main.langium",
       "detection": {
@@ -76,6 +80,111 @@
         "contextKinds": ["active-grammar", "imported-grammar", "config", "package-json"],
         "requiredFiles": ["src/language/main.langium", "src/language/shared.langium", "src/language/tokens.langium", "langium-config.json", "package.json"],
         "relatedFileCount": 4
+      }
+    },
+    {
+      "name": "gradle-wrapper",
+      "framework": "langium",
+      "workspaceRoot": "test-fixtures/langium/gradle-wrapper",
+      "activeFile": "src/language/gradle-wrapper.langium",
+      "detection": {
+        "minimumConfidence": 100,
+        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "package-json", "dependency", "script"]
+      },
+      "validation": {
+        "source": "gradle-wrapper",
+        "commandLine": "./gradlew build"
+      },
+      "context": {
+        "activeGrammarFile": "src/language/gradle-wrapper.langium",
+        "contextKinds": ["active-grammar", "config", "package-json"],
+        "requiredFiles": ["src/language/gradle-wrapper.langium", "langium-config.json", "package.json"],
+        "relatedFileCount": 2
+      }
+    },
+    {
+      "name": "maven-wrapper",
+      "framework": "langium",
+      "workspaceRoot": "test-fixtures/langium/maven-wrapper",
+      "activeFile": "src/language/maven-wrapper.langium",
+      "detection": {
+        "minimumConfidence": 100,
+        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "package-json", "dependency", "script"]
+      },
+      "validation": {
+        "preferredCommandNames": ["package", "test", "validate", "langium:validate", "langium:check"],
+        "source": "maven-wrapper",
+        "commandLine": "./mvnw package"
+      },
+      "context": {
+        "activeGrammarFile": "src/language/maven-wrapper.langium",
+        "contextKinds": ["active-grammar", "config", "package-json"],
+        "requiredFiles": ["src/language/maven-wrapper.langium", "langium-config.json", "package.json"],
+        "relatedFileCount": 2
+      }
+    },
+    {
+      "name": "antlr4-package-script",
+      "framework": "antlr4",
+      "workspaceRoot": "test-fixtures/antlr4/package-script",
+      "activeFile": "src/grammar/Expr.g4",
+      "detection": {
+        "minimumConfidence": 100,
+        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "package-json", "dependency", "script"]
+      },
+      "validation": {
+        "preferredCommandNames": ["validate", "antlr:validate", "build"],
+        "source": "package-script",
+        "commandLine": "npm run validate",
+        "scriptName": "validate"
+      },
+      "context": {
+        "activeGrammarFile": "src/grammar/Expr.g4",
+        "contextKinds": ["active-grammar", "imported-grammar", "package-json"],
+        "requiredFiles": ["src/grammar/Expr.g4", "src/grammar/ExprLexer.g4", "package.json"],
+        "relatedFileCount": 2
+      }
+    },
+    {
+      "name": "antlr4-gradle-wrapper",
+      "framework": "antlr4",
+      "workspaceRoot": "test-fixtures/antlr4/gradle-wrapper",
+      "activeFile": "src/main/antlr/Orders.g4",
+      "detection": {
+        "minimumConfidence": 100,
+        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "build-file", "wrapper"]
+      },
+      "validation": {
+        "preferredCommandNames": ["generateGrammarSource", "build", "test"],
+        "source": "gradle-wrapper",
+        "commandLine": "./gradlew generateGrammarSource"
+      },
+      "context": {
+        "activeGrammarFile": "src/main/antlr/Orders.g4",
+        "contextKinds": ["active-grammar", "build-file"],
+        "requiredFiles": ["src/main/antlr/Orders.g4", "build.gradle"],
+        "relatedFileCount": 1
+      }
+    },
+    {
+      "name": "antlr4-maven-wrapper",
+      "framework": "antlr4",
+      "workspaceRoot": "test-fixtures/antlr4/maven-wrapper",
+      "activeFile": "src/main/antlr4/com/acme/Rules.g4",
+      "detection": {
+        "minimumConfidence": 100,
+        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "build-file", "wrapper"]
+      },
+      "validation": {
+        "preferredCommandNames": ["generate-sources", "package", "test"],
+        "source": "maven-wrapper",
+        "commandLine": "./mvnw generate-sources"
+      },
+      "context": {
+        "activeGrammarFile": "src/main/antlr4/com/acme/Rules.g4",
+        "contextKinds": ["active-grammar", "build-file"],
+        "requiredFiles": ["src/main/antlr4/com/acme/Rules.g4", "pom.xml"],
+        "relatedFileCount": 1
       }
     }
   ]

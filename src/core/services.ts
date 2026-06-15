@@ -5,9 +5,10 @@ import { GrammarExplanationService } from './grammarExplanationService';
 import { ProjectService } from './projectService';
 import { SampleDslService } from './sampleDslService';
 import { ValidationOrchestrator } from './validationOrchestrator';
+import { antlr4Adapter } from '../antlr4/adapter';
 import { langiumAdapter } from '../langium/adapter';
 
-const adapterRegistry = new AdapterRegistry([langiumAdapter]);
+const adapterRegistry = new AdapterRegistry([langiumAdapter, antlr4Adapter]);
 
 export const projectService = new ProjectService(adapterRegistry);
 export const validationOrchestrator = new ValidationOrchestrator();
