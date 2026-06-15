@@ -4,6 +4,7 @@ import { strict as assert } from 'node:assert';
 import { interpretAntlr4ValidationOutput } from '../antlr4/validationDiagnostics';
 import { parseValidationIssues, dedupeValidationIssues } from '../core/validationIssueParser';
 import { interpretLangiumValidationOutput } from '../langium/validationDiagnostics';
+import { interpretXtextValidationOutput } from '../xtext/validationDiagnostics';
 import type { ProjectDetectionResult, ValidationIssue } from '../types';
 
 interface ExpectedIssue {
@@ -18,7 +19,7 @@ interface ExpectedIssue {
 
 interface DiagnosticsFixture {
   name: string;
-  parser: 'generic' | 'langium' | 'antlr4';
+  parser: 'generic' | 'langium' | 'antlr4' | 'xtext';
   logFile: string;
   workspaceRoot?: string;
   activeGrammarFile?: string;
@@ -59,6 +60,26 @@ function createAntlr4Project(
     context: {
       adapterId: 'antlr4',
       framework: 'antlr4',
+      workspaceRoot,
+      activeFile: activeGrammarFile,
+      grammarFiles: activeGrammarFile ? [activeGrammarFile] : [],
+      signals: []
+    }
+  };
+}
+
+function createXtextProject(
+  workspaceRoot: string,
+  activeGrammarFile?: string
+): ProjectDetectionResult {
+  return {
+    adapterId: 'xtext',
+    framework: 'xtext',
+    displayName: 'Xtext',
+    confidence: 1,
+    context: {
+      adapterId: 'xtext',
+      framework: 'xtext',
       workspaceRoot,
       activeFile: activeGrammarFile,
       grammarFiles: activeGrammarFile ? [activeGrammarFile] : [],
@@ -133,6 +154,26 @@ async function runFixture(
       : fixture.parser === 'antlr4'
         ? interpretAntlr4ValidationOutput({
             project: createAntlr4Project(
+              effectiveWorkspaceRoot,
+              resolveExpectedFilePath(
+                effectiveWorkspaceRoot,
+                fixture.activeGrammarFile
+              )
+            ),
+            context: {
+              activeGrammarFile: resolveExpectedFilePath(
+                effectiveWorkspaceRoot,
+                fixture.activeGrammarFile
+              ),
+              relatedFiles: [],
+              contextFiles: [],
+              notes: []
+            },
+            rawOutput
+          })
+      : fixture.parser === 'xtext'
+        ? interpretXtextValidationOutput({
+            project: createXtextProject(
               effectiveWorkspaceRoot,
               resolveExpectedFilePath(
                 effectiveWorkspaceRoot,

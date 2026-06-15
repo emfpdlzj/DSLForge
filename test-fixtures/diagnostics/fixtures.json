@@ -89,6 +89,37 @@
           "messageIncludes": "token recognition error at: '$'"
         }
       ]
+    },
+    {
+      "name": "xtext-located-error",
+      "parser": "xtext",
+      "workspaceRoot": "test-fixtures/xtext/gradle-wrapper",
+      "activeGrammarFile": "src/main/java/com/acme/Orders.xtext",
+      "logFile": "test-fixtures/diagnostics/xtext-located-error.log",
+      "expectedIssues": [
+        {
+          "severity": "error",
+          "source": "Xtext",
+          "filePath": "src/main/java/com/acme/Orders.xtext",
+          "line": 5,
+          "column": 1,
+          "messageIncludes": "mismatched input 'order' expecting RULE_ID"
+        }
+      ]
+    },
+    {
+      "name": "xtext-epackage-error",
+      "parser": "xtext",
+      "workspaceRoot": "test-fixtures/xtext/import-context",
+      "activeGrammarFile": "src/main/java/com/acme/Main.xtext",
+      "logFile": "test-fixtures/diagnostics/xtext-epackage-error.log",
+      "expectedIssues": [
+        {
+          "severity": "error",
+          "source": "Xtext",
+          "messageIncludes": "Couldn't resolve reference to EPackage 'http://acme.com/shared'"
+        }
+      ]
     }
   ]
 }

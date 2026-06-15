@@ -9,6 +9,7 @@ import type {
 import { createProjectContext } from '../core/projectContext';
 import { buildXtextContextSelection } from './contextSelection';
 import { detectXtextProject } from './projectDetection';
+import { interpretXtextValidationOutput } from './validationDiagnostics';
 import type { GrammarContextSelection, ProjectDetectionResult } from '../types';
 
 async function collectGrammarFiles(workspaceRoot: string): Promise<string[]> {
@@ -88,5 +89,7 @@ export const xtextAdapter: DslAdapter = {
   displayName: 'Xtext',
   detect,
   selectContext,
-  getValidationPreferences
+  getValidationPreferences,
+  interpretValidationOutput: async (input) =>
+    interpretXtextValidationOutput(input)
 };

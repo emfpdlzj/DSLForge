@@ -228,6 +228,33 @@
         "requiredFiles": ["src/main/java/com/acme/Rules.xtext", "GenerateRules.mwe2", "pom.xml"],
         "relatedFileCount": 2
       }
+    },
+    {
+      "name": "xtext-import-context",
+      "framework": "xtext",
+      "workspaceRoot": "test-fixtures/xtext/import-context",
+      "activeFile": "src/main/java/com/acme/Main.xtext",
+      "detection": {
+        "minimumConfidence": 100,
+        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "build-file", "wrapper", "dependency"]
+      },
+      "validation": {
+        "preferredGradleTaskNames": ["generateXtext", "build", "check"],
+        "source": "gradle-wrapper",
+        "commandLine": "./gradlew generateXtext"
+      },
+      "context": {
+        "activeGrammarFile": "src/main/java/com/acme/Main.xtext",
+        "contextKinds": ["active-grammar", "imported-grammar", "config", "build-file"],
+        "requiredFiles": [
+          "src/main/java/com/acme/Main.xtext",
+          "src/main/java/com/acme/Common.xtext",
+          "model/shared.ecore",
+          "GenerateMain.mwe2",
+          "build.gradle"
+        ],
+        "relatedFileCount": 4
+      }
     }
   ]
 }

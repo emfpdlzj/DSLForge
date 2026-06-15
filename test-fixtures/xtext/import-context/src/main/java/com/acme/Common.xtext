@@ -1,0 +1,6 @@
+grammar com.acme.Common with org.eclipse.xtext.common.Terminals
+
+generate shared "http://acme.com/shared"
+
+Entity:
+  'entity' name=ID ';';
