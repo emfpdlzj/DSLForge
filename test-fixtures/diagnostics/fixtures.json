@@ -1,0 +1,59 @@
+{
+  "workspaceRoot": "test-fixtures/langium/import-context",
+  "fixtures": [
+    {
+      "name": "generic-typescript-unlocated",
+      "parser": "generic",
+      "logFile": "test-fixtures/diagnostics/generic-typescript-unlocated.log",
+      "defaultSource": "Langium",
+      "expectedIssues": [
+        {
+          "severity": "error",
+          "source": "TypeScript",
+          "code": "TS2345",
+          "messageIncludes": "Argument of type 'string' is not assignable to parameter of type 'number'"
+        }
+      ]
+    },
+    {
+      "name": "langium-webpack-tsl-block",
+      "parser": "langium",
+      "logFile": "test-fixtures/diagnostics/langium-webpack-tsl-block.log",
+      "expectedIssues": [
+        {
+          "severity": "error",
+          "source": "TypeScript",
+          "code": "TS2322",
+          "filePath": "src/language/main.langium",
+          "line": 5,
+          "column": 12,
+          "messageIncludes": "Type 'number' is not assignable to type 'string'"
+        }
+      ]
+    },
+    {
+      "name": "langium-unlocated-reference",
+      "parser": "langium",
+      "logFile": "test-fixtures/diagnostics/langium-unlocated-reference.log",
+      "expectedIssues": [
+        {
+          "severity": "error",
+          "source": "Langium",
+          "messageIncludes": "Could not resolve reference to Type 'MissingRule'"
+        }
+      ]
+    },
+    {
+      "name": "langium-config-failure",
+      "parser": "langium",
+      "logFile": "test-fixtures/diagnostics/langium-config-failure.log",
+      "expectedIssues": [
+        {
+          "severity": "error",
+          "source": "Langium",
+          "messageIncludes": "Failed to read langium-config.json because the JSON is invalid"
+        }
+      ]
+    }
+  ]
+}

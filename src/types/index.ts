@@ -1,3 +1,67 @@
+export type FrameworkId = 'langium';
+
+export type ValidationCommandSource = 'user-configured' | 'package-script' | 'missing';
+
+export interface ProjectSignal {
+  kind:
+    | 'workspace-folder'
+    | 'active-file'
+    | 'grammar-file'
+    | 'package-json'
+    | 'config-file'
+    | 'dependency'
+    | 'script';
+  value: string;
+  detail?: string;
+}
+
+export interface ProjectContext {
+  adapterId: string;
+  framework: FrameworkId;
+  workspaceRoot: string;
+  activeFile?: string;
+  grammarFiles: string[];
+  signals: ProjectSignal[];
+}
+
+export interface ProjectDetectionResult {
+  adapterId: string;
+  framework: FrameworkId;
+  displayName: string;
+  confidence: number;
+  context: ProjectContext;
+}
+
+export type GrammarContextFileKind =
+  | 'active-grammar'
+  | 'imported-grammar'
+  | 'sibling-grammar'
+  | 'config'
+  | 'package-json';
+
+export type GrammarContextLanguageId = 'langium' | 'json' | 'plaintext';
+
+export interface GrammarContextFileSelection {
+  filePath: string;
+  kind: GrammarContextFileKind;
+  languageId: GrammarContextLanguageId;
+  detail?: string;
+}
+
+export interface GrammarContextSelection {
+  activeGrammarFile?: string;
+  relatedFiles: string[];
+  contextFiles: GrammarContextFileSelection[];
+  notes: string[];
+}
+
+export interface ValidationCommandSuggestion {
+  source: ValidationCommandSource;
+  commandLine?: string;
+  scriptName?: string;
+  detail: string;
+}
+
 export interface GrammarExplanation {
   summary: string;
   keyRules: string[];
@@ -6,4 +70,34 @@ export interface GrammarExplanation {
 export interface ValidationIssue {
   message: string;
   severity: 'error' | 'warning' | 'info';
+  filePath?: string;
+  line?: number;
+  column?: number;
+  endLine?: number;
+  endColumn?: number;
+  code?: string;
+  source?: string;
+}
+
+export interface ValidationPlan {
+  command: ValidationCommandSuggestion;
+  rationale: string[];
+}
+
+export interface ValidationRunResult {
+  status:
+    | 'succeeded'
+    | 'failed'
+    | 'needs_configuration'
+    | 'cancelled'
+    | 'busy';
+  summary: string;
+  plan: ValidationPlan;
+  issues: ValidationIssue[];
+  rawOutput?: string;
+  exitCode?: number | null;
+  durationMs?: number;
+  signal?: NodeJS.Signals | null;
+  outputTruncated?: boolean;
+  executionError?: string;
 }

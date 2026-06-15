@@ -1,11 +1,25 @@
-export interface ProjectContext {
+import type {
+  FrameworkId,
+  ProjectContext,
+  ProjectSignal
+} from '../types';
+
+export interface ProjectContextOptions {
+  adapterId: string;
+  framework: FrameworkId;
   workspaceRoot: string;
-  grammarFiles: string[];
+  activeFile?: string;
+  grammarFiles?: string[];
+  signals?: ProjectSignal[];
 }
 
-export function createEmptyProjectContext(workspaceRoot: string): ProjectContext {
+export function createProjectContext(options: ProjectContextOptions): ProjectContext {
   return {
-    workspaceRoot,
-    grammarFiles: []
+    adapterId: options.adapterId,
+    framework: options.framework,
+    workspaceRoot: options.workspaceRoot,
+    activeFile: options.activeFile,
+    grammarFiles: options.grammarFiles ?? [],
+    signals: options.signals ?? []
   };
 }

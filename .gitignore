@@ -3,6 +3,11 @@ dist/
 
 .idea/
 .DS_Store
+.agents/
+AGENTS.md
 
 *.log
 *.tsbuildinfo
+*.vsix
+.vscode-test/
+.tmp-vsix-*/

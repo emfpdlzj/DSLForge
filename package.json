@@ -1,27 +1,125 @@
 {
-  "name": "llm-grammer",
-  "version": "1.0.0",
-  "description": "",
-  "main": "dist/extension.js",
+  "name": "dslforge",
+  "displayName": "DSLForge",
+  "description": "DSL authoring workflow assistant for Visual Studio Code, starting with Langium.",
+  "version": "0.0.1",
+  "publisher": "emfpdlzj",
+  "engines": {
+    "vscode": "^1.120.0"
+  },
+  "preview": true,
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "dsl",
+    "langium",
+    "grammar",
+    "language-engineering",
+    "language-workbench",
+    "antlr",
+    "xtext",
+    "vscode"
+  ],
+  "main": "./dist/extension.js",
+  "icon": "media/icon.png",
+  "capabilities": {
+    "virtualWorkspaces": false,
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "DSLForge can inspect Langium workspaces in Restricted Mode, but validation and AI-backed commands require workspace trust."
+    }
+  },
+  "activationEvents": [
+    "onCommand:dslforge.createDslScaffold",
+    "onCommand:dslforge.generateSampleDsl",
+    "onCommand:dslforge.validateCurrentGrammar",
+    "onCommand:dslforge.explainCurrentGrammar"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "DSLForge",
+      "properties": {
+        "dslforge.validation.command": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Workspace validation command used first by `DSLForge: Validate Current Grammar`. If empty, DSLForge auto-detects a supported `package.json` script."
+        },
+        "dslforge.validation.maxCapturedOutputCharacters": {
+          "type": "number",
+          "default": 250000,
+          "minimum": 10000,
+          "markdownDescription": "Maximum number of output characters DSLForge keeps in memory while validation is running. Additional output is still streamed to the Output panel but is not retained for diagnostics parsing."
+        },
+        "dslforge.ai.maxContextFiles": {
+          "type": "number",
+          "default": 5,
+          "minimum": 1,
+          "markdownDescription": "Maximum number of selected context files DSLForge sends to AI-backed commands such as `Explain Current Grammar`, `Create DSL Scaffold`, and `Generate Sample DSL`."
+        },
+        "dslforge.ai.maxCharactersPerFile": {
+          "type": "number",
+          "default": 8000,
+          "minimum": 1000,
+          "markdownDescription": "Maximum number of characters DSLForge includes from any single context file for AI-backed commands."
+        },
+        "dslforge.ai.maxContextCharacters": {
+          "type": "number",
+          "default": 20000,
+          "minimum": 4000,
+          "markdownDescription": "Maximum total number of context characters DSLForge sends to AI-backed commands across all selected files."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "dslforge.createDslScaffold",
+        "title": "Create DSL Scaffold",
+        "category": "DSLForge"
+      },
+      {
+        "command": "dslforge.generateSampleDsl",
+        "title": "Generate Sample DSL",
+        "category": "DSLForge"
+      },
+      {
+        "command": "dslforge.validateCurrentGrammar",
+        "title": "Validate Current Grammar",
+        "category": "DSLForge"
+      },
+      {
+        "command": "dslforge.explainCurrentGrammar",
+        "title": "Explain Current Grammar",
+        "category": "DSLForge"
+      }
+    ]
+  },
   "scripts": {
+    "vscode:prepublish": "npm run build",
     "build": "tsc -p tsconfig.json",
+    "watch": "tsc -watch -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:diagnostics": "npm run build && node dist/test/diagnosticsFixtureRunner.js",
+    "test:manifest": "npm run build && node dist/test/manifestFixtureRunner.js",
+    "test:projects": "npm run build && node dist/test/projectFixtureRunner.js",
     "clean": "rm -rf dist",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run build && node dist/test/diagnosticsFixtureRunner.js && node dist/test/projectFixtureRunner.js && node dist/test/manifestFixtureRunner.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/emfpdlzj/llm-grammer.git"
+    "url": "git+https://github.com/emfpdlzj/DSLForge.git"
   },
-  "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "SEE LICENSE IN LICENSE",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/emfpdlzj/llm-grammer/issues"
+    "url": "https://github.com/emfpdlzj/DSLForge/issues"
   },
-  "homepage": "https://github.com/emfpdlzj/llm-grammer#readme",
+  "homepage": "https://github.com/emfpdlzj/DSLForge#readme",
   "devDependencies": {
+    "@types/node": "^24.13.1",
+    "@types/vscode": "^1.120.0",
     "typescript": "^6.0.3"
   }
 }
