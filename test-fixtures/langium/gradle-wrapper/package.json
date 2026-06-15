@@ -1,0 +1,11 @@
+{
+  "name": "dslforge-fixture-gradle-wrapper",
+  "private": true,
+  "devDependencies": {
+    "langium": "^3.0.0"
+  },
+  "scripts": {
+    "langium:generate": "echo \"langium generate fixture\"",
+    "typecheck": "echo \"no package validation script configured\""
+  }
+}

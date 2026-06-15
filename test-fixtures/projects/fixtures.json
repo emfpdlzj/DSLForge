@@ -77,6 +77,45 @@
         "requiredFiles": ["src/language/main.langium", "src/language/shared.langium", "src/language/tokens.langium", "langium-config.json", "package.json"],
         "relatedFileCount": 4
       }
+    },
+    {
+      "name": "gradle-wrapper",
+      "workspaceRoot": "test-fixtures/langium/gradle-wrapper",
+      "activeFile": "src/language/gradle-wrapper.langium",
+      "detection": {
+        "minimumConfidence": 100,
+        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "package-json", "dependency", "script"]
+      },
+      "validation": {
+        "source": "gradle-wrapper",
+        "commandLine": "./gradlew build"
+      },
+      "context": {
+        "activeGrammarFile": "src/language/gradle-wrapper.langium",
+        "contextKinds": ["active-grammar", "config", "package-json"],
+        "requiredFiles": ["src/language/gradle-wrapper.langium", "langium-config.json", "package.json"],
+        "relatedFileCount": 2
+      }
+    },
+    {
+      "name": "maven-wrapper",
+      "workspaceRoot": "test-fixtures/langium/maven-wrapper",
+      "activeFile": "src/language/maven-wrapper.langium",
+      "detection": {
+        "minimumConfidence": 100,
+        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "package-json", "dependency", "script"]
+      },
+      "validation": {
+        "preferredCommandNames": ["package", "test", "validate", "langium:validate", "langium:check"],
+        "source": "maven-wrapper",
+        "commandLine": "./mvnw package"
+      },
+      "context": {
+        "activeGrammarFile": "src/language/maven-wrapper.langium",
+        "contextKinds": ["active-grammar", "config", "package-json"],
+        "requiredFiles": ["src/language/maven-wrapper.langium", "langium-config.json", "package.json"],
+        "relatedFileCount": 2
+      }
     }
   ]
 }

@@ -41,6 +41,14 @@ function buildValidationMessageDetail(result: ValidationRunResult): string {
     return `package.json script "${result.plan.command.scriptName ?? ''}"`;
   }
 
+  if (result.plan.command.source === 'gradle-wrapper') {
+    return `Gradle wrapper command "${result.plan.command.commandLine ?? ''}"`;
+  }
+
+  if (result.plan.command.source === 'maven-wrapper') {
+    return `Maven wrapper command "${result.plan.command.commandLine ?? ''}"`;
+  }
+
   return 'missing validation configuration';
 }
 
@@ -61,7 +69,7 @@ function createMissingConfigurationIssue(
       column: 1,
       severity: 'warning',
       code: VALIDATION_MISSING_CODE,
-      message: `${result.plan.command.detail} Quick Fix: configure dslforge.validation.command or open package.json.`
+      message: `${result.plan.command.detail} Quick Fix: configure dslforge.validation.command or review the workspace validation entry point.`
     }
   ];
 }
@@ -332,7 +340,7 @@ export class DiagnosticsPresenter {
 
     await showMessageWithActions(
       'warning',
-      'DSLForge could not resolve a validation command. Configure dslforge.validation.command or add a supported package.json script.',
+      'DSLForge could not resolve a validation command. Configure dslforge.validation.command or add a supported package.json script, Gradle wrapper task, or Maven wrapper goal.',
       [settingsAction, packageJsonAction, problemsAction, outputAction]
     );
   }

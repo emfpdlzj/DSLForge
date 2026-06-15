@@ -1,0 +1,9 @@
+plugins {
+    id 'java'
+}
+
+tasks.register('generateGrammarSource') {
+    doLast {
+        println 'antlr fixture'
+    }
+}

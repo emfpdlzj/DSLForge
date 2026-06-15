@@ -4,6 +4,7 @@ import * as path from 'node:path';
 import { detectLangiumProject } from '../langium/projectDetection';
 import { buildLangiumContextSelection } from '../langium/contextSelection';
 import { readWorkspacePackageInfo } from '../core/workspacePackage';
+import { readWorkspaceBuildToolInfo } from '../core/workspaceBuildTool';
 import { resolveValidationPlanCore } from '../core/validationPlan';
 
 interface DetectionExpectation {
@@ -13,7 +14,13 @@ interface DetectionExpectation {
 
 interface ValidationExpectation {
   configuredCommand?: string;
-  source: 'user-configured' | 'package-script' | 'missing';
+  preferredCommandNames?: string[];
+  source:
+    | 'user-configured'
+    | 'package-script'
+    | 'gradle-wrapper'
+    | 'maven-wrapper'
+    | 'missing';
   commandLine?: string;
   scriptName?: string;
 }
@@ -109,8 +116,15 @@ async function runValidationCase(fixture: ProjectFixtureCase): Promise<void> {
   const plan = resolveValidationPlanCore({
     configuredCommand: fixture.validation.configuredCommand,
     adapterDisplayName: 'Langium',
-    preferredScriptNames: ['validate', 'langium:validate', 'langium:check', 'build'],
-    packageInfo
+    preferredScriptNames:
+      fixture.validation.preferredCommandNames ?? [
+        'validate',
+        'langium:validate',
+        'langium:check',
+        'build'
+      ],
+    packageInfo,
+    buildToolInfo: await readWorkspaceBuildToolInfo(workspaceRoot)
   });
 
   assert.equal(

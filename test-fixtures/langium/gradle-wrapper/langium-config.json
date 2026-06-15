@@ -1,0 +1,13 @@
+{
+  "projectName": "GradleWrapperFixture",
+  "languages": [
+    {
+      "id": "gradle-wrapper-fixture",
+      "grammar": "src/language/gradle-wrapper.langium",
+      "fileExtensions": [
+        ".gradlefixture"
+      ]
+    }
+  ],
+  "out": "src/language/generated"
+}

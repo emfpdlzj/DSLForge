@@ -3,12 +3,123 @@ import {
   buildPackageScriptCommand,
   type WorkspacePackageInfo
 } from './workspacePackage';
+import {
+  buildGradleWrapperCommand,
+  buildMavenWrapperCommand,
+  type WorkspaceBuildToolInfo
+} from './workspaceBuildTool';
+
+const COMMON_GRADLE_TASK_NAMES = new Set([
+  'assemble',
+  'build',
+  'check',
+  'generateGrammarSource',
+  'generateTestGrammarSource',
+  'test'
+]);
+
+const COMMON_MAVEN_GOAL_NAMES = new Set([
+  'compile',
+  'generate-sources',
+  'package',
+  'test',
+  'validate',
+  'verify'
+]);
 
 export interface ResolveValidationPlanCoreInput {
   configuredCommand?: string;
   adapterDisplayName: string;
   preferredScriptNames: string[];
   packageInfo?: WorkspacePackageInfo;
+  buildToolInfo?: WorkspaceBuildToolInfo;
+}
+
+function isGradleTaskCandidate(taskName: string): boolean {
+  return COMMON_GRADLE_TASK_NAMES.has(taskName) || taskName.startsWith(':');
+}
+
+function isMavenGoalCandidate(goalName: string): boolean {
+  return COMMON_MAVEN_GOAL_NAMES.has(goalName) || goalName.includes(':');
+}
+
+function resolveGradleWrapperPlan(
+  input: ResolveValidationPlanCoreInput
+): ValidationPlan | undefined {
+  if (!input.buildToolInfo?.gradle) {
+    return undefined;
+  }
+
+  const matchingTaskName = input.preferredScriptNames.find((taskName) =>
+    isGradleTaskCandidate(taskName)
+  );
+
+  if (!matchingTaskName) {
+    return undefined;
+  }
+
+  const commandLine = buildGradleWrapperCommand(
+    input.buildToolInfo.gradle,
+    matchingTaskName
+  );
+
+  if (!commandLine) {
+    return undefined;
+  }
+
+  return {
+    command: {
+      source: 'gradle-wrapper',
+      commandLine,
+      detail: `Using Gradle wrapper task candidate "${matchingTaskName}" via ${commandLine}.`
+    },
+    rationale: [
+      `Adapter selected: ${input.adapterDisplayName}`,
+      'Workspace setting dslforge.validation.command is empty.',
+      'No preferred package.json validation script was found.',
+      `Gradle wrapper was detected and matched the preferred task candidate "${matchingTaskName}".`
+    ]
+  };
+}
+
+function resolveMavenWrapperPlan(
+  input: ResolveValidationPlanCoreInput
+): ValidationPlan | undefined {
+  if (!input.buildToolInfo?.maven) {
+    return undefined;
+  }
+
+  const matchingGoalName = input.preferredScriptNames.find((goalName) =>
+    isMavenGoalCandidate(goalName)
+  );
+
+  if (!matchingGoalName) {
+    return undefined;
+  }
+
+  const commandLine = buildMavenWrapperCommand(
+    input.buildToolInfo.maven,
+    matchingGoalName
+  );
+
+  if (!commandLine) {
+    return undefined;
+  }
+
+  return {
+    command: {
+      source: 'maven-wrapper',
+      commandLine,
+      detail: `Using Maven wrapper goal candidate "${matchingGoalName}" via ${commandLine}.`
+    },
+    rationale: [
+      `Adapter selected: ${input.adapterDisplayName}`,
+      'Workspace setting dslforge.validation.command is empty.',
+      'No preferred package.json validation script was found.',
+      'No Gradle wrapper task candidate was selected.',
+      `Maven wrapper was detected and matched the preferred goal candidate "${matchingGoalName}".`
+    ]
+  };
 }
 
 export function resolveValidationPlanCore(
@@ -30,55 +141,57 @@ export function resolveValidationPlanCore(
     };
   }
 
-  if (!input.packageInfo) {
-    return {
-      command: {
-        source: 'missing',
-        detail:
-          'No package.json was found in the workspace root, so DSLForge could not auto-detect a validation script.'
-      },
-      rationale: [
-        `Adapter selected: ${input.adapterDisplayName}`,
-        'Workspace setting dslforge.validation.command is empty.',
-        'No package.json exists at the workspace root.'
-      ]
-    };
+  if (input.packageInfo) {
+    const scripts = input.packageInfo.manifest.scripts ?? {};
+    const matchingScriptName = input.preferredScriptNames.find((scriptName) =>
+      Object.prototype.hasOwnProperty.call(scripts, scriptName)
+    );
+
+    if (matchingScriptName) {
+      return {
+        command: {
+          source: 'package-script',
+          commandLine: buildPackageScriptCommand(
+            input.packageInfo.packageManager,
+            matchingScriptName
+          ),
+          scriptName: matchingScriptName,
+          detail: `Using package.json script "${matchingScriptName}" via ${input.packageInfo.packageManager}.`
+        },
+        rationale: [
+          `Adapter selected: ${input.adapterDisplayName}`,
+          'Workspace setting dslforge.validation.command is empty.',
+          `Matched package.json script "${matchingScriptName}" from the preferred validation script list.`
+        ]
+      };
+    }
   }
 
-  const scripts = input.packageInfo.manifest.scripts ?? {};
-  const matchingScriptName = input.preferredScriptNames.find((scriptName) =>
-    Object.prototype.hasOwnProperty.call(scripts, scriptName)
-  );
+  const gradleWrapperPlan = resolveGradleWrapperPlan(input);
 
-  if (matchingScriptName) {
-    return {
-      command: {
-        source: 'package-script',
-        commandLine: buildPackageScriptCommand(
-          input.packageInfo.packageManager,
-          matchingScriptName
-        ),
-        scriptName: matchingScriptName,
-        detail: `Using package.json script "${matchingScriptName}" via ${input.packageInfo.packageManager}.`
-      },
-      rationale: [
-        `Adapter selected: ${input.adapterDisplayName}`,
-        'Workspace setting dslforge.validation.command is empty.',
-        `Matched package.json script "${matchingScriptName}" from the preferred validation script list.`
-      ]
-    };
+  if (gradleWrapperPlan) {
+    return gradleWrapperPlan;
+  }
+
+  const mavenWrapperPlan = resolveMavenWrapperPlan(input);
+
+  if (mavenWrapperPlan) {
+    return mavenWrapperPlan;
   }
 
   return {
     command: {
       source: 'missing',
       detail:
-        'DSLForge could not find a validation command. Configure dslforge.validation.command or add a supported package.json script.'
+        'DSLForge could not find a validation command. Configure dslforge.validation.command or add a supported package.json script, Gradle wrapper task, or Maven wrapper goal.'
     },
     rationale: [
       `Adapter selected: ${input.adapterDisplayName}`,
       'Workspace setting dslforge.validation.command is empty.',
-      `No preferred validation script was found in package.json. Checked: ${input.preferredScriptNames.join(', ')}.`
+      input.packageInfo
+        ? 'No preferred package.json validation script was found.'
+        : 'No package.json exists at the workspace root.',
+      `No preferred validation source was resolved. Checked candidates: ${input.preferredScriptNames.join(', ')}.`
     ]
   };
 }

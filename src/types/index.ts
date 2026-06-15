@@ -1,6 +1,11 @@
 export type FrameworkId = 'langium';
 
-export type ValidationCommandSource = 'user-configured' | 'package-script' | 'missing';
+export type ValidationCommandSource =
+  | 'user-configured'
+  | 'package-script'
+  | 'gradle-wrapper'
+  | 'maven-wrapper'
+  | 'missing';
 
 export interface ProjectSignal {
   kind:
