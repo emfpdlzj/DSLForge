@@ -12,15 +12,16 @@ Last updated: 2026-06-15
 
 - [x] Add Xtext validation output normalization so common Eclipse/Xtext errors map cleanly into Problems.
 - [x] Expand Xtext context selection beyond sibling grammars to follow imported grammars and referenced EPackages where practical.
-- [ ] Run manual VS Code smoke for the new Xtext fixtures and capture release screenshots.
+- [ ] Run manual VS Code smoke for the new Xtext fixtures.
+- [ ] Capture release screenshots if that is re-enabled for the release process.
 - [x] Revisit AI scaffold guidance so Xtext workspaces do not default to Langium-oriented suggestions when stronger Xtext signals are present.
 
 ## Product Follow-Ups
 
 - [x] Align extension messaging across README, package metadata, and restricted-mode copy so DSLForge is described consistently as a multi-framework DSL workflow assistant, not a Langium-first product.
 - [x] Add product-facing UI entry points beyond Command Palette, such as Explorer/context menu actions, a status bar entry, or a validation plan preview surface.
-- [ ] Define and implement a safe apply flow for AI output so scaffold/sample/explanation results can evolve from preview-only documents toward reviewed edits or generated files.
-- [ ] Prepare Marketplace launch assets and onboarding material, including screenshots, short demo flow, positioning copy, and supported workspace examples.
+- [x] Define and implement a safe apply flow for AI output so scaffold/sample/explanation results can evolve from preview-only documents toward reviewed edits or generated files.
+- [ ] Prepare Marketplace launch assets and onboarding material. Copy, demo flow, and supported workspace examples are drafted; screenshots remain deferred.
 
 ## Product Positioning Notes
 
@@ -30,5 +31,6 @@ Last updated: 2026-06-15
 
 ## Backlog Added During Implementation
 
-- [ ] Add manual AI smoke coverage for an Xtext fixture so scaffold/sample/explanation prompts are verified against MWE2, imported grammars, and EPackage context.
-- [ ] Design a reviewed apply flow for AI preview documents with explicit target-file confirmation, diff preview, and overwrite safeguards.
+- [x] Add manual AI smoke coverage for an Xtext fixture so scaffold/sample/explanation prompts are verified against MWE2, imported grammars, and EPackage context.
+- [ ] Extend the reviewed apply flow toward multi-file scaffold application and add focused smoke coverage for overwrite/conflict cases.
+- [ ] Capture actual Marketplace screenshot image files only if the release process later re-enables screenshot work.

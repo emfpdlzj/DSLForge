@@ -60,6 +60,7 @@ These items must be true before `vsce publish`:
 
 - Confirm extension title and short description are final
 - Confirm `keywords` match real discovery terms
+- Review [docs/marketplace-launch.md](/private/tmp/DSLForge-xtext-validation-normalization/docs/marketplace-launch.md:1) and finalize one short description candidate plus the opening paragraph
 - Add at least three screenshots:
   - validation success or failure with diagnostics surfaced
   - AI gate blocked state with setup guidance
