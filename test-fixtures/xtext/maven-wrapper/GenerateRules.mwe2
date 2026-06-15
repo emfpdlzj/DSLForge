@@ -1,0 +1,7 @@
+module com.acme.GenerateRules
+
+Workflow {
+  component = DirectoryCleaner {
+    directory = "src-gen"
+  }
+}

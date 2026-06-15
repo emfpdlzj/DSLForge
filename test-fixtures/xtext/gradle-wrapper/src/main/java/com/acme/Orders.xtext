@@ -1,0 +1,9 @@
+grammar com.acme.Orders with org.eclipse.xtext.common.Terminals
+
+generate orders "http://acme.com/orders"
+
+Model:
+  orders+=Order*;
+
+Order:
+  'order' name=ID ';';

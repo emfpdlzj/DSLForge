@@ -1,0 +1,7 @@
+module com.acme.GenerateOrders
+
+Workflow {
+  component = DirectoryCleaner {
+    directory = "src-gen"
+  }
+}

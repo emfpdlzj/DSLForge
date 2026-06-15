@@ -61,16 +61,14 @@ function getValidationPreferences(
   input: AdapterValidationPlanningInput
 ): Promise<AdapterValidationPreferences> {
   return Promise.resolve({
-    preferredScriptNames: [
-      'validate',
-      'antlr:validate',
-      'antlr4:validate',
+    preferredScriptNames: ['validate', 'antlr:validate', 'antlr4:validate', 'build'],
+    preferredGradleTaskNames: [
       'generateGrammarSource',
-      'generate-sources',
+      'generateTestGrammarSource',
       'build',
-      'test',
-      'package'
+      'test'
     ],
+    preferredMavenGoalNames: ['generate-sources', 'package', 'test', 'verify'],
     rationale: [
       `Adapter selected: ${input.project.displayName}`,
       `Workspace root: ${input.project.context.workspaceRoot}`,

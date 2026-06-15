@@ -1,6 +1,6 @@
 # DSLForge
 
-DSLForge is a VS Code extension for DSL authoring workflows, starting with Langium and expanding to ANTLR4.
+DSLForge is a VS Code extension for DSL authoring workflows across Langium, ANTLR4, and Xtext workspaces.
 
 It is not a generic AI generator. In v0.1, it focuses on the real loop around grammar work: detect the active DSL project, choose the right context, run the workspace's actual validation path, and present diagnostics in a form you can act on.
 
@@ -8,15 +8,15 @@ It is not a generic AI generator. In v0.1, it focuses on the real loop around gr
 
 DSLForge is currently a pre-release extension.
 
-- current branch work supports Langium and an in-progress ANTLR4 adapter
+- current branch work supports Langium, ANTLR4, and Xtext detection for validation planning
 - `Validate Current Grammar` is intentionally non-AI
 - AI commands require GitHub Copilot or another supported VS Code model environment
 - if AI access is unavailable, DSLForge stops and shows guidance instead of inventing a fake fallback
 
 ## What DSLForge Does
 
-- detects the current Langium or ANTLR4 workspace and grammar context
-- follows import-aware grammar context selection for Langium and reference-aware context selection for ANTLR4
+- detects the current Langium, ANTLR4, or Xtext workspace and grammar context
+- follows import-aware grammar context selection for Langium, reference-aware context selection for ANTLR4, and workflow-aware context selection for Xtext
 - resolves validation from the real workspace in this order:
   1. `dslforge.validation.command`
   2. auto-detected supported `package.json` script
@@ -45,7 +45,7 @@ Until then, you can evaluate it locally:
 
 ## One-Minute Flow
 
-1. Open a Langium or ANTLR4 workspace.
+1. Open a Langium, ANTLR4, or Xtext workspace.
 2. Open the grammar file you are working on.
 3. Run `DSLForge: Validate Current Grammar`.
 4. If DSLForge cannot resolve a validation command, set `dslforge.validation.command` or add a supported `package.json` script, `gradlew` task, or `mvnw` goal.
@@ -83,7 +83,9 @@ Validation priority:
 
 1. `dslforge.validation.command`
 2. supported `package.json` script auto-detection
-3. setup guidance
+3. supported `gradlew` task auto-detection
+4. supported `mvnw` goal auto-detection
+5. setup guidance
 
 This keeps DSLForge aligned with the workspace's real build and CI behavior instead of inventing an internal validation path that does not match the project.
 
@@ -108,6 +110,7 @@ Current implemented adapters in this branch:
 
 - Langium
 - ANTLR4
+- Xtext
 
 Current responsibilities:
 
@@ -116,10 +119,10 @@ Current responsibilities:
 - validation orchestration
 - diagnostics presentation
 
-Planned adapter sequence:
+Next adapter work after this branch:
 
-- current v0.2 branch: ANTLR4 adapter
-- next target: Xtext adapter
+- Xtext validation output normalization
+- richer Xtext import and EPackage context selection
 - later target: Generic mode
 
 ## Settings
