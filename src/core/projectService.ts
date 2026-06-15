@@ -10,6 +10,11 @@ export interface ResolvedProject {
   detection: ProjectDetectionResult;
 }
 
+export interface WorkspaceSelection {
+  workspaceFolder: vscode.WorkspaceFolder;
+  activeFile?: string;
+}
+
 export interface ResolvedProjectContext extends ResolvedProject {
   context: GrammarContextSelection;
 }
@@ -17,7 +22,7 @@ export interface ResolvedProjectContext extends ResolvedProject {
 export class ProjectService {
   public constructor(private readonly adapterRegistry: AdapterRegistry) {}
 
-  public async resolveProject(): Promise<ResolvedProject | undefined> {
+  public resolveWorkspaceSelection(): WorkspaceSelection | undefined {
     const activeEditor = vscode.window.activeTextEditor;
     const activeUri = activeEditor?.document.uri;
     const workspaceFolder = activeUri
@@ -30,6 +35,21 @@ export class ProjectService {
 
     const activeFile =
       activeUri && activeUri.scheme === 'file' ? activeUri.fsPath : undefined;
+
+    return {
+      workspaceFolder,
+      activeFile
+    };
+  }
+
+  public async resolveProject(): Promise<ResolvedProject | undefined> {
+    const workspaceSelection = this.resolveWorkspaceSelection();
+
+    if (!workspaceSelection) {
+      return undefined;
+    }
+
+    const { workspaceFolder, activeFile } = workspaceSelection;
 
     const detections = await Promise.all(
       this.adapterRegistry.all().map(async (adapter) => {

@@ -5,8 +5,7 @@ import {
   projectService
 } from '../core/services';
 import {
-  showFeatureExecutionError,
-  showUnsupportedWorkspaceGuidance
+  showFeatureExecutionError
 } from '../core/userGuidance';
 import { ensureTrustedWorkspace } from '../core/workspaceTrust';
 
@@ -18,13 +17,17 @@ export function createDslScaffold(): vscode.Disposable {
       return;
     }
 
-    const projectContext = await projectService.resolveProjectContext();
+    const workspaceSelection = projectService.resolveWorkspaceSelection();
 
-    if (!projectContext) {
-      await showUnsupportedWorkspaceGuidance('Create DSL Scaffold');
+    if (!workspaceSelection) {
+      await showFeatureExecutionError(
+        'Create DSL Scaffold',
+        'DSLForge needs an open workspace folder to create a scaffold proposal.'
+      );
       return;
     }
 
+    const projectContext = await projectService.resolveProjectContext();
     const gateResult = await getAiCommandGate().ensureAccess(
       'Create DSL Scaffold'
     );
@@ -35,7 +38,7 @@ export function createDslScaffold(): vscode.Disposable {
 
     try {
       await dslScaffoldService.createDslScaffold(
-        projectContext,
+        projectContext ?? workspaceSelection,
         gateResult.selectedModel!
       );
     } catch (error) {

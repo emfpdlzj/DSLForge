@@ -103,9 +103,10 @@
     "test:diagnostics": "npm run build && node dist/test/diagnosticsFixtureRunner.js",
     "test:manifest": "npm run build && node dist/test/manifestFixtureRunner.js",
     "test:projects": "npm run build && node dist/test/projectFixtureRunner.js",
+    "test:scaffold": "npm run build && node dist/test/scaffoldFixtureRunner.js",
     "ci:check": "npm run typecheck && npm run build",
     "clean": "rm -rf dist",
-    "test": "npm run build && node dist/test/diagnosticsFixtureRunner.js && node dist/test/projectFixtureRunner.js && node dist/test/manifestFixtureRunner.js"
+    "test": "npm run build && node dist/test/diagnosticsFixtureRunner.js && node dist/test/projectFixtureRunner.js && node dist/test/scaffoldFixtureRunner.js && node dist/test/manifestFixtureRunner.js"
   },
   "repository": {
     "type": "git",
