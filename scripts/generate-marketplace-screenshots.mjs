@@ -44,7 +44,8 @@ function multilineText(x, y, lines, options = {}) {
   const tspans = lines
     .map((line, index) => {
       const dy = index === 0 ? 0 : lineHeight;
-      return `<tspan x="${x}" dy="${dy}">${escapeXml(line)}</tspan>`;
+      const content = line.length === 0 ? '&#160;' : escapeXml(line);
+      return `<tspan x="${x}" dy="${dy}">${content}</tspan>`;
     })
     .join('');
 

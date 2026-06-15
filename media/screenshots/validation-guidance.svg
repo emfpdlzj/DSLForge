@@ -73,7 +73,7 @@
 
       <rect x="944" y="372" width="524" height="514" rx="28" fill="#101a28" stroke="#24364f" />
       <text x="980" y="416" fill="#7e95ad" font-size="16" font-weight="700" font-family="SF Pro Text, Inter, Arial, sans-serif">PROBLEMS / GUIDANCE</text>
-      <text x="980" y="474" fill="#edf3ff" font-size="21" font-weight="400" font-family="SF Pro Text, Inter, Arial, sans-serif"><tspan x="980" dy="0">dslforge.validation.missing</tspan><tspan x="980" dy="30.45"></tspan><tspan x="980" dy="30.45">No preferred validation script was found in package.json.</tspan><tspan x="980" dy="30.45">Checked: validate, langium:generate, build.</tspan><tspan x="980" dy="30.45"></tspan><tspan x="980" dy="30.45">Quick Fix</tspan><tspan x="980" dy="30.45">• Open Validation Settings</tspan><tspan x="980" dy="30.45">• Open Workspace package.json</tspan></text>
+      <text x="980" y="474" fill="#edf3ff" font-size="21" font-weight="400" font-family="SF Pro Text, Inter, Arial, sans-serif"><tspan x="980" dy="0">dslforge.validation.missing</tspan><tspan x="980" dy="30.45">&#160;</tspan><tspan x="980" dy="30.45">No preferred validation script was found in package.json.</tspan><tspan x="980" dy="30.45">Checked: validate, langium:generate, build.</tspan><tspan x="980" dy="30.45">&#160;</tspan><tspan x="980" dy="30.45">Quick Fix</tspan><tspan x="980" dy="30.45">• Open Validation Settings</tspan><tspan x="980" dy="30.45">• Open Workspace package.json</tspan></text>
       
     <rect x="980" y="730" width="188" height="38" rx="19" fill="#4a3518" />
     <text x="1074" y="755" text-anchor="middle" fill="#ffe0a3" font-size="18" font-weight="700" font-family="SF Pro Text, Inter, Arial, sans-serif">SETUP REQUIRED</text>
