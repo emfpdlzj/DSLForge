@@ -1,6 +1,6 @@
 # DSLForge Release Checklist
 
-Last updated: 2026-06-15
+Last updated: 2026-06-16
 
 This checklist is for the first public VS Code Marketplace release of `DSLForge`.
 
@@ -118,14 +118,15 @@ These items must be true before `vsce publish`:
   - `package.json.bugs.url`
   - `package.json.homepage`
   - git `origin`
-- Tagging, commit, and push are manual steps and must be done intentionally
+- Release tagging is intentional, but Marketplace publish now runs automatically from the `Publish Extension` GitHub Actions workflow when a `v*` tag is pushed
 
 ## Publisher Checklist
 
 - Confirm Marketplace publisher exists for `emfpdlzj`
 - Confirm you can authenticate with the publisher account
 - Confirm `vsce` is available in the intended publishing environment
-- Prefer an Entra ID-based publishing path for automation planning
+- Confirm the `VSCE_PAT` GitHub Actions secret exists before pushing a release tag
+- Prefer an Entra ID-based publishing path for longer-term automation planning
 - If doing a one-off manual publish, confirm the current official authentication path you will use before release day
 
 ## Execution Log
