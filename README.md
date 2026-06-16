@@ -8,7 +8,7 @@ It is not a generic AI generator. In v0.1, it focuses on the real loop around gr
 
 DSLForge is currently a pre-release extension.
 
-- current branch work supports Langium and an in-progress ANTLR4 adapter
+- current branch work supports Langium and ANTLR4
 - `Validate Current Grammar` is intentionally non-AI
 - AI commands require GitHub Copilot or another supported VS Code model environment
 - if AI access is unavailable, DSLForge stops and shows guidance instead of inventing a fake fallback
@@ -51,6 +51,12 @@ Until then, you can evaluate it locally:
 4. If DSLForge cannot resolve a validation command, set `dslforge.validation.command` or add a supported `package.json` script, `gradlew` task, or `mvnw` goal.
 5. Use the AI commands only if VS Code already has a supported model environment available.
 
+Scaffold-only bootstrap flow:
+
+1. Open any trusted workspace folder, even if it does not contain a detected DSL yet.
+2. Run `DSLForge: Create DSL Scaffold`.
+3. Review the proposal before creating files manually.
+
 Recommended first local check from this repository:
 
 1. open `test-fixtures/langium/configured-command`
@@ -75,6 +81,11 @@ AI-backed:
 - `DSLForge: Create DSL Scaffold`
 - `DSLForge: Generate Sample DSL`
 
+`Create DSL Scaffold` can run in two modes:
+
+- detected-workspace mode when DSLForge recognizes a Langium or ANTLR4 context
+- bootstrap mode when the workspace is open but no supported DSL framework has been detected yet
+
 ## Validation Behavior
 
 `Validate Current Grammar` is intentionally non-AI.
@@ -83,7 +94,9 @@ Validation priority:
 
 1. `dslforge.validation.command`
 2. supported `package.json` script auto-detection
-3. setup guidance
+3. supported `gradlew` task auto-detection
+4. supported `mvnw` goal auto-detection
+5. setup guidance
 
 This keeps DSLForge aligned with the workspace's real build and CI behavior instead of inventing an internal validation path that does not match the project.
 
