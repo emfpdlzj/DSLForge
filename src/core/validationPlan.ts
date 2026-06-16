@@ -13,8 +13,10 @@ const COMMON_GRADLE_TASK_NAMES = new Set([
   'assemble',
   'build',
   'check',
+  'generateLanguage',
   'generateGrammarSource',
   'generateTestGrammarSource',
+  'generateXtext',
   'test'
 ]);
 
@@ -31,6 +33,8 @@ export interface ResolveValidationPlanCoreInput {
   configuredCommand?: string;
   adapterDisplayName: string;
   preferredScriptNames: string[];
+  preferredGradleTaskNames?: string[];
+  preferredMavenGoalNames?: string[];
   packageInfo?: WorkspacePackageInfo;
   buildToolInfo?: WorkspaceBuildToolInfo;
 }
@@ -50,7 +54,9 @@ function resolveGradleWrapperPlan(
     return undefined;
   }
 
-  const matchingTaskName = input.preferredScriptNames.find((taskName) =>
+  const matchingTaskName = (
+    input.preferredGradleTaskNames ?? input.preferredScriptNames
+  ).find((taskName) =>
     isGradleTaskCandidate(taskName)
   );
 
@@ -89,7 +95,9 @@ function resolveMavenWrapperPlan(
     return undefined;
   }
 
-  const matchingGoalName = input.preferredScriptNames.find((goalName) =>
+  const matchingGoalName = (
+    input.preferredMavenGoalNames ?? input.preferredScriptNames
+  ).find((goalName) =>
     isMavenGoalCandidate(goalName)
   );
 

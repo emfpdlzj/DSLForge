@@ -9,6 +9,8 @@ export interface ValidationResolutionInput {
   workspaceUri: vscode.Uri;
   adapterDisplayName: string;
   preferredScriptNames: string[];
+  preferredGradleTaskNames?: string[];
+  preferredMavenGoalNames?: string[];
 }
 
 export async function resolveValidationPlan(
@@ -28,6 +30,8 @@ export async function resolveValidationPlan(
     configuredCommand,
     adapterDisplayName: input.adapterDisplayName,
     preferredScriptNames: input.preferredScriptNames,
+    preferredGradleTaskNames: input.preferredGradleTaskNames,
+    preferredMavenGoalNames: input.preferredMavenGoalNames,
     packageInfo,
     buildToolInfo
   });

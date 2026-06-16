@@ -1,0 +1,17 @@
+plugins {
+  id 'java'
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation "org.eclipse.xtext:org.eclipse.xtext:2.38.0"
+}
+
+tasks.register('generateXtext') {
+  doLast {
+    println 'Generating Xtext artifacts'
+  }
+}

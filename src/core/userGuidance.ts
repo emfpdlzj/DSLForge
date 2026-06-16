@@ -42,7 +42,7 @@ export async function showUnsupportedWorkspaceGuidance(
 ): Promise<void> {
   const message =
     `DSLForge could not detect a supported DSL workspace for ${featureName}. ` +
-    'Current supported framework signals are Langium and ANTLR4. Open a workspace with .langium or .g4 files, or with related config/build files such as langium-config.json, gradlew, or mvnw, then retry.';
+    'Current supported framework signals are Langium, ANTLR4, and Xtext. Open a workspace with .langium, .g4, or .xtext files, or with related config/build files such as langium-config.json, .mwe2, gradlew, or mvnw, then retry.';
 
   appendOutputDivider(`DSLForge Workspace Guidance ${featureName}`);
   appendOutputLine(`message: ${message}`);
