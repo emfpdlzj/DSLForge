@@ -1,0 +1,7 @@
+module com.acme.GenerateMain
+
+Workflow {
+  component = DirectoryCleaner {
+    directory = "src-gen"
+  }
+}

@@ -11,13 +11,17 @@ The goal is to verify four things:
 1. AI gate blocks correctly when no supported model environment is available
 2. AI gate blocks correctly when a model exists but request access is not granted
 3. import-aware context selection reaches the model
-4. result documents follow the expected output contract and stay preview-only
+4. result documents follow the expected output contract and stay preview-only until a reviewed apply is explicitly completed
 
 ## Workspace Fixture
 
 Use this workspace unless a case explicitly says otherwise:
 
 - `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/langium/import-context`
+
+Additional Xtext workspace for context-sensitive AI smoke:
+
+- `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/xtext/import-context`
 
 Open this file before running commands:
 
@@ -42,6 +46,7 @@ Expected selected context set for AI commands:
 Use the dedicated extension host configuration in [.vscode/launch.json](/Users/emfpdlzj/Desktop/DSLForge/.vscode/launch.json:1):
 
 - `Run DSLForge: import-context fixture`
+- `Run DSLForge: xtext-import-context fixture`
 
 ## Case 1: Missing Model Environment
 
@@ -160,13 +165,13 @@ Expected document header:
 
 - `DSLForge DSL Scaffold Proposal`
 - `Preview only: DSLForge has not written any files.`
-- `Contract sections: Scaffold Overview, Suggested Files, Suggested Commands, Starter Grammar, Implementation Notes, Next Steps`
+- `Contract sections: Scaffold Overview, Suggested Files, package.json Scripts, Starter Grammar, Implementation Notes, Next Steps`
 
 Expected document sections:
 
 - `## Scaffold Overview`
 - `## Suggested Files`
-- `## Suggested Commands`
+- `## package.json Scripts`
 - `## Starter Grammar`
 - `## Implementation Notes`
 - `## Next Steps`
@@ -174,41 +179,9 @@ Expected document sections:
 Acceptance criteria:
 
 - output is proposal-oriented and does not pretend files were already created
-- file suggestions are practical for Langium-first v0.1
-- `Suggested Commands` contains concrete commands or scripts
+- file suggestions stay aligned with the detected framework and visible toolchain
+- `package.json Scripts` contains concrete script names/commands
 - `Starter Grammar` includes fenced code blocks
-
-## Case 4B: Create DSL Scaffold In Bootstrap Mode
-
-Precondition:
-
-- a supported chat model is available
-- request access is granted
-- a trusted workspace folder is open even if it does not contain a detected `.langium` or `.g4` grammar yet
-
-Procedure:
-
-1. Open a non-DSL workspace folder or a new empty project folder
-2. Run `DSLForge: Create DSL Scaffold`
-
-Expected behavior:
-
-- Output includes `DSLForge AI Gate Create DSL Scaffold`
-- Output includes `DSLForge Create DSL Scaffold`
-- Output includes `mode: bootstrap workspace scaffold`
-- a new markdown document opens
-
-Expected document header:
-
-- `DSLForge DSL Scaffold Proposal`
-- `Mode: bootstrap workspace scaffold`
-- `Framework hint:`
-
-Acceptance criteria:
-
-- the proposal makes assumptions explicit instead of pretending the framework is already decided
-- the suggested commands reflect detected package manager or build-tool signals when present
-- if no strong framework signal exists, the proposal defaults to a pragmatic Langium-first TypeScript layout
 
 ## Case 5: Generate Sample DSL
 
@@ -265,6 +238,72 @@ If contract status is `normalized`, verify:
 - all required sections are still present
 - any drift is visible in the `DSLForge ... Contract` output block
 
+## Case 6: Reviewed Apply Flow
+
+Precondition:
+
+- a supported chat model is available
+- request access is granted
+- one AI preview document is already open from Case 3, 4, or 5
+
+Procedure:
+
+1. Focus the AI preview markdown document
+2. Run `DSLForge: Apply AI Preview to Workspace`
+3. Choose either `Preview Body Only` or a fenced `Code Block`
+4. Accept or adjust the suggested target path
+5. Review the opened draft or diff
+6. Run `DSLForge: Complete AI Preview Apply`
+
+Expected behavior:
+
+- apply does not write any workspace file before the explicit complete step
+- DSLForge opens a draft or diff review surface first
+- Output includes `DSLForge AI Apply prepared`
+- the complete step requires explicit confirmation before write
+- Output includes `DSLForge AI Apply completed`
+
+Acceptance criteria:
+
+- the selected content is written only after the explicit completion step
+- if the target file changed after review preparation, DSLForge blocks the write and asks for a new apply pass
+- the final target file opens in the editor after completion
+- if a scaffold preview contains multiple explicit `File Target:` hints, DSLForge can review them as a bundle before applying
+
+## Case 7: Xtext AI Context Coverage
+
+Precondition:
+
+- a supported chat model is available
+- request access is granted
+
+Procedure:
+
+1. Launch `Run DSLForge: xtext-import-context fixture`
+2. Open `src/main/java/com/acme/Main.xtext`
+3. Run each AI command once:
+4. `DSLForge: Explain Current Grammar`
+5. `DSLForge: Create DSL Scaffold`
+6. `DSLForge: Generate Sample DSL`
+
+Expected behavior:
+
+- Output includes the active Xtext grammar, the mixed-in grammar, the referenced `.ecore` file, and the `.mwe2` workflow file
+- `Create DSL Scaffold` does not default to Langium-specific framing when Xtext signals are present
+- `Explain Current Grammar` mentions mixed-in grammars, imported namespaces, or EPackage assumptions when relevant
+- `Generate Sample DSL` stays grounded in the visible Xtext grammar rather than generic DSL filler
+
+Acceptance criteria:
+
+- the context file list includes:
+  - `src/main/java/com/acme/Main.xtext`
+  - `src/main/java/com/acme/Common.xtext`
+  - `model/shared.ecore`
+  - `GenerateMain.mwe2`
+  - `build.gradle`
+- scaffold output stays Xtext-oriented
+- explanation and samples reference visible namespace or cross-reference evidence when relevant
+
 ## Failure Criteria
 
 Treat the smoke test as failed if any of these happen:
@@ -274,4 +313,5 @@ Treat the smoke test as failed if any of these happen:
 - imported grammar files are missing from the successful-run context file list
 - required contract sections are absent from the final document
 - scaffold output implies that files were written automatically
+- AI preview content writes to the workspace before explicit apply confirmation
 - sample DSL output is not copyable as fenced code blocks

@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { aiPreviewApplyService } from './aiPreviewApplyService';
 import {
   appendAiContractReport,
   appendGrammarAiReport,
@@ -6,6 +7,7 @@ import {
   buildAiDocumentHeader,
   buildGrammarContextBlock,
   collectGrammarModelContext,
+  getFrameworkPromptProfile,
   normalizeAiContractMarkdown,
   requestTextFromModel,
   type GrammarContextFile,
@@ -18,7 +20,41 @@ import {
   type ScaffoldWorkspaceProfile
 } from './scaffoldWorkspaceProfile';
 
-const SCAFFOLD_CONTRACT = {
+function createScaffoldContract(projectContext: ResolvedProjectContext) {
+  const profile = getFrameworkPromptProfile(projectContext);
+
+  return {
+    outputTitle: 'DSLForge DSL Scaffold Proposal',
+    progressTitle: 'DSLForge is creating a DSL scaffold proposal',
+    justification: `Create a ${profile.frameworkLabel}-aware DSL scaffold proposal for the user inside DSLForge.`,
+    previewOnly: true,
+    systemIntent: [
+      `You are helping design a ${profile.frameworkLabel}-aware DSL scaffold inside VS Code.`,
+      'Produce a practical scaffold proposal for a DSL authoring project.',
+      'Do not claim files already exist unless they are shown in context.',
+      'Do not ask follow-up questions. Make reasonable assumptions and label them clearly.'
+    ],
+    sections: [
+      'Scaffold Overview',
+      'Suggested Files',
+      'package.json Scripts',
+      'Starter Grammar',
+      'Implementation Notes',
+      'Next Steps'
+    ],
+    requirements: [
+      'This is a preview proposal, not an instruction to write files automatically.',
+      'Keep file suggestions practical and minimal for an early implementation milestone.',
+      'Include fenced code blocks for important starter file contents.',
+      'When a fenced code block represents a proposed file, add a preceding line in the form `File Target: relative/path`.',
+      'Suggested Files should explain each file purpose in one sentence.',
+      'package.json Scripts should propose concrete script names and commands.',
+      ...profile.scaffoldFocus
+    ]
+  } as const;
+}
+
+const BOOTSTRAP_SCAFFOLD_CONTRACT = {
   outputTitle: 'DSLForge DSL Scaffold Proposal',
   progressTitle: 'DSLForge is creating a DSL scaffold proposal',
   justification: 'Create a practical DSL scaffold proposal for the user inside DSLForge.',
@@ -42,7 +78,7 @@ const SCAFFOLD_CONTRACT = {
   requirements: [
     'This is a preview proposal, not an instruction to write files automatically.',
     'Focus on a practical DSL project structure and authoring workflow.',
-    'Keep file suggestions practical and minimal for v0.1.',
+    'Keep file suggestions practical and minimal for an early implementation milestone.',
     'Include fenced code blocks for important starter file contents.',
     'Suggested Files should explain each file purpose in one sentence.',
     'Suggested Commands should propose concrete commands or scripts that match the visible package manager or build tool when possible.'
@@ -96,16 +132,16 @@ function buildBootstrapPrompt(
   contextBlock: string
 ): string {
   return [
-    ...SCAFFOLD_CONTRACT.systemIntent,
+    ...BOOTSTRAP_SCAFFOLD_CONTRACT.systemIntent,
     '',
     'Return markdown only.',
     'Use these section headings exactly and in this order:',
-    ...SCAFFOLD_CONTRACT.sections.map(
+    ...BOOTSTRAP_SCAFFOLD_CONTRACT.sections.map(
       (section, index) => `${index + 1}. ## ${section}`
     ),
     '',
     'Requirements:',
-    ...SCAFFOLD_CONTRACT.requirements.map(
+    ...BOOTSTRAP_SCAFFOLD_CONTRACT.requirements.map(
       (requirement) => `- ${requirement}`
     ),
     '',
@@ -124,7 +160,7 @@ function buildBootstrapDocumentHeader(
   const generatedAt = new Date().toISOString();
 
   return [
-    `# ${SCAFFOLD_CONTRACT.outputTitle}`,
+    `# ${BOOTSTRAP_SCAFFOLD_CONTRACT.outputTitle}`,
     '',
     `- Generated at: ${generatedAt}`,
     '- Mode: bootstrap workspace scaffold',
@@ -156,6 +192,7 @@ export class DslScaffoldService {
     projectContext: ResolvedProjectContext,
     model: vscode.LanguageModelChat
   ): Promise<void> {
+    const scaffoldContract = createScaffoldContract(projectContext);
     const context = await collectGrammarModelContext(projectContext);
     appendGrammarAiReport(
       'DSLForge Create DSL Scaffold',
@@ -166,18 +203,18 @@ export class DslScaffoldService {
 
     const scaffold = await requestTextFromModel({
       model,
-      progressTitle: SCAFFOLD_CONTRACT.progressTitle,
-      justification: SCAFFOLD_CONTRACT.justification,
+      progressTitle: scaffoldContract.progressTitle,
+      justification: scaffoldContract.justification,
       prompt: buildAiContractPrompt(
         projectContext,
         buildGrammarContextBlock(context),
-        SCAFFOLD_CONTRACT
+        scaffoldContract
       )
     });
-    const normalized = normalizeAiContractMarkdown(scaffold, SCAFFOLD_CONTRACT);
+    const normalized = normalizeAiContractMarkdown(scaffold, scaffoldContract);
     appendAiContractReport(
       'DSLForge Create DSL Scaffold Contract',
-      SCAFFOLD_CONTRACT,
+      scaffoldContract,
       normalized.validation
     );
 
@@ -185,12 +222,12 @@ export class DslScaffoldService {
       language: 'markdown',
       content: [
         buildAiDocumentHeader(
-          SCAFFOLD_CONTRACT.outputTitle,
+          scaffoldContract.outputTitle,
           projectContext,
           model,
           [
             'Preview only: DSLForge has not written any files.',
-            `Contract sections: ${SCAFFOLD_CONTRACT.sections.join(', ')}`,
+            `Contract sections: ${scaffoldContract.sections.join(', ')}`,
             `Contract status: ${normalized.validation.normalized ? 'normalized' : 'exact'}`
           ]
         ),
@@ -200,6 +237,11 @@ export class DslScaffoldService {
 
     await vscode.window.showTextDocument(document, {
       preview: false
+    });
+    aiPreviewApplyService.registerPreviewDocument(document, {
+      featureName: 'Create DSL Scaffold',
+      outputTitle: scaffoldContract.outputTitle,
+      workspaceRoot: projectContext.workspaceFolder.uri.fsPath
     });
   }
 
@@ -233,8 +275,8 @@ export class DslScaffoldService {
 
     const scaffold = await requestTextFromModel({
       model,
-      progressTitle: SCAFFOLD_CONTRACT.progressTitle,
-      justification: SCAFFOLD_CONTRACT.justification,
+      progressTitle: BOOTSTRAP_SCAFFOLD_CONTRACT.progressTitle,
+      justification: BOOTSTRAP_SCAFFOLD_CONTRACT.justification,
       prompt: buildBootstrapPrompt(
         profile,
         buildGrammarContextBlock(context)
@@ -242,11 +284,11 @@ export class DslScaffoldService {
     });
     const normalized = normalizeAiContractMarkdown(
       scaffold,
-      SCAFFOLD_CONTRACT
+      BOOTSTRAP_SCAFFOLD_CONTRACT
     );
     appendAiContractReport(
       'DSLForge Create DSL Scaffold Contract',
-      SCAFFOLD_CONTRACT,
+      BOOTSTRAP_SCAFFOLD_CONTRACT,
       normalized.validation
     );
 
@@ -255,7 +297,7 @@ export class DslScaffoldService {
       content: [
         buildBootstrapDocumentHeader(profile, model, [
           'Preview only: DSLForge has not written any files.',
-          `Contract sections: ${SCAFFOLD_CONTRACT.sections.join(', ')}`,
+          `Contract sections: ${BOOTSTRAP_SCAFFOLD_CONTRACT.sections.join(', ')}`,
           `Contract status: ${normalized.validation.normalized ? 'normalized' : 'exact'}`
         ]),
         normalized.markdown
@@ -264,6 +306,11 @@ export class DslScaffoldService {
 
     await vscode.window.showTextDocument(document, {
       preview: false
+    });
+    aiPreviewApplyService.registerPreviewDocument(document, {
+      featureName: 'Create DSL Scaffold',
+      outputTitle: BOOTSTRAP_SCAFFOLD_CONTRACT.outputTitle,
+      workspaceRoot: workspaceSelection.workspaceFolder.uri.fsPath
     });
   }
 

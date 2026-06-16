@@ -1,0 +1,8 @@
+grammar com.acme.Main with com.acme.Common
+
+import "http://acme.com/shared" as shared
+
+generate main "http://acme.com/main"
+
+Model:
+  entities+=shared::Entity*;

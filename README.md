@@ -2,18 +2,18 @@
 
 DSLForge is a VS Code extension for DSL authoring workflows across Langium, ANTLR4, and Xtext workspaces.
 
-It is not a generic AI generator. In v0.1, it focuses on the real loop around grammar work: detect the active DSL project, choose the right context, run the workspace's actual validation path, and present diagnostics in a form you can act on.
+It is not a generic AI generator. The current branch focuses on the real loop around grammar work: detect the active DSL project, choose the right context, run the workspace's actual validation path, and present diagnostics in a form you can act on.
 
 ## Current Status
 
 DSLForge is currently a pre-release extension.
 
-- current branch work supports Langium, ANTLR4, and Xtext detection for validation planning
+- current branch work supports Langium, ANTLR4, and Xtext workflows
 - `Validate Current Grammar` is intentionally non-AI
 - AI commands require GitHub Copilot or another supported VS Code model environment
 - if AI access is unavailable, DSLForge stops and shows guidance instead of inventing a fake fallback
 
-## What DSLForge Does
+## Features
 
 - detects the current Langium, ANTLR4, or Xtext workspace and grammar context
 - follows import-aware grammar context selection for Langium, reference-aware context selection for ANTLR4, and workflow-aware context selection for Xtext
@@ -25,6 +25,8 @@ DSLForge is currently a pre-release extension.
   5. setup guidance
 - publishes normalized diagnostics into Problems
 - uses AI only for explicitly AI-scoped authoring tasks
+- exposes grammar actions from editor and Explorer context menus in addition to the Command Palette
+- lets reviewed AI preview documents move toward workspace files through an explicit diff-and-apply flow
 
 ## What DSLForge Does Not Do
 
@@ -83,7 +85,7 @@ AI-backed:
 
 `Create DSL Scaffold` can run in two modes:
 
-- detected-workspace mode when DSLForge recognizes a Langium or ANTLR4 context
+- detected-workspace mode when DSLForge recognizes a Langium, ANTLR4, or Xtext context
 - bootstrap mode when the workspace is open but no supported DSL framework has been detected yet
 
 ## Validation Behavior
@@ -132,8 +134,6 @@ Current responsibilities:
 
 Next adapter work after this branch:
 
-- Xtext validation output normalization
-- richer Xtext import and EPackage context selection
 - later target: Generic mode
 
 ## Settings
