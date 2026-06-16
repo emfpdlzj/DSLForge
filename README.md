@@ -45,7 +45,7 @@ Until then, you can evaluate it locally:
 
 1. run `npm install`
 2. run `npm exec -- vsce package`
-3. install the generated `dslforge-0.2.0.vsix` in VS Code
+3. install the generated `dslforge-0.3.1.vsix` in VS Code
 
 ## One-Minute Flow
 
@@ -147,6 +147,34 @@ Current extension settings:
 - `dslforge.ai.maxContextFiles`
 - `dslforge.ai.maxCharactersPerFile`
 - `dslforge.ai.maxContextCharacters`
+- `dslforge.telemetry.enabled`
+- `dslforge.telemetry.endpointOverride`
+
+## Telemetry
+
+DSLForge can send minimal product telemetry through a server-side proxy when telemetry is enabled.
+
+Telemetry behavior:
+
+- DSLForge always respects VS Code telemetry enablement
+- `dslforge.telemetry.enabled` can further disable extension telemetry
+- released builds can embed a proxy endpoint through `DSLFORGE_TELEMETRY_PROXY_ENDPOINT` at package time
+- `dslforge.telemetry.endpointOverride` or runtime `DSLFORGE_TELEMETRY_ENDPOINT` can override that endpoint for local validation
+- the client never stores the PostHog project key directly
+
+Telemetry scope:
+
+- command and workflow events such as extension activation, AI gate results, validation runs, AI document generation, and reviewed preview apply flows
+- coarse counts such as context file count, issue count, duration, and apply target count
+- no grammar file content, prompts, workspace file paths, or raw validation output are intentionally sent
+
+Proxy deployment:
+
+1. deploy this repository to Vercel
+2. set the Vercel environment variable `POSTHOG_PROJECT_API_KEY`
+3. optionally set `POSTHOG_HOST`, `TELEMETRY_RATE_LIMIT_WINDOW_MS`, and `TELEMETRY_RATE_LIMIT_MAX_EVENTS`
+4. set the GitHub repository variable `DSLFORGE_TELEMETRY_PROXY_ENDPOINT` to your production URL such as `https://your-project.vercel.app/api/telemetry`
+5. publish the extension from CI so the packaged VSIX embeds that proxy endpoint
 
 ## Development
 

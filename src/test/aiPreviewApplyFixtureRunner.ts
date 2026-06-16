@@ -54,16 +54,11 @@ function runSelectionSuggestionsCase(): void {
     'DSLForge DSL Scaffold Proposal',
     markdown
   );
-  const bundleSelection = selections.find(
-    (selection) => selection.label === 'Scaffold Bundle'
-  );
+  const bundleSelection = selections.find((selection) => selection.label === 'Scaffold Bundle');
 
   assert.ok(bundleSelection, 'expected scaffold bundle selection');
   assert.equal(bundleSelection?.bundleTargets?.length, 2);
-  assert.equal(
-    bundleSelection?.bundleTargets?.[0].targetRelativePath,
-    'package.json'
-  );
+  assert.equal(bundleSelection?.bundleTargets?.[0].targetRelativePath, 'package.json');
 }
 
 function runBundleReviewMarkdownCase(): void {

@@ -4,9 +4,7 @@
     {
       "id": "configured-command-fixture",
       "grammar": "src/language/configured.langium",
-      "fileExtensions": [
-        ".cfg"
-      ]
+      "fileExtensions": [".cfg"]
     }
   ],
   "out": "src/language/generated"

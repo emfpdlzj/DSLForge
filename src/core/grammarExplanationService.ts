@@ -12,6 +12,7 @@ import {
   requestTextFromModel
 } from './grammarAiSupport';
 import type { ResolvedProjectContext } from './projectService';
+import { getTelemetryService } from './telemetry';
 
 function createExplanationContract(projectContext: ResolvedProjectContext) {
   const profile = getFrameworkPromptProfile(projectContext);
@@ -50,12 +51,7 @@ export class GrammarExplanationService {
   ): Promise<void> {
     const explanationContract = createExplanationContract(projectContext);
     const context = await collectGrammarModelContext(projectContext);
-    appendGrammarAiReport(
-      'DSLForge Explain Current Grammar',
-      projectContext,
-      model,
-      context
-    );
+    appendGrammarAiReport('DSLForge Explain Current Grammar', projectContext, model, context);
 
     const explanation = await requestTextFromModel({
       model,
@@ -67,28 +63,34 @@ export class GrammarExplanationService {
         explanationContract
       )
     });
-    const normalized = normalizeAiContractMarkdown(
-      explanation,
-      explanationContract
-    );
+    const normalized = normalizeAiContractMarkdown(explanation, explanationContract);
     appendAiContractReport(
       'DSLForge Explain Current Grammar Contract',
       explanationContract,
       normalized.validation
     );
+    getTelemetryService().sendUsage(
+      'ai_document_generated',
+      {
+        feature_name: 'Explain Current Grammar',
+        output_kind: 'explanation',
+        contract_normalized: normalized.validation.normalized
+      },
+      {
+        context_file_count: context.files.length,
+        context_character_count: context.totalCharacters,
+        missing_section_count: normalized.validation.missingSections.length,
+        unexpected_section_count: normalized.validation.unexpectedSections.length
+      }
+    );
 
     const document = await vscode.workspace.openTextDocument({
       language: 'markdown',
       content: [
-        buildAiDocumentHeader(
-          explanationContract.outputTitle,
-          projectContext,
-          model,
-          [
-            `Contract sections: ${explanationContract.sections.join(', ')}`,
-            `Contract status: ${normalized.validation.normalized ? 'normalized' : 'exact'}`
-          ]
-        ),
+        buildAiDocumentHeader(explanationContract.outputTitle, projectContext, model, [
+          `Contract sections: ${explanationContract.sections.join(', ')}`,
+          `Contract status: ${normalized.validation.normalized ? 'normalized' : 'exact'}`
+        ]),
         normalized.markdown
       ].join('\n')
     });

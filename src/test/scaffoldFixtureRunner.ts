@@ -20,15 +20,15 @@ interface ScaffoldFixtureManifest {
 }
 
 async function loadManifest(): Promise<ScaffoldFixtureManifest> {
-  const manifestPath = path.resolve(
-    process.cwd(),
-    'test-fixtures/scaffold/fixtures.json'
-  );
+  const manifestPath = path.resolve(process.cwd(), 'test-fixtures/scaffold/fixtures.json');
   const raw = await fs.readFile(manifestPath, 'utf8');
   return JSON.parse(raw) as ScaffoldFixtureManifest;
 }
 
-function resolveFixturePath(workspaceRoot: string, relativePath: string | undefined): string | undefined {
+function resolveFixturePath(
+  workspaceRoot: string,
+  relativePath: string | undefined
+): string | undefined {
   if (!relativePath) {
     return undefined;
   }

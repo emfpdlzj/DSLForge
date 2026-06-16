@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/telemetry.ts": {
+      "maxDuration": 10
+    }
+  }
+}

@@ -12,6 +12,7 @@ import {
   requestTextFromModel
 } from './grammarAiSupport';
 import type { ResolvedProjectContext } from './projectService';
+import { getTelemetryService } from './telemetry';
 
 function createSampleDslContract(projectContext: ResolvedProjectContext) {
   const profile = getFrameworkPromptProfile(projectContext);
@@ -26,13 +27,7 @@ function createSampleDslContract(projectContext: ResolvedProjectContext) {
       'Generate realistic example inputs for a DSL author who is validating and refining the grammar.',
       'Do not pretend to know constraints that are not visible in the grammar.'
     ],
-    sections: [
-      'Reading of the Grammar',
-      'Sample 1',
-      'Sample 2',
-      'Sample 3',
-      'Edge Cases to Try'
-    ],
+    sections: ['Reading of the Grammar', 'Sample 1', 'Sample 2', 'Sample 3', 'Edge Cases to Try'],
     requirements: [
       'Put each sample in its own fenced code block.',
       'Vary the samples: one minimal, one representative, one more complex.',
@@ -51,12 +46,7 @@ export class SampleDslService {
   ): Promise<void> {
     const sampleDslContract = createSampleDslContract(projectContext);
     const context = await collectGrammarModelContext(projectContext);
-    appendGrammarAiReport(
-      'DSLForge Generate Sample DSL',
-      projectContext,
-      model,
-      context
-    );
+    appendGrammarAiReport('DSLForge Generate Sample DSL', projectContext, model, context);
 
     const samples = await requestTextFromModel({
       model,
@@ -68,29 +58,35 @@ export class SampleDslService {
         sampleDslContract
       )
     });
-    const normalized = normalizeAiContractMarkdown(
-      samples,
-      sampleDslContract
-    );
+    const normalized = normalizeAiContractMarkdown(samples, sampleDslContract);
     appendAiContractReport(
       'DSLForge Generate Sample DSL Contract',
       sampleDslContract,
       normalized.validation
     );
+    getTelemetryService().sendUsage(
+      'ai_document_generated',
+      {
+        feature_name: 'Generate Sample DSL',
+        output_kind: 'sample_dsl',
+        contract_normalized: normalized.validation.normalized
+      },
+      {
+        context_file_count: context.files.length,
+        context_character_count: context.totalCharacters,
+        missing_section_count: normalized.validation.missingSections.length,
+        unexpected_section_count: normalized.validation.unexpectedSections.length
+      }
+    );
 
     const document = await vscode.workspace.openTextDocument({
       language: 'markdown',
       content: [
-        buildAiDocumentHeader(
-          sampleDslContract.outputTitle,
-          projectContext,
-          model,
-          [
-            'Preview only: review the samples before using them.',
-            `Contract sections: ${sampleDslContract.sections.join(', ')}`,
-            `Contract status: ${normalized.validation.normalized ? 'normalized' : 'exact'}`
-          ]
-        ),
+        buildAiDocumentHeader(sampleDslContract.outputTitle, projectContext, model, [
+          'Preview only: review the samples before using them.',
+          `Contract sections: ${sampleDslContract.sections.join(', ')}`,
+          `Contract status: ${normalized.validation.normalized ? 'normalized' : 'exact'}`
+        ]),
         normalized.markdown
       ].join('\n')
     });

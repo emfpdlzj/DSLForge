@@ -22,9 +22,7 @@ async function pathExists(filePath: string): Promise<boolean> {
   }
 }
 
-async function readLangiumConfigGrammarFiles(
-  workspaceRoot: string
-): Promise<string[]> {
+async function readLangiumConfigGrammarFiles(workspaceRoot: string): Promise<string[]> {
   const configPath = path.join(workspaceRoot, 'langium-config.json');
 
   if (!(await pathExists(configPath))) {
@@ -66,9 +64,7 @@ async function resolveImportPath(
   importSpecifier: string
 ): Promise<string | undefined> {
   const basePath = path.resolve(path.dirname(fromGrammarFile), importSpecifier);
-  const candidates = basePath.endsWith('.langium')
-    ? [basePath]
-    : [basePath, `${basePath}.langium`];
+  const candidates = basePath.endsWith('.langium') ? [basePath] : [basePath, `${basePath}.langium`];
 
   for (const candidate of candidates) {
     if (await pathExists(candidate)) {
@@ -170,8 +166,7 @@ export async function buildLangiumContextSelection(
   const importedGrammarFiles = await collectImportedGrammarFiles(activeGrammarFile);
   const siblingGrammarFiles = grammarFiles.filter(
     (grammarFile) =>
-      grammarFile !== activeGrammarFile &&
-      !importedGrammarFiles.includes(grammarFile)
+      grammarFile !== activeGrammarFile && !importedGrammarFiles.includes(grammarFile)
   );
   const packageInfo = await readWorkspacePackageInfo(workspaceRoot);
   const contextSelections: GrammarContextFileSelection[] = [];
@@ -240,9 +235,7 @@ export async function buildLangiumContextSelection(
   const relatedFiles = contextFiles
     .filter((file) => file.filePath !== activeGrammarFile)
     .map((file) => file.filePath);
-  const importedFileCount = contextFiles.filter(
-    (file) => file.kind === 'imported-grammar'
-  ).length;
+  const importedFileCount = contextFiles.filter((file) => file.kind === 'imported-grammar').length;
   const supplementalFileCount = contextFiles.filter(
     (file) => file.kind === 'config' || file.kind === 'package-json'
   ).length;

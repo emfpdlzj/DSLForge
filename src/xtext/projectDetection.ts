@@ -27,10 +27,7 @@ export interface DetectedXtextProject {
   signals: ProjectSignal[];
 }
 
-async function collectFilesWithExtension(
-  rootPath: string,
-  extension: string
-): Promise<string[]> {
+async function collectFilesWithExtension(rootPath: string, extension: string): Promise<string[]> {
   const entries = await fs.readdir(rootPath, { withFileTypes: true });
   const files: string[] = [];
 
@@ -54,9 +51,7 @@ async function collectFilesWithExtension(
   return files.sort();
 }
 
-async function collectConfigSignals(
-  workspaceRoot: string
-): Promise<ProjectSignal[]> {
+async function collectConfigSignals(workspaceRoot: string): Promise<ProjectSignal[]> {
   const workflowFiles = await collectFilesWithExtension(workspaceRoot, '.mwe2');
 
   return workflowFiles.map((workflowFile) => ({
@@ -66,9 +61,7 @@ async function collectConfigSignals(
   }));
 }
 
-async function collectBuildSignals(
-  workspaceRoot: string
-): Promise<ProjectSignal[]> {
+async function collectBuildSignals(workspaceRoot: string): Promise<ProjectSignal[]> {
   const buildInfo = await readWorkspaceBuildToolInfo(workspaceRoot);
   const signals: ProjectSignal[] = [];
 
@@ -92,8 +85,7 @@ async function collectBuildSignals(
   if (buildInfo?.gradle?.wrapperScriptPath || buildInfo?.gradle?.wrapperBatchPath) {
     signals.push({
       kind: 'wrapper',
-      value:
-        buildInfo.gradle.wrapperScriptPath ?? buildInfo.gradle.wrapperBatchPath ?? 'gradlew',
+      value: buildInfo.gradle.wrapperScriptPath ?? buildInfo.gradle.wrapperBatchPath ?? 'gradlew',
       detail: 'Gradle wrapper'
     });
   }
@@ -118,8 +110,7 @@ async function collectBuildSignals(
   if (buildInfo?.maven?.wrapperScriptPath || buildInfo?.maven?.wrapperCommandPath) {
     signals.push({
       kind: 'wrapper',
-      value:
-        buildInfo.maven.wrapperScriptPath ?? buildInfo.maven.wrapperCommandPath ?? 'mvnw',
+      value: buildInfo.maven.wrapperScriptPath ?? buildInfo.maven.wrapperCommandPath ?? 'mvnw',
       detail: 'Maven wrapper'
     });
   }
@@ -127,9 +118,7 @@ async function collectBuildSignals(
   return signals;
 }
 
-async function collectPackageSignals(
-  workspaceRoot: string
-): Promise<ProjectSignal[]> {
+async function collectPackageSignals(workspaceRoot: string): Promise<ProjectSignal[]> {
   const packageInfo = await readWorkspacePackageInfo(workspaceRoot);
 
   if (!packageInfo) {

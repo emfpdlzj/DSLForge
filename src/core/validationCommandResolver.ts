@@ -16,13 +16,8 @@ export interface ValidationResolutionInput {
 export async function resolveValidationPlan(
   input: ValidationResolutionInput
 ): Promise<ValidationPlan> {
-  const configuration = vscode.workspace.getConfiguration(
-    'dslforge',
-    input.workspaceUri
-  );
-  const configuredCommand = configuration
-    .get<string>('validation.command')
-    ?.trim();
+  const configuration = vscode.workspace.getConfiguration('dslforge', input.workspaceUri);
+  const configuredCommand = configuration.get<string>('validation.command')?.trim();
   const packageInfo = await readWorkspacePackageInfo(input.workspaceRoot);
   const buildToolInfo = await readWorkspaceBuildToolInfo(input.workspaceRoot);
 

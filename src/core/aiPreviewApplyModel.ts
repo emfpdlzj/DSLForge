@@ -162,12 +162,11 @@ function defaultRelativePathForSelection(
     return `docs/${documentSlug}.md`;
   }
 
-  const folderName =
-    featureName.includes('Sample DSL')
-      ? 'examples'
-      : featureName.includes('Scaffold')
-        ? 'drafts'
-        : 'docs';
+  const folderName = featureName.includes('Sample DSL')
+    ? 'examples'
+    : featureName.includes('Scaffold')
+      ? 'drafts'
+      : 'docs';
 
   return `${folderName}/${featureSlug}-${index + 1}${extension}`;
 }
@@ -224,36 +223,29 @@ export function buildSelectionSuggestions(
       content: selection.content,
       suggestedRelativePath:
         selection.fileTarget ??
-        defaultRelativePathForSelection(
-          featureName,
-          outputTitle,
-          index,
-          selection.languageId
-        )
+        defaultRelativePathForSelection(featureName, outputTitle, index, selection.languageId)
     });
   }
 
-  const bundleTargets: PreviewBundleTarget[] = codeBlockSelections.flatMap(
-    (selection, index) =>
-      selection.fileTarget
-        ? [
-            {
-              targetRelativePath: selection.fileTarget,
-              content: selection.content,
-              languageId: selection.languageId,
-              sourceLabel: selection.heading
-                ? `${selection.heading} code block ${index + 1}`
-                : `Code block ${index + 1}`
-            }
-          ]
-        : []
+  const bundleTargets: PreviewBundleTarget[] = codeBlockSelections.flatMap((selection, index) =>
+    selection.fileTarget
+      ? [
+          {
+            targetRelativePath: selection.fileTarget,
+            content: selection.content,
+            languageId: selection.languageId,
+            sourceLabel: selection.heading
+              ? `${selection.heading} code block ${index + 1}`
+              : `Code block ${index + 1}`
+          }
+        ]
+      : []
   );
 
   if (
     featureName.includes('Scaffold') &&
     bundleTargets.length >= 2 &&
-    new Set(bundleTargets.map((target) => target.targetRelativePath)).size ===
-      bundleTargets.length
+    new Set(bundleTargets.map((target) => target.targetRelativePath)).size === bundleTargets.length
   ) {
     selections.push({
       label: 'Scaffold Bundle',

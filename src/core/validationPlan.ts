@@ -1,8 +1,5 @@
 import type { ValidationPlan } from '../types';
-import {
-  buildPackageScriptCommand,
-  type WorkspacePackageInfo
-} from './workspacePackage';
+import { buildPackageScriptCommand, type WorkspacePackageInfo } from './workspacePackage';
 import {
   buildGradleWrapperCommand,
   buildMavenWrapperCommand,
@@ -54,20 +51,15 @@ function resolveGradleWrapperPlan(
     return undefined;
   }
 
-  const matchingTaskName = (
-    input.preferredGradleTaskNames ?? input.preferredScriptNames
-  ).find((taskName) =>
-    isGradleTaskCandidate(taskName)
+  const matchingTaskName = (input.preferredGradleTaskNames ?? input.preferredScriptNames).find(
+    (taskName) => isGradleTaskCandidate(taskName)
   );
 
   if (!matchingTaskName) {
     return undefined;
   }
 
-  const commandLine = buildGradleWrapperCommand(
-    input.buildToolInfo.gradle,
-    matchingTaskName
-  );
+  const commandLine = buildGradleWrapperCommand(input.buildToolInfo.gradle, matchingTaskName);
 
   if (!commandLine) {
     return undefined;
@@ -95,20 +87,15 @@ function resolveMavenWrapperPlan(
     return undefined;
   }
 
-  const matchingGoalName = (
-    input.preferredMavenGoalNames ?? input.preferredScriptNames
-  ).find((goalName) =>
-    isMavenGoalCandidate(goalName)
+  const matchingGoalName = (input.preferredMavenGoalNames ?? input.preferredScriptNames).find(
+    (goalName) => isMavenGoalCandidate(goalName)
   );
 
   if (!matchingGoalName) {
     return undefined;
   }
 
-  const commandLine = buildMavenWrapperCommand(
-    input.buildToolInfo.maven,
-    matchingGoalName
-  );
+  const commandLine = buildMavenWrapperCommand(input.buildToolInfo.maven, matchingGoalName);
 
   if (!commandLine) {
     return undefined;
@@ -130,9 +117,7 @@ function resolveMavenWrapperPlan(
   };
 }
 
-export function resolveValidationPlanCore(
-  input: ResolveValidationPlanCoreInput
-): ValidationPlan {
+export function resolveValidationPlanCore(input: ResolveValidationPlanCoreInput): ValidationPlan {
   const configuredCommand = input.configuredCommand?.trim();
 
   if (configuredCommand) {

@@ -7,7 +7,15 @@
       "activeFile": "src/language/configured.langium",
       "detection": {
         "minimumConfidence": 100,
-        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "package-json", "dependency", "script"]
+        "requiredSignalKinds": [
+          "workspace-folder",
+          "active-file",
+          "grammar-file",
+          "config-file",
+          "package-json",
+          "dependency",
+          "script"
+        ]
       },
       "validation": {
         "configuredCommand": "node ./scripts/validate-configured.js",
@@ -28,7 +36,15 @@
       "activeFile": "src/language/package-script.langium",
       "detection": {
         "minimumConfidence": 100,
-        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "package-json", "dependency", "script"]
+        "requiredSignalKinds": [
+          "workspace-folder",
+          "active-file",
+          "grammar-file",
+          "config-file",
+          "package-json",
+          "dependency",
+          "script"
+        ]
       },
       "validation": {
         "source": "package-script",
@@ -38,7 +54,11 @@
       "context": {
         "activeGrammarFile": "src/language/package-script.langium",
         "contextKinds": ["active-grammar", "config", "package-json"],
-        "requiredFiles": ["src/language/package-script.langium", "langium-config.json", "package.json"],
+        "requiredFiles": [
+          "src/language/package-script.langium",
+          "langium-config.json",
+          "package.json"
+        ],
         "relatedFileCount": 2
       }
     },
@@ -49,7 +69,15 @@
       "activeFile": "src/language/missing-command.langium",
       "detection": {
         "minimumConfidence": 100,
-        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "package-json", "dependency", "script"]
+        "requiredSignalKinds": [
+          "workspace-folder",
+          "active-file",
+          "grammar-file",
+          "config-file",
+          "package-json",
+          "dependency",
+          "script"
+        ]
       },
       "validation": {
         "source": "missing"
@@ -57,7 +85,11 @@
       "context": {
         "activeGrammarFile": "src/language/missing-command.langium",
         "contextKinds": ["active-grammar", "config", "package-json"],
-        "requiredFiles": ["src/language/missing-command.langium", "langium-config.json", "package.json"],
+        "requiredFiles": [
+          "src/language/missing-command.langium",
+          "langium-config.json",
+          "package.json"
+        ],
         "relatedFileCount": 2
       }
     },
@@ -68,7 +100,15 @@
       "activeFile": "src/language/main.langium",
       "detection": {
         "minimumConfidence": 100,
-        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "package-json", "dependency", "script"]
+        "requiredSignalKinds": [
+          "workspace-folder",
+          "active-file",
+          "grammar-file",
+          "config-file",
+          "package-json",
+          "dependency",
+          "script"
+        ]
       },
       "validation": {
         "source": "package-script",
@@ -78,7 +118,13 @@
       "context": {
         "activeGrammarFile": "src/language/main.langium",
         "contextKinds": ["active-grammar", "imported-grammar", "config", "package-json"],
-        "requiredFiles": ["src/language/main.langium", "src/language/shared.langium", "src/language/tokens.langium", "langium-config.json", "package.json"],
+        "requiredFiles": [
+          "src/language/main.langium",
+          "src/language/shared.langium",
+          "src/language/tokens.langium",
+          "langium-config.json",
+          "package.json"
+        ],
         "relatedFileCount": 4
       }
     },
@@ -89,7 +135,15 @@
       "activeFile": "src/language/gradle-wrapper.langium",
       "detection": {
         "minimumConfidence": 100,
-        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "package-json", "dependency", "script"]
+        "requiredSignalKinds": [
+          "workspace-folder",
+          "active-file",
+          "grammar-file",
+          "config-file",
+          "package-json",
+          "dependency",
+          "script"
+        ]
       },
       "validation": {
         "source": "gradle-wrapper",
@@ -98,7 +152,11 @@
       "context": {
         "activeGrammarFile": "src/language/gradle-wrapper.langium",
         "contextKinds": ["active-grammar", "config", "package-json"],
-        "requiredFiles": ["src/language/gradle-wrapper.langium", "langium-config.json", "package.json"],
+        "requiredFiles": [
+          "src/language/gradle-wrapper.langium",
+          "langium-config.json",
+          "package.json"
+        ],
         "relatedFileCount": 2
       }
     },
@@ -109,17 +167,35 @@
       "activeFile": "src/language/maven-wrapper.langium",
       "detection": {
         "minimumConfidence": 100,
-        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "package-json", "dependency", "script"]
+        "requiredSignalKinds": [
+          "workspace-folder",
+          "active-file",
+          "grammar-file",
+          "config-file",
+          "package-json",
+          "dependency",
+          "script"
+        ]
       },
       "validation": {
-        "preferredCommandNames": ["package", "test", "validate", "langium:validate", "langium:check"],
+        "preferredCommandNames": [
+          "package",
+          "test",
+          "validate",
+          "langium:validate",
+          "langium:check"
+        ],
         "source": "maven-wrapper",
         "commandLine": "./mvnw package"
       },
       "context": {
         "activeGrammarFile": "src/language/maven-wrapper.langium",
         "contextKinds": ["active-grammar", "config", "package-json"],
-        "requiredFiles": ["src/language/maven-wrapper.langium", "langium-config.json", "package.json"],
+        "requiredFiles": [
+          "src/language/maven-wrapper.langium",
+          "langium-config.json",
+          "package.json"
+        ],
         "relatedFileCount": 2
       }
     },
@@ -130,7 +206,14 @@
       "activeFile": "src/grammar/Expr.g4",
       "detection": {
         "minimumConfidence": 100,
-        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "package-json", "dependency", "script"]
+        "requiredSignalKinds": [
+          "workspace-folder",
+          "active-file",
+          "grammar-file",
+          "package-json",
+          "dependency",
+          "script"
+        ]
       },
       "validation": {
         "preferredCommandNames": ["validate", "antlr:validate", "build"],
@@ -152,7 +235,13 @@
       "activeFile": "src/main/antlr/Orders.g4",
       "detection": {
         "minimumConfidence": 100,
-        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "build-file", "wrapper"]
+        "requiredSignalKinds": [
+          "workspace-folder",
+          "active-file",
+          "grammar-file",
+          "build-file",
+          "wrapper"
+        ]
       },
       "validation": {
         "preferredCommandNames": ["generateGrammarSource", "build", "test"],
@@ -173,7 +262,13 @@
       "activeFile": "src/main/antlr4/com/acme/Rules.g4",
       "detection": {
         "minimumConfidence": 100,
-        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "build-file", "wrapper"]
+        "requiredSignalKinds": [
+          "workspace-folder",
+          "active-file",
+          "grammar-file",
+          "build-file",
+          "wrapper"
+        ]
       },
       "validation": {
         "preferredCommandNames": ["generate-sources", "package", "test"],
@@ -194,7 +289,15 @@
       "activeFile": "src/main/java/com/acme/Orders.xtext",
       "detection": {
         "minimumConfidence": 100,
-        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "build-file", "wrapper", "dependency"]
+        "requiredSignalKinds": [
+          "workspace-folder",
+          "active-file",
+          "grammar-file",
+          "config-file",
+          "build-file",
+          "wrapper",
+          "dependency"
+        ]
       },
       "validation": {
         "preferredGradleTaskNames": ["generateXtext", "build", "check"],
@@ -204,7 +307,11 @@
       "context": {
         "activeGrammarFile": "src/main/java/com/acme/Orders.xtext",
         "contextKinds": ["active-grammar", "config", "build-file"],
-        "requiredFiles": ["src/main/java/com/acme/Orders.xtext", "GenerateOrders.mwe2", "build.gradle"],
+        "requiredFiles": [
+          "src/main/java/com/acme/Orders.xtext",
+          "GenerateOrders.mwe2",
+          "build.gradle"
+        ],
         "relatedFileCount": 2
       }
     },
@@ -215,7 +322,15 @@
       "activeFile": "src/main/java/com/acme/Rules.xtext",
       "detection": {
         "minimumConfidence": 100,
-        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "build-file", "wrapper", "dependency"]
+        "requiredSignalKinds": [
+          "workspace-folder",
+          "active-file",
+          "grammar-file",
+          "config-file",
+          "build-file",
+          "wrapper",
+          "dependency"
+        ]
       },
       "validation": {
         "preferredMavenGoalNames": ["generate-sources", "package", "test"],
@@ -236,7 +351,15 @@
       "activeFile": "src/main/java/com/acme/Main.xtext",
       "detection": {
         "minimumConfidence": 100,
-        "requiredSignalKinds": ["workspace-folder", "active-file", "grammar-file", "config-file", "build-file", "wrapper", "dependency"]
+        "requiredSignalKinds": [
+          "workspace-folder",
+          "active-file",
+          "grammar-file",
+          "config-file",
+          "build-file",
+          "wrapper",
+          "dependency"
+        ]
       },
       "validation": {
         "preferredGradleTaskNames": ["generateXtext", "build", "check"],

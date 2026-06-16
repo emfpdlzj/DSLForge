@@ -38,10 +38,7 @@ function dedupeSelections(
   return deduped;
 }
 
-async function collectFilesWithExtension(
-  rootPath: string,
-  extension: string
-): Promise<string[]> {
+async function collectFilesWithExtension(rootPath: string, extension: string): Promise<string[]> {
   const entries = await fs.readdir(rootPath, { withFileTypes: true });
   const files: string[] = [];
 
@@ -65,9 +62,7 @@ async function collectFilesWithExtension(
   return files.sort();
 }
 
-function determineActiveGrammarFile(
-  input: XtextContextSelectionInput
-): string | undefined {
+function determineActiveGrammarFile(input: XtextContextSelectionInput): string | undefined {
   if (input.activeFile?.endsWith('.xtext')) {
     return path.normalize(input.activeFile);
   }
@@ -92,25 +87,15 @@ function parseRepeatedMatches(content: string, pattern: RegExp): string[] {
 
 async function readGrammarMetadata(filePath: string): Promise<XtextGrammarMetadata> {
   const content = await fs.readFile(filePath, 'utf8').catch(() => '');
-  const grammarNameMatch =
-    /^\s*grammar\s+(?<value>[\w.]+)(?:\s+with\s+[\w.]+)?/im.exec(content);
-  const mixinMatch =
-    /^\s*grammar\s+[\w.]+\s+with\s+(?<value>[\w.]+)/im.exec(content);
+  const grammarNameMatch = /^\s*grammar\s+(?<value>[\w.]+)(?:\s+with\s+[\w.]+)?/im.exec(content);
+  const mixinMatch = /^\s*grammar\s+[\w.]+\s+with\s+(?<value>[\w.]+)/im.exec(content);
 
   return {
     filePath,
     grammarName: grammarNameMatch?.groups?.value?.trim(),
-    mixedInGrammarNames: mixinMatch?.groups?.value
-      ? [mixinMatch.groups.value.trim()]
-      : [],
-    importedNsUris: parseRepeatedMatches(
-      content,
-      /^\s*import\s+"(?<value>[^"]+)"\s+as\s+\w+/gim
-    ),
-    generatedNsUris: parseRepeatedMatches(
-      content,
-      /^\s*generate\s+\w+\s+"(?<value>[^"]+)"/gim
-    )
+    mixedInGrammarNames: mixinMatch?.groups?.value ? [mixinMatch.groups.value.trim()] : [],
+    importedNsUris: parseRepeatedMatches(content, /^\s*import\s+"(?<value>[^"]+)"\s+as\s+\w+/gim),
+    generatedNsUris: parseRepeatedMatches(content, /^\s*generate\s+\w+\s+"(?<value>[^"]+)"/gim)
   };
 }
 

@@ -1,9 +1,6 @@
 import * as path from 'node:path';
 import type { AdapterValidationInterpretationInput } from '../core/adapter';
-import {
-  dedupeValidationIssues,
-  parseValidationIssues
-} from '../core/validationIssueParser';
+import { dedupeValidationIssues, parseValidationIssues } from '../core/validationIssueParser';
 import type { ValidationIssue } from '../types';
 
 function normalizeFilePath(workspaceRoot: string, filePath: string): string {
@@ -16,9 +13,7 @@ function normalizeFilePath(workspaceRoot: string, filePath: string): string {
   return path.normalize(path.resolve(workspaceRoot, unquotedPath));
 }
 
-function parseLocatedXtextIssues(
-  input: AdapterValidationInterpretationInput
-): ValidationIssue[] {
+function parseLocatedXtextIssues(input: AdapterValidationInterpretationInput): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
   for (const line of input.rawOutput.split(/\r?\n/)) {
@@ -33,10 +28,7 @@ function parseLocatedXtextIssues(
     }
 
     issues.push({
-      filePath: normalizeFilePath(
-        input.project.context.workspaceRoot,
-        match.groups.file
-      ),
+      filePath: normalizeFilePath(input.project.context.workspaceRoot, match.groups.file),
       line: Number.parseInt(match.groups.line, 10),
       column: Number.parseInt(match.groups.column, 10) + 1,
       severity: match.groups.severity.toLowerCase() === 'warning' ? 'warning' : 'error',
@@ -77,8 +69,7 @@ function parseActiveGrammarLineIssues(
       line: Number.parseInt(match.groups.line, 10),
       column: Number.parseInt(match.groups.column, 10) + 1,
       severity:
-        match.groups.severity?.toLowerCase() === 'warning' ||
-        loweredMessage.includes('warning')
+        match.groups.severity?.toLowerCase() === 'warning' || loweredMessage.includes('warning')
           ? 'warning'
           : 'error',
       message: normalizedMessage,
@@ -89,9 +80,7 @@ function parseActiveGrammarLineIssues(
   return issues;
 }
 
-function parseFrameworkIssues(
-  input: AdapterValidationInterpretationInput
-): ValidationIssue[] {
+function parseFrameworkIssues(input: AdapterValidationInterpretationInput): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
   for (const line of input.rawOutput.split(/\r?\n/)) {
@@ -104,10 +93,7 @@ function parseFrameworkIssues(
 
     if (ePackageIssue?.groups) {
       issues.push({
-        severity:
-          ePackageIssue.groups.severity.toLowerCase() === 'warning'
-            ? 'warning'
-            : 'error',
+        severity: ePackageIssue.groups.severity.toLowerCase() === 'warning' ? 'warning' : 'error',
         message: ePackageIssue.groups.message.trim(),
         source: 'Xtext'
       });
@@ -121,10 +107,7 @@ function parseFrameworkIssues(
 
     if (generatorIssue?.groups) {
       issues.push({
-        severity:
-          generatorIssue.groups.severity.toLowerCase() === 'warning'
-            ? 'warning'
-            : 'error',
+        severity: generatorIssue.groups.severity.toLowerCase() === 'warning' ? 'warning' : 'error',
         message: generatorIssue.groups.message.trim(),
         source: 'Xtext'
       });

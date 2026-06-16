@@ -4,9 +4,7 @@
     {
       "id": "maven-wrapper-fixture",
       "grammar": "src/language/maven-wrapper.langium",
-      "fileExtensions": [
-        ".mavenfixture"
-      ]
+      "fileExtensions": [".mavenfixture"]
     }
   ],
   "out": "src/language/generated"

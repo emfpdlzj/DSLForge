@@ -1,9 +1,6 @@
 import * as vscode from 'vscode';
-import {
-  appendOutputDivider,
-  appendOutputLine,
-  showOutputChannel
-} from './outputChannel';
+import { appendOutputDivider, appendOutputLine, showOutputChannel } from './outputChannel';
+import { getTelemetryService } from './telemetry';
 import { showAiSetupGuidance } from './userGuidance';
 
 export type AiGateStatus = 'ready' | 'missing_model' | 'no_access';
@@ -29,9 +26,7 @@ function preferModel(
     return accessibleCopilotModel;
   }
 
-  const accessibleModel = models.find(
-    (model) => accessInformation.canSendRequest(model) === true
-  );
+  const accessibleModel = models.find((model) => accessInformation.canSendRequest(model) === true);
 
   if (accessibleModel) {
     return accessibleModel;
@@ -58,9 +53,7 @@ function appendAiGateReport(result: AiGateResult): void {
 }
 
 export class AiCommandGate {
-  public constructor(
-    private readonly accessInformation: vscode.LanguageModelAccessInformation
-  ) {}
+  public constructor(private readonly accessInformation: vscode.LanguageModelAccessInformation) {}
 
   public async ensureAccess(featureName: string): Promise<AiGateResult> {
     const models = await vscode.lm.selectChatModels();
@@ -75,6 +68,16 @@ export class AiCommandGate {
       };
 
       appendAiGateReport(result);
+      getTelemetryService().sendUsage(
+        'ai_gate',
+        {
+          feature_name: featureName,
+          status: result.status
+        },
+        {
+          available_model_count: result.availableModelCount
+        }
+      );
       showOutputChannel();
       await showAiSetupGuidance(featureName, result.message);
       return result;
@@ -90,6 +93,16 @@ export class AiCommandGate {
       };
 
       appendAiGateReport(result);
+      getTelemetryService().sendUsage(
+        'ai_gate',
+        {
+          feature_name: featureName,
+          status: result.status
+        },
+        {
+          available_model_count: result.availableModelCount
+        }
+      );
       showOutputChannel();
       await showAiSetupGuidance(featureName, result.message);
       return result;
@@ -104,6 +117,16 @@ export class AiCommandGate {
     };
 
     appendAiGateReport(result);
+    getTelemetryService().sendUsage(
+      'ai_gate',
+      {
+        feature_name: featureName,
+        status: result.status
+      },
+      {
+        available_model_count: result.availableModelCount
+      }
+    );
     return result;
   }
 }

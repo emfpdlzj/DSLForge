@@ -79,6 +79,5 @@ export const langiumAdapter: DslAdapter = {
   detect,
   selectContext,
   getValidationPreferences,
-  interpretValidationOutput: async (input) =>
-    interpretLangiumValidationOutput(input)
+  interpretValidationOutput: async (input) => interpretLangiumValidationOutput(input)
 };

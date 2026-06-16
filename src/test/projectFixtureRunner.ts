@@ -21,12 +21,7 @@ interface ValidationExpectation {
   preferredCommandNames?: string[];
   preferredGradleTaskNames?: string[];
   preferredMavenGoalNames?: string[];
-  source:
-    | 'user-configured'
-    | 'package-script'
-    | 'gradle-wrapper'
-    | 'maven-wrapper'
-    | 'missing';
+  source: 'user-configured' | 'package-script' | 'gradle-wrapper' | 'maven-wrapper' | 'missing';
   commandLine?: string;
   scriptName?: string;
 }
@@ -104,15 +99,15 @@ async function collectFilesWithExtension(
 }
 
 async function loadManifest(): Promise<ProjectFixtureManifest> {
-  const manifestPath = path.resolve(
-    process.cwd(),
-    'test-fixtures/projects/fixtures.json'
-  );
+  const manifestPath = path.resolve(process.cwd(), 'test-fixtures/projects/fixtures.json');
   const raw = await fs.readFile(manifestPath, 'utf8');
   return JSON.parse(raw) as ProjectFixtureManifest;
 }
 
-function resolveFixturePath(workspaceRoot: string, relativePath: string | undefined): string | undefined {
+function resolveFixturePath(
+  workspaceRoot: string,
+  relativePath: string | undefined
+): string | undefined {
   if (!relativePath) {
     return undefined;
   }
@@ -174,13 +169,12 @@ async function runValidationCase(fixture: ProjectFixtureCase): Promise<void> {
   const plan = resolveValidationPlanCore({
     configuredCommand: fixture.validation.configuredCommand,
     adapterDisplayName: getAdapterDisplayName(fixture.framework),
-    preferredScriptNames:
-      fixture.validation.preferredCommandNames ?? [
-        'validate',
-        'langium:validate',
-        'langium:check',
-        'build'
-      ],
+    preferredScriptNames: fixture.validation.preferredCommandNames ?? [
+      'validate',
+      'langium:validate',
+      'langium:check',
+      'build'
+    ],
     preferredGradleTaskNames: fixture.validation.preferredGradleTaskNames,
     preferredMavenGoalNames: fixture.validation.preferredMavenGoalNames,
     packageInfo,

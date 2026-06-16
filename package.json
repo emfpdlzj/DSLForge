@@ -1,8 +1,8 @@
 {
   "name": "dslforge",
   "displayName": "DSLForge",
-  "description": "Copilot-assisted DSL authoring for Visual Studio Code across Langium, ANTLR4, and Xtext workflows.",
-  "version": "0.2.0",
+  "description": "Multi-framework DSL workflow assistant for Visual Studio Code with Langium, ANTLR4, and Xtext support.",
+  "version": "0.3.1",
   "publisher": "emfpdlzj",
   "engines": {
     "vscode": "^1.120.0"
@@ -70,6 +70,25 @@
           "default": 20000,
           "minimum": 4000,
           "markdownDescription": "Maximum total number of context characters DSLForge sends to AI-backed commands across all selected files."
+        },
+        "dslforge.telemetry.enabled": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Enable DSLForge telemetry sinks when VS Code telemetry is enabled. If VS Code telemetry is disabled, DSLForge will not send telemetry regardless of this setting.",
+          "tags": [
+            "telemetry",
+            "usesOnlineServices"
+          ]
+        },
+        "dslforge.telemetry.endpointOverride": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "markdownDescription": "Optional override for the DSLForge telemetry proxy endpoint. Intended for local validation and staging environments.",
+          "tags": [
+            "telemetry",
+            "usesOnlineServices"
+          ]
         }
       }
     },
@@ -175,18 +194,23 @@
     ]
   },
   "scripts": {
+    "prebuild": "node scripts/set-telemetry-endpoint.mjs",
+    "pretypecheck": "node scripts/set-telemetry-endpoint.mjs",
     "vscode:prepublish": "npm run build",
     "build": "tsc -p tsconfig.json",
     "watch": "tsc -watch -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.vercel.json --noEmit",
     "test:ai-preview-apply": "npm run build && node dist/test/aiPreviewApplyFixtureRunner.js",
     "test:diagnostics": "npm run build && node dist/test/diagnosticsFixtureRunner.js",
     "test:manifest": "npm run build && node dist/test/manifestFixtureRunner.js",
     "test:projects": "npm run build && node dist/test/projectFixtureRunner.js",
     "test:scaffold": "npm run build && node dist/test/scaffoldFixtureRunner.js",
-    "ci:check": "npm run typecheck && npm run build",
+    "ci:check": "npm run format:check && npm run typecheck && npm run build",
     "clean": "rm -rf dist",
-    "test": "npm run build && node dist/test/aiPreviewApplyFixtureRunner.js && node dist/test/diagnosticsFixtureRunner.js && node dist/test/projectFixtureRunner.js && node dist/test/scaffoldFixtureRunner.js && node dist/test/manifestFixtureRunner.js"
+    "test": "npm run build && node dist/test/aiPreviewApplyFixtureRunner.js && node dist/test/diagnosticsFixtureRunner.js && node dist/test/projectFixtureRunner.js && node dist/test/scaffoldFixtureRunner.js && node dist/test/manifestFixtureRunner.js",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -202,6 +226,15 @@
   "devDependencies": {
     "@types/node": "^24.13.1",
     "@types/vscode": "^1.120.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "prettier": "^3.8.4",
     "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "posthog-node": "^5.37.1"
+  },
+  "lint-staged": {
+    "*.{ts,js,json,md,yml,yaml}": "prettier --write"
   }
 }

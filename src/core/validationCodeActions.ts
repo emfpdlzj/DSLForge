@@ -8,19 +8,13 @@ import {
 
 const VALIDATION_MISSING_CODE = 'dslforge.validation.missing';
 
-function hasMissingValidationDiagnostic(
-  context: vscode.CodeActionContext
-): boolean {
+function hasMissingValidationDiagnostic(context: vscode.CodeActionContext): boolean {
   return context.diagnostics.some((diagnostic) => {
     if (typeof diagnostic.code === 'string') {
       return diagnostic.code === VALIDATION_MISSING_CODE;
     }
 
-    if (
-      diagnostic.code &&
-      typeof diagnostic.code === 'object' &&
-      'value' in diagnostic.code
-    ) {
+    if (diagnostic.code && typeof diagnostic.code === 'object' && 'value' in diagnostic.code) {
       return diagnostic.code.value === VALIDATION_MISSING_CODE;
     }
 
@@ -29,10 +23,7 @@ function hasMissingValidationDiagnostic(
 }
 
 function createOpenSettingsAction(): vscode.CodeAction {
-  const action = new vscode.CodeAction(
-    'Open Validation Settings',
-    vscode.CodeActionKind.QuickFix
-  );
+  const action = new vscode.CodeAction('Open Validation Settings', vscode.CodeActionKind.QuickFix);
   action.command = {
     command: OPEN_VALIDATION_SETTINGS_COMMAND,
     title: 'Open Validation Settings'
@@ -40,9 +31,7 @@ function createOpenSettingsAction(): vscode.CodeAction {
   return action;
 }
 
-function createOpenPackageJsonAction(
-  workspaceRoot: string
-): vscode.CodeAction | undefined {
+function createOpenPackageJsonAction(workspaceRoot: string): vscode.CodeAction | undefined {
   const packageJsonPath = path.join(workspaceRoot, 'package.json');
 
   if (!fs.existsSync(packageJsonPath)) {
@@ -78,9 +67,7 @@ class ValidationCodeActionProvider implements vscode.CodeActionProvider {
     }
 
     const actions = [createOpenSettingsAction()];
-    const openPackageJsonAction = createOpenPackageJsonAction(
-      workspaceFolder.uri.fsPath
-    );
+    const openPackageJsonAction = createOpenPackageJsonAction(workspaceFolder.uri.fsPath);
 
     if (openPackageJsonAction) {
       actions.push(openPackageJsonAction);
@@ -90,9 +77,7 @@ class ValidationCodeActionProvider implements vscode.CodeActionProvider {
   }
 }
 
-export function registerValidationCodeActions(
-  context: vscode.ExtensionContext
-): void {
+export function registerValidationCodeActions(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.languages.registerCodeActionsProvider(
       {

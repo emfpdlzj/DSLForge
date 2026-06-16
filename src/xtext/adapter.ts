@@ -68,13 +68,7 @@ function getValidationPreferences(
       'generateXtext',
       'build'
     ],
-    preferredGradleTaskNames: [
-      'generateXtext',
-      'generateLanguage',
-      'build',
-      'check',
-      'test'
-    ],
+    preferredGradleTaskNames: ['generateXtext', 'generateLanguage', 'build', 'check', 'test'],
     preferredMavenGoalNames: ['generate-sources', 'package', 'test', 'verify'],
     rationale: [
       `Adapter selected: ${input.project.displayName}`,
@@ -90,6 +84,5 @@ export const xtextAdapter: DslAdapter = {
   detect,
   selectContext,
   getValidationPreferences,
-  interpretValidationOutput: async (input) =>
-    interpretXtextValidationOutput(input)
+  interpretValidationOutput: async (input) => interpretXtextValidationOutput(input)
 };

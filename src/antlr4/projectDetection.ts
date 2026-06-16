@@ -39,8 +39,7 @@ async function collectBuildSignals(workspaceRoot: string): Promise<ProjectSignal
   if (buildInfo?.gradle?.wrapperScriptPath || buildInfo?.gradle?.wrapperBatchPath) {
     signals.push({
       kind: 'wrapper',
-      value:
-        buildInfo.gradle.wrapperScriptPath ?? buildInfo.gradle.wrapperBatchPath ?? 'gradlew',
+      value: buildInfo.gradle.wrapperScriptPath ?? buildInfo.gradle.wrapperBatchPath ?? 'gradlew',
       detail: 'Gradle wrapper'
     });
   }
@@ -56,8 +55,7 @@ async function collectBuildSignals(workspaceRoot: string): Promise<ProjectSignal
   if (buildInfo?.maven?.wrapperScriptPath || buildInfo?.maven?.wrapperCommandPath) {
     signals.push({
       kind: 'wrapper',
-      value:
-        buildInfo.maven.wrapperScriptPath ?? buildInfo.maven.wrapperCommandPath ?? 'mvnw',
+      value: buildInfo.maven.wrapperScriptPath ?? buildInfo.maven.wrapperCommandPath ?? 'mvnw',
       detail: 'Maven wrapper'
     });
   }
