@@ -1,9 +1,5 @@
 import * as vscode from 'vscode';
-import {
-  appendOutputDivider,
-  appendOutputLine,
-  showOutputChannel
-} from './outputChannel';
+import { appendOutputDivider, appendOutputLine, showOutputChannel } from './outputChannel';
 import type { ResolvedProjectContext } from './projectService';
 import type { ValidationIssue, ValidationRunResult } from '../types';
 import { publishValidationIssues } from './validationDiagnostics';
@@ -139,9 +135,7 @@ function appendIssuePreview(issues: ValidationIssue[]): void {
   }
 
   if (issues.length > previewLimit) {
-    appendOutputLine(
-      `... ${issues.length - previewLimit} more issue(s) omitted from the preview.`
-    );
+    appendOutputLine(`... ${issues.length - previewLimit} more issue(s) omitted from the preview.`);
   }
 }
 
@@ -157,18 +151,12 @@ function appendValidationReport(
   appendOutputLine(`workspace: ${projectContext.workspaceFolder.uri.fsPath}`);
   appendOutputLine(`adapter: ${projectContext.adapter.displayName}`);
   appendOutputLine(`status: ${result.status}`);
-  appendOutputLine(
-    `active grammar: ${projectContext.context.activeGrammarFile ?? 'none'}`
-  );
+  appendOutputLine(`active grammar: ${projectContext.context.activeGrammarFile ?? 'none'}`);
   appendOutputLine(
     `selected context files: ${projectContext.context.contextFiles.length > 0 ? projectContext.context.contextFiles.map((file) => file.filePath).join(', ') : 'none'}`
   );
-  appendOutputLine(
-    `command source: ${result.plan.command.source}`
-  );
-  appendOutputLine(
-    `command detail: ${result.plan.command.detail}`
-  );
+  appendOutputLine(`command source: ${result.plan.command.source}`);
+  appendOutputLine(`command detail: ${result.plan.command.detail}`);
 
   if (result.plan.command.commandLine) {
     appendOutputLine(`command line: ${result.plan.command.commandLine}`);
@@ -250,10 +238,7 @@ async function showMessageWithActions(
     return;
   }
 
-  await vscode.commands.executeCommand(
-    selectedAction.command,
-    ...(selectedAction.arguments ?? [])
-  );
+  await vscode.commands.executeCommand(selectedAction.command, ...(selectedAction.arguments ?? []));
 }
 
 export class DiagnosticsPresenter {

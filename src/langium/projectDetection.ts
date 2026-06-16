@@ -35,9 +35,7 @@ async function pathExists(targetPath: string): Promise<boolean> {
   }
 }
 
-async function collectConfigSignals(
-  workspaceRoot: string
-): Promise<ProjectSignal[]> {
+async function collectConfigSignals(workspaceRoot: string): Promise<ProjectSignal[]> {
   const signals: ProjectSignal[] = [];
 
   for (const fileName of LANGIUM_CONFIG_FILE_NAMES) {
@@ -55,9 +53,7 @@ async function collectConfigSignals(
   return signals;
 }
 
-async function collectPackageSignals(
-  workspaceRoot: string
-): Promise<ProjectSignal[]> {
+async function collectPackageSignals(workspaceRoot: string): Promise<ProjectSignal[]> {
   const packageInfo = await readWorkspacePackageInfo(workspaceRoot);
 
   if (!packageInfo) {
@@ -94,8 +90,7 @@ async function collectPackageSignals(
 
   for (const [scriptName, scriptCommand] of Object.entries(scripts)) {
     const isLangiumScript =
-      LANGIUM_SCRIPT_HINTS.includes(scriptName) ||
-      scriptCommand.toLowerCase().includes('langium');
+      LANGIUM_SCRIPT_HINTS.includes(scriptName) || scriptCommand.toLowerCase().includes('langium');
 
     if (!isLangiumScript) {
       continue;

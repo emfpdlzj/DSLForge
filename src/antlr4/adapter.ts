@@ -83,6 +83,5 @@ export const antlr4Adapter: DslAdapter = {
   detect,
   selectContext,
   getValidationPreferences,
-  interpretValidationOutput: async (input) =>
-    interpretAntlr4ValidationOutput(input)
+  interpretValidationOutput: async (input) => interpretAntlr4ValidationOutput(input)
 };

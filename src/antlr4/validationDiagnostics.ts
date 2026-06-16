@@ -1,9 +1,6 @@
 import * as path from 'node:path';
 import type { AdapterValidationInterpretationInput } from '../core/adapter';
-import {
-  dedupeValidationIssues,
-  parseValidationIssues
-} from '../core/validationIssueParser';
+import { dedupeValidationIssues, parseValidationIssues } from '../core/validationIssueParser';
 import type { ValidationIssue } from '../types';
 
 function normalizeFilePath(workspaceRoot: string, filePath: string): string {
@@ -16,9 +13,7 @@ function normalizeFilePath(workspaceRoot: string, filePath: string): string {
   return path.normalize(path.resolve(workspaceRoot, unquotedPath));
 }
 
-function parseLocatedAntlr4Issues(
-  input: AdapterValidationInterpretationInput
-): ValidationIssue[] {
+function parseLocatedAntlr4Issues(input: AdapterValidationInterpretationInput): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
   for (const line of input.rawOutput.split(/\r?\n/)) {
@@ -33,10 +28,7 @@ function parseLocatedAntlr4Issues(
     }
 
     issues.push({
-      filePath: normalizeFilePath(
-        input.project.context.workspaceRoot,
-        match.groups.file
-      ),
+      filePath: normalizeFilePath(input.project.context.workspaceRoot, match.groups.file),
       line: Number.parseInt(match.groups.line, 10),
       column: Number.parseInt(match.groups.column, 10),
       severity: match.groups.severity.toLowerCase() === 'warning' ? 'warning' : 'error',
@@ -61,8 +53,7 @@ function parseActiveFileAntlr4Issues(
 
   for (const line of input.rawOutput.split(/\r?\n/)) {
     const trimmed = line.trim();
-    const match =
-      /^line\s+(?<line>\d+):(?<column>\d+)\s+(?<message>.+)$/i.exec(trimmed);
+    const match = /^line\s+(?<line>\d+):(?<column>\d+)\s+(?<message>.+)$/i.exec(trimmed);
 
     if (!match?.groups) {
       continue;
@@ -158,9 +149,5 @@ export function interpretAntlr4ValidationOutput(
     })
   );
 
-  return dedupeValidationIssues([
-    ...locatedIssues,
-    ...activeFileIssues,
-    ...genericIssues
-  ]);
+  return dedupeValidationIssues([...locatedIssues, ...activeFileIssues, ...genericIssues]);
 }

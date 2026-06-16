@@ -6,10 +6,7 @@
       "activeFile": "src/language/package-script.langium",
       "expectedFrameworkHint": "langium",
       "expectedPackageManager": "npm",
-      "requiredFiles": [
-        "src/language/package-script.langium",
-        "package.json"
-      ]
+      "requiredFiles": ["src/language/package-script.langium", "package.json"]
     },
     {
       "name": "antlr4 workspace bootstrap profile",
@@ -17,10 +14,7 @@
       "activeFile": "src/grammar/Expr.g4",
       "expectedFrameworkHint": "antlr4",
       "expectedPackageManager": "npm",
-      "requiredFiles": [
-        "src/grammar/Expr.g4",
-        "package.json"
-      ]
+      "requiredFiles": ["src/grammar/Expr.g4", "package.json"]
     }
   ]
 }

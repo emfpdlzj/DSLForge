@@ -4,9 +4,7 @@
     {
       "id": "gradle-wrapper-fixture",
       "grammar": "src/language/gradle-wrapper.langium",
-      "fileExtensions": [
-        ".gradlefixture"
-      ]
+      "fileExtensions": [".gradlefixture"]
     }
   ],
   "out": "src/language/generated"

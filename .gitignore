@@ -4,6 +4,7 @@ docs/
 
 .idea/
 .vscode/
+.vercel/
 .DS_Store
 .agents/
 AGENTS.md

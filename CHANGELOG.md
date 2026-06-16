@@ -4,9 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.3.1 - 2026-06-16
+
 - Added bootstrap-mode support for `DSLForge: Create DSL Scaffold`, so scaffold proposals can run in any trusted workspace folder even before Langium or ANTLR4 is detected.
 - Added scaffold workspace profiling and regression fixtures for framework hints and selected context files.
 - Updated unsupported-workspace guidance and README/manual smoke docs to reflect Langium + ANTLR4 support and the new scaffold bootstrap path.
+- Added a Vercel-friendly telemetry proxy path so minimal product usage events can flow to PostHog without embedding project keys in the client.
 
 ## 0.2.0 - 2026-06-15
 

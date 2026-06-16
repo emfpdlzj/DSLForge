@@ -1,9 +1,5 @@
 import * as vscode from 'vscode';
-import {
-  appendOutputDivider,
-  appendOutputLine,
-  showOutputChannel
-} from './outputChannel';
+import { appendOutputDivider, appendOutputLine, showOutputChannel } from './outputChannel';
 
 const OPEN_CHAT_SETTINGS_ACTION = 'Open Chat Settings';
 const MANAGE_WORKSPACE_TRUST_ACTION = 'Manage Workspace Trust';
@@ -17,10 +13,7 @@ async function showMessageWithActions(
 }
 
 async function openWorkspaceTrustManagement(): Promise<void> {
-  const candidateCommands = [
-    'workbench.trust.manage',
-    'workbench.trust.configure'
-  ];
+  const candidateCommands = ['workbench.trust.manage', 'workbench.trust.configure'];
 
   for (const command of candidateCommands) {
     try {
@@ -37,9 +30,7 @@ async function openWorkspaceTrustManagement(): Promise<void> {
   );
 }
 
-export async function showUnsupportedWorkspaceGuidance(
-  featureName: string
-): Promise<void> {
+export async function showUnsupportedWorkspaceGuidance(featureName: string): Promise<void> {
   const message =
     `DSLForge could not detect a supported DSL workspace for ${featureName}. ` +
     'Current supported framework signals are Langium, ANTLR4, and Xtext. Open a workspace with .langium, .g4, or .xtext files, or with related config/build files such as langium-config.json, .mwe2, gradlew, or mvnw, then retry.';
@@ -63,20 +54,14 @@ export async function showFeatureExecutionError(
   appendOutputLine(`message: ${message}`);
   showOutputChannel();
 
-  const selection = await vscode.window.showErrorMessage(
-    message,
-    SHOW_OUTPUT_ACTION
-  );
+  const selection = await vscode.window.showErrorMessage(message, SHOW_OUTPUT_ACTION);
 
   if (selection === SHOW_OUTPUT_ACTION) {
     await vscode.commands.executeCommand('workbench.action.output.toggleOutput');
   }
 }
 
-export async function showAiSetupGuidance(
-  featureName: string,
-  message: string
-): Promise<void> {
+export async function showAiSetupGuidance(featureName: string, message: string): Promise<void> {
   appendOutputDivider(`DSLForge AI Setup Guidance ${featureName}`);
   appendOutputLine(`message: ${message}`);
   showOutputChannel();
@@ -87,10 +72,7 @@ export async function showAiSetupGuidance(
   ]);
 
   if (selection === OPEN_CHAT_SETTINGS_ACTION) {
-    await vscode.commands.executeCommand(
-      'workbench.action.openSettings',
-      'chat'
-    );
+    await vscode.commands.executeCommand('workbench.action.openSettings', 'chat');
     return;
   }
 
@@ -99,9 +81,7 @@ export async function showAiSetupGuidance(
   }
 }
 
-export async function showWorkspaceTrustGuidance(
-  featureName: string
-): Promise<void> {
+export async function showWorkspaceTrustGuidance(featureName: string): Promise<void> {
   const message =
     `DSLForge cannot run ${featureName} in Restricted Mode. ` +
     'Trust this workspace to allow validation commands and AI-backed grammar actions.';

@@ -47,13 +47,7 @@ export type GrammarContextFileKind =
   | 'build-file'
   | 'package-json';
 
-export type GrammarContextLanguageId =
-  | 'langium'
-  | 'antlr'
-  | 'xtext'
-  | 'json'
-  | 'xml'
-  | 'plaintext';
+export type GrammarContextLanguageId = 'langium' | 'antlr' | 'xtext' | 'json' | 'xml' | 'plaintext';
 
 export interface GrammarContextFileSelection {
   filePath: string;
@@ -99,12 +93,7 @@ export interface ValidationPlan {
 }
 
 export interface ValidationRunResult {
-  status:
-    | 'succeeded'
-    | 'failed'
-    | 'needs_configuration'
-    | 'cancelled'
-    | 'busy';
+  status: 'succeeded' | 'failed' | 'needs_configuration' | 'cancelled' | 'busy';
   summary: string;
   plan: ValidationPlan;
   issues: ValidationIssue[];

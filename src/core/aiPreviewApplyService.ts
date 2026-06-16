@@ -1,10 +1,7 @@
 import * as path from 'node:path';
 import * as vscode from 'vscode';
-import {
-  appendOutputDivider,
-  appendOutputLine,
-  showOutputChannel
-} from './outputChannel';
+import { appendOutputDivider, appendOutputLine, showOutputChannel } from './outputChannel';
+import { getTelemetryService } from './telemetry';
 import {
   buildBundleReviewMarkdown,
   buildSelectionSuggestions,
@@ -12,10 +9,8 @@ import {
   type PreviewBundleTarget
 } from './aiPreviewApplyModel';
 
-export const APPLY_AI_PREVIEW_TO_WORKSPACE_COMMAND =
-  'dslforge.applyAiPreviewToWorkspace';
-export const COMPLETE_AI_PREVIEW_APPLY_COMMAND =
-  'dslforge.completeAiPreviewApply';
+export const APPLY_AI_PREVIEW_TO_WORKSPACE_COMMAND = 'dslforge.applyAiPreviewToWorkspace';
+export const COMPLETE_AI_PREVIEW_APPLY_COMMAND = 'dslforge.completeAiPreviewApply';
 
 interface AiPreviewDocumentRegistration {
   featureName: string;
@@ -142,9 +137,7 @@ export class AiPreviewApplyService {
         ...selection,
         label: selection.label,
         description: selection.description,
-        detail:
-          selection.detail ??
-          `Suggested target: ${selection.suggestedRelativePath}`
+        detail: selection.detail ?? `Suggested target: ${selection.suggestedRelativePath}`
       })),
       {
         placeHolder: 'Choose what to review and apply from this AI preview'
@@ -168,7 +161,7 @@ export class AiPreviewApplyService {
       validateInput: (value) => {
         return resolveWorkspaceTargetPath(registration.workspaceRoot, value)
           ? undefined
-          : 'Enter a workspace-relative file path inside the current workspace.'
+          : 'Enter a workspace-relative file path inside the current workspace.';
       }
     });
 
@@ -176,10 +169,7 @@ export class AiPreviewApplyService {
       return;
     }
 
-    const targetUri = resolveWorkspaceTargetPath(
-      registration.workspaceRoot,
-      targetRelativePath
-    );
+    const targetUri = resolveWorkspaceTargetPath(registration.workspaceRoot, targetRelativePath);
 
     if (!targetUri) {
       await vscode.window.showErrorMessage(
@@ -208,12 +198,19 @@ export class AiPreviewApplyService {
 
     this.pendingSessions.set(toDocumentKey(draftDocument.uri), session);
     await this.refreshContextKeys();
-    await this.openSingleTargetReviewSurface(
-      targetUri,
-      draftDocument.uri,
-      targetSnapshot
-    );
+    await this.openSingleTargetReviewSurface(targetUri, draftDocument.uri, targetSnapshot);
     this.appendApplyReport('prepared', session);
+    getTelemetryService().sendUsage(
+      'ai_preview_apply',
+      {
+        status: 'prepared',
+        feature_name: session.featureName,
+        apply_mode: 'single_target'
+      },
+      {
+        target_count: session.targets.length
+      }
+    );
     void vscode.window.showInformationMessage(
       `Review the draft for ${targetRelativePath}, then run DSLForge: Complete AI Preview Apply to write it.`
     );
@@ -223,9 +220,7 @@ export class AiPreviewApplyService {
     const session = await this.resolvePendingSession();
 
     if (!session) {
-      await vscode.window.showWarningMessage(
-        'No pending DSLForge AI apply draft is available.'
-      );
+      await vscode.window.showWarningMessage('No pending DSLForge AI apply draft is available.');
       return;
     }
 
@@ -240,6 +235,17 @@ export class AiPreviewApplyService {
     );
 
     if (conflictingTargets.length > 0) {
+      getTelemetryService().sendUsage(
+        'ai_preview_apply',
+        {
+          status: 'conflict',
+          feature_name: session.featureName
+        },
+        {
+          target_count: session.targets.length,
+          conflicting_target_count: conflictingTargets.length
+        }
+      );
       await vscode.window.showWarningMessage(
         `The target file changed after the draft was prepared: ${conflictingTargets.join(', ')}. Re-run Apply AI Preview to Workspace.`
       );
@@ -270,10 +276,18 @@ This will ${session.targets.some((target) => typeof target.targetSnapshot !== 'u
     this.pendingSessions.delete(toDocumentKey(session.reviewUri));
     await this.refreshContextKeys();
     this.appendApplyReport('completed', session);
-
-    const document = await vscode.workspace.openTextDocument(
-      session.targets[0].targetUri
+    getTelemetryService().sendUsage(
+      'ai_preview_apply',
+      {
+        status: 'completed',
+        feature_name: session.featureName
+      },
+      {
+        target_count: session.targets.length
+      }
     );
+
+    const document = await vscode.workspace.openTextDocument(session.targets[0].targetUri);
     await vscode.window.showTextDocument(document, {
       preview: false
     });
@@ -387,6 +401,17 @@ This will ${session.targets.some((target) => typeof target.targetSnapshot !== 'u
     this.pendingSessions.set(toDocumentKey(reviewDocument.uri), session);
     await this.refreshContextKeys();
     this.appendApplyReport('prepared', session);
+    getTelemetryService().sendUsage(
+      'ai_preview_apply',
+      {
+        status: 'prepared',
+        feature_name: session.featureName,
+        apply_mode: 'bundle'
+      },
+      {
+        target_count: preparedTargets.length
+      }
+    );
     void vscode.window.showInformationMessage(
       `Review the scaffold bundle for ${preparedTargets.length} files, then run DSLForge: Complete AI Preview Apply to write them.`
     );
@@ -436,24 +461,16 @@ This will ${session.targets.some((target) => typeof target.targetSnapshot !== 'u
 
 export const aiPreviewApplyService = new AiPreviewApplyService();
 
-export function registerAiPreviewApplyCommands(
-  context: vscode.ExtensionContext
-): void {
+export function registerAiPreviewApplyCommands(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
-    vscode.commands.registerCommand(
-      APPLY_AI_PREVIEW_TO_WORKSPACE_COMMAND,
-      async () => {
-        await aiPreviewApplyService.applyActivePreviewToWorkspace();
-      }
-    )
+    vscode.commands.registerCommand(APPLY_AI_PREVIEW_TO_WORKSPACE_COMMAND, async () => {
+      await aiPreviewApplyService.applyActivePreviewToWorkspace();
+    })
   );
   context.subscriptions.push(
-    vscode.commands.registerCommand(
-      COMPLETE_AI_PREVIEW_APPLY_COMMAND,
-      async () => {
-        await aiPreviewApplyService.completePendingApply();
-      }
-    )
+    vscode.commands.registerCommand(COMPLETE_AI_PREVIEW_APPLY_COMMAND, async () => {
+      await aiPreviewApplyService.completePendingApply();
+    })
   );
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor(() => {

@@ -45,10 +45,7 @@ function run(): void {
   const packageJson = readPackageJson();
 
   assert(packageJson.name === 'dslforge', 'package name must be dslforge');
-  assert(
-    packageJson.displayName === 'DSLForge',
-    'displayName must be DSLForge'
-  );
+  assert(packageJson.displayName === 'DSLForge', 'displayName must be DSLForge');
 
   assert(
     packageJson.capabilities?.virtualWorkspaces === false,
@@ -61,17 +58,12 @@ function run(): void {
   );
 
   assert(
-    packageJson.capabilities?.untrustedWorkspaces?.description?.includes(
-      'Restricted Mode'
-    ) ||
-      packageJson.capabilities?.untrustedWorkspaces?.description?.includes(
-        'workspace trust'
-      ),
+    packageJson.capabilities?.untrustedWorkspaces?.description?.includes('Restricted Mode') ||
+      packageJson.capabilities?.untrustedWorkspaces?.description?.includes('workspace trust'),
     'untrustedWorkspaces description must explain the trust limitation'
   );
 
-  const commands =
-    packageJson.contributes?.commands?.map((command) => command.command) ?? [];
+  const commands = packageJson.contributes?.commands?.map((command) => command.command) ?? [];
 
   for (const commandId of [
     'dslforge.validateCurrentGrammar',

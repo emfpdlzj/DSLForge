@@ -3,7 +3,7 @@ name: Publish Extension
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
 
 concurrency:
   group: publish-extension-${{ github.ref }}
@@ -16,6 +16,8 @@ jobs:
   publish:
     name: publish
     runs-on: ubuntu-latest
+    env:
+      DSLFORGE_TELEMETRY_PROXY_ENDPOINT: ${{ vars.DSLFORGE_TELEMETRY_PROXY_ENDPOINT }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -49,6 +51,9 @@ jobs:
             echo "Release tags must point to a commit that is already on origin/main."
             exit 1
           fi
+
+      - name: Run format check
+        run: npm run format:check
 
       - name: Run typecheck
         run: npm run typecheck

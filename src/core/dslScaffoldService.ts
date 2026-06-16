@@ -19,6 +19,7 @@ import {
   buildScaffoldWorkspaceProfile,
   type ScaffoldWorkspaceProfile
 } from './scaffoldWorkspaceProfile';
+import { getTelemetryService } from './telemetry';
 
 function createScaffoldContract(projectContext: ResolvedProjectContext) {
   const profile = getFrameworkPromptProfile(projectContext);
@@ -91,23 +92,16 @@ const MAX_TOTAL_CHARACTERS = 20000;
 
 type ScaffoldTarget = ResolvedProjectContext | WorkspaceSelection;
 
-function isResolvedProjectContext(
-  target: ScaffoldTarget
-): target is ResolvedProjectContext {
+function isResolvedProjectContext(target: ScaffoldTarget): target is ResolvedProjectContext {
   return 'adapter' in target;
 }
 
-function getBootstrapContextLimits(
-  workspaceFolder: vscode.WorkspaceFolder
-): {
+function getBootstrapContextLimits(workspaceFolder: vscode.WorkspaceFolder): {
   maxContextFiles: number;
   maxCharactersPerFile: number;
   maxTotalCharacters: number;
 } {
-  const configuration = vscode.workspace.getConfiguration(
-    'dslforge',
-    workspaceFolder.uri
-  );
+  const configuration = vscode.workspace.getConfiguration('dslforge', workspaceFolder.uri);
 
   return {
     maxContextFiles: Math.max(
@@ -115,35 +109,26 @@ function getBootstrapContextLimits(
       1
     ),
     maxCharactersPerFile: Math.max(
-      configuration.get<number>('ai.maxCharactersPerFile') ??
-        MAX_CHARACTERS_PER_FILE,
+      configuration.get<number>('ai.maxCharactersPerFile') ?? MAX_CHARACTERS_PER_FILE,
       1000
     ),
     maxTotalCharacters: Math.max(
-      configuration.get<number>('ai.maxContextCharacters') ??
-        MAX_TOTAL_CHARACTERS,
+      configuration.get<number>('ai.maxContextCharacters') ?? MAX_TOTAL_CHARACTERS,
       4000
     )
   };
 }
 
-function buildBootstrapPrompt(
-  profile: ScaffoldWorkspaceProfile,
-  contextBlock: string
-): string {
+function buildBootstrapPrompt(profile: ScaffoldWorkspaceProfile, contextBlock: string): string {
   return [
     ...BOOTSTRAP_SCAFFOLD_CONTRACT.systemIntent,
     '',
     'Return markdown only.',
     'Use these section headings exactly and in this order:',
-    ...BOOTSTRAP_SCAFFOLD_CONTRACT.sections.map(
-      (section, index) => `${index + 1}. ## ${section}`
-    ),
+    ...BOOTSTRAP_SCAFFOLD_CONTRACT.sections.map((section, index) => `${index + 1}. ## ${section}`),
     '',
     'Requirements:',
-    ...BOOTSTRAP_SCAFFOLD_CONTRACT.requirements.map(
-      (requirement) => `- ${requirement}`
-    ),
+    ...BOOTSTRAP_SCAFFOLD_CONTRACT.requirements.map((requirement) => `- ${requirement}`),
     '',
     ...profile.summaryLines,
     '',
@@ -194,12 +179,7 @@ export class DslScaffoldService {
   ): Promise<void> {
     const scaffoldContract = createScaffoldContract(projectContext);
     const context = await collectGrammarModelContext(projectContext);
-    appendGrammarAiReport(
-      'DSLForge Create DSL Scaffold',
-      projectContext,
-      model,
-      context
-    );
+    appendGrammarAiReport('DSLForge Create DSL Scaffold', projectContext, model, context);
 
     const scaffold = await requestTextFromModel({
       model,
@@ -217,20 +197,30 @@ export class DslScaffoldService {
       scaffoldContract,
       normalized.validation
     );
+    getTelemetryService().sendUsage(
+      'ai_document_generated',
+      {
+        feature_name: 'Create DSL Scaffold',
+        output_kind: 'scaffold',
+        scaffold_mode: 'detected',
+        contract_normalized: normalized.validation.normalized
+      },
+      {
+        context_file_count: context.files.length,
+        context_character_count: context.totalCharacters,
+        missing_section_count: normalized.validation.missingSections.length,
+        unexpected_section_count: normalized.validation.unexpectedSections.length
+      }
+    );
 
     const document = await vscode.workspace.openTextDocument({
       language: 'markdown',
       content: [
-        buildAiDocumentHeader(
-          scaffoldContract.outputTitle,
-          projectContext,
-          model,
-          [
-            'Preview only: DSLForge has not written any files.',
-            `Contract sections: ${scaffoldContract.sections.join(', ')}`,
-            `Contract status: ${normalized.validation.normalized ? 'normalized' : 'exact'}`
-          ]
-        ),
+        buildAiDocumentHeader(scaffoldContract.outputTitle, projectContext, model, [
+          'Preview only: DSLForge has not written any files.',
+          `Contract sections: ${scaffoldContract.sections.join(', ')}`,
+          `Contract status: ${normalized.validation.normalized ? 'normalized' : 'exact'}`
+        ]),
         normalized.markdown
       ].join('\n')
     });
@@ -263,9 +253,7 @@ export class DslScaffoldService {
     appendOutputLine('mode: bootstrap workspace scaffold');
     appendOutputLine(`framework hint: ${profile.frameworkHint}`);
     appendOutputLine(`framework hint reason: ${profile.frameworkReason}`);
-    appendOutputLine(
-      `model: ${model.vendor}/${model.family} (${model.name})`
-    );
+    appendOutputLine(`model: ${model.vendor}/${model.family} (${model.name})`);
     appendOutputLine(`context files: ${context.files.length}`);
     appendOutputLine(`context characters: ${context.totalCharacters}`);
 
@@ -277,19 +265,28 @@ export class DslScaffoldService {
       model,
       progressTitle: BOOTSTRAP_SCAFFOLD_CONTRACT.progressTitle,
       justification: BOOTSTRAP_SCAFFOLD_CONTRACT.justification,
-      prompt: buildBootstrapPrompt(
-        profile,
-        buildGrammarContextBlock(context)
-      )
+      prompt: buildBootstrapPrompt(profile, buildGrammarContextBlock(context))
     });
-    const normalized = normalizeAiContractMarkdown(
-      scaffold,
-      BOOTSTRAP_SCAFFOLD_CONTRACT
-    );
+    const normalized = normalizeAiContractMarkdown(scaffold, BOOTSTRAP_SCAFFOLD_CONTRACT);
     appendAiContractReport(
       'DSLForge Create DSL Scaffold Contract',
       BOOTSTRAP_SCAFFOLD_CONTRACT,
       normalized.validation
+    );
+    getTelemetryService().sendUsage(
+      'ai_document_generated',
+      {
+        feature_name: 'Create DSL Scaffold',
+        output_kind: 'scaffold',
+        scaffold_mode: 'bootstrap',
+        contract_normalized: normalized.validation.normalized
+      },
+      {
+        context_file_count: context.files.length,
+        context_character_count: context.totalCharacters,
+        missing_section_count: normalized.validation.missingSections.length,
+        unexpected_section_count: normalized.validation.unexpectedSections.length
+      }
     );
 
     const document = await vscode.workspace.openTextDocument({

@@ -33,8 +33,7 @@ export class ProjectService {
       return undefined;
     }
 
-    const activeFile =
-      activeUri && activeUri.scheme === 'file' ? activeUri.fsPath : undefined;
+    const activeFile = activeUri && activeUri.scheme === 'file' ? activeUri.fsPath : undefined;
 
     return {
       workspaceFolder,
@@ -63,15 +62,15 @@ export class ProjectService {
     );
 
     const rankedDetections = detections
-      .filter((entry): entry is { adapter: DslAdapter; detection: ProjectDetectionResult } => Boolean(entry))
+      .filter((entry): entry is { adapter: DslAdapter; detection: ProjectDetectionResult } =>
+        Boolean(entry)
+      )
       .sort((left, right) => right.detection.confidence - left.detection.confidence);
 
     const resolved = rankedDetections[0];
 
     if (!resolved) {
-      appendOutputLine(
-        `No adapter matched workspace: ${workspaceFolder.uri.fsPath}`
-      );
+      appendOutputLine(`No adapter matched workspace: ${workspaceFolder.uri.fsPath}`);
       return undefined;
     }
 

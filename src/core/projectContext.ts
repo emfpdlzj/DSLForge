@@ -1,8 +1,4 @@
-import type {
-  FrameworkId,
-  ProjectContext,
-  ProjectSignal
-} from '../types';
+import type { FrameworkId, ProjectContext, ProjectSignal } from '../types';
 
 export interface ProjectContextOptions {
   adapterId: string;

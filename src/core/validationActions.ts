@@ -3,18 +3,14 @@ import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { showMissingWorkspacePackageJsonGuidance } from './userGuidance';
 
-export const OPEN_VALIDATION_SETTINGS_COMMAND =
-  'dslforge.openValidationSettings';
-export const OPEN_WORKSPACE_PACKAGE_JSON_COMMAND =
-  'dslforge.openWorkspacePackageJson';
+export const OPEN_VALIDATION_SETTINGS_COMMAND = 'dslforge.openValidationSettings';
+export const OPEN_WORKSPACE_PACKAGE_JSON_COMMAND = 'dslforge.openWorkspacePackageJson';
 
 export interface OpenWorkspacePackageJsonArgs {
   workspaceRoot: string;
 }
 
-export function registerValidationActionCommands(
-  context: vscode.ExtensionContext
-): void {
+export function registerValidationActionCommands(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand(OPEN_VALIDATION_SETTINGS_COMMAND, async () => {
       await vscode.commands.executeCommand(

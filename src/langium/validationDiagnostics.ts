@@ -1,9 +1,6 @@
 import * as path from 'node:path';
 import type { AdapterValidationInterpretationInput } from '../core/adapter';
-import {
-  dedupeValidationIssues,
-  parseValidationIssues
-} from '../core/validationIssueParser';
+import { dedupeValidationIssues, parseValidationIssues } from '../core/validationIssueParser';
 import type { ValidationIssue } from '../types';
 
 interface PendingWebpackIssue {
@@ -24,9 +21,7 @@ function normalizeFilePath(workspaceRoot: string, filePath: string): string {
   return path.normalize(path.resolve(workspaceRoot, unquotedPath));
 }
 
-function parseWebpackTslIssues(
-  input: AdapterValidationInterpretationInput
-): ValidationIssue[] {
+function parseWebpackTslIssues(input: AdapterValidationInterpretationInput): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   const lines = input.rawOutput.split(/\r?\n/);
   let pendingIssue: PendingWebpackIssue | undefined;
@@ -34,26 +29,17 @@ function parseWebpackTslIssues(
   for (const line of lines) {
     const trimmed = line.trim();
 
-    const headerMatch =
-      /^(?<severity>ERROR|WARNING)\s+in\s+(?<file>.+)$/i.exec(trimmed);
+    const headerMatch = /^(?<severity>ERROR|WARNING)\s+in\s+(?<file>.+)$/i.exec(trimmed);
 
     if (headerMatch?.groups) {
       pendingIssue = {
-        filePath: normalizeFilePath(
-          input.project.context.workspaceRoot,
-          headerMatch.groups.file
-        ),
-        severity:
-          headerMatch.groups.severity.toLowerCase() === 'warning'
-            ? 'warning'
-            : 'error'
+        filePath: normalizeFilePath(input.project.context.workspaceRoot, headerMatch.groups.file),
+        severity: headerMatch.groups.severity.toLowerCase() === 'warning' ? 'warning' : 'error'
       };
       continue;
     }
 
-    const rangeMatch = /^(?<line>\d+):(?<column>\d+)-(?<endColumn>\d+)$/i.exec(
-      trimmed
-    );
+    const rangeMatch = /^(?<line>\d+):(?<column>\d+)-(?<endColumn>\d+)$/i.exec(trimmed);
 
     if (rangeMatch?.groups && pendingIssue) {
       pendingIssue = {
@@ -72,16 +58,10 @@ function parseWebpackTslIssues(
 
     if (tslMatch?.groups) {
       pendingIssue = {
-        filePath: normalizeFilePath(
-          input.project.context.workspaceRoot,
-          tslMatch.groups.file
-        ),
+        filePath: normalizeFilePath(input.project.context.workspaceRoot, tslMatch.groups.file),
         line: Number.parseInt(tslMatch.groups.line, 10),
         column: Number.parseInt(tslMatch.groups.column, 10),
-        severity:
-          tslMatch.groups.severity.toLowerCase() === 'warning'
-            ? 'warning'
-            : 'error'
+        severity: tslMatch.groups.severity.toLowerCase() === 'warning' ? 'warning' : 'error'
       };
       continue;
     }
@@ -122,17 +102,16 @@ function parseLangiumFrameworkIssues(
     if (generatorFailureMatch?.groups) {
       issues.push({
         severity:
-          generatorFailureMatch.groups.severity.toLowerCase() === 'warning'
-            ? 'warning'
-            : 'error',
+          generatorFailureMatch.groups.severity.toLowerCase() === 'warning' ? 'warning' : 'error',
         message: generatorFailureMatch.groups.message.trim(),
         source: 'Langium'
       });
       continue;
     }
 
-    const referenceFailureMatch =
-      /^Error:\s+(?<message>Could not resolve reference to.+)$/i.exec(trimmed);
+    const referenceFailureMatch = /^Error:\s+(?<message>Could not resolve reference to.+)$/i.exec(
+      trimmed
+    );
 
     if (referenceFailureMatch?.groups) {
       issues.push({
@@ -144,16 +123,12 @@ function parseLangiumFrameworkIssues(
     }
 
     const configFailureMatch =
-      /^(?<severity>Error|Warning):\s+(?<message>.+langium-config\.json.+)$/i.exec(
-        trimmed
-      );
+      /^(?<severity>Error|Warning):\s+(?<message>.+langium-config\.json.+)$/i.exec(trimmed);
 
     if (configFailureMatch?.groups) {
       issues.push({
         severity:
-          configFailureMatch.groups.severity.toLowerCase() === 'warning'
-            ? 'warning'
-            : 'error',
+          configFailureMatch.groups.severity.toLowerCase() === 'warning' ? 'warning' : 'error',
         message: configFailureMatch.groups.message.trim(),
         source: 'Langium'
       });
@@ -204,14 +179,10 @@ export function interpretLangiumValidationOutput(
   const genericIssues = filterDuplicateUnlocatedIssues(
     webpackIssues,
     parseValidationIssues(input.rawOutput, {
-    workspaceRoot: input.project.context.workspaceRoot,
-    defaultSource: 'Langium'
+      workspaceRoot: input.project.context.workspaceRoot,
+      defaultSource: 'Langium'
     })
   );
 
-  return dedupeValidationIssues([
-    ...webpackIssues,
-    ...frameworkIssues,
-    ...genericIssues
-  ]);
+  return dedupeValidationIssues([...webpackIssues, ...frameworkIssues, ...genericIssues]);
 }

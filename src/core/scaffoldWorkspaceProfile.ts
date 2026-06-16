@@ -39,7 +39,9 @@ async function pathExists(targetPath: string): Promise<boolean> {
 
 function isInsideWorkspace(workspaceRoot: string, candidatePath: string): boolean {
   const relativePath = path.relative(workspaceRoot, candidatePath);
-  return relativePath.length > 0 && !relativePath.startsWith('..') && !path.isAbsolute(relativePath);
+  return (
+    relativePath.length > 0 && !relativePath.startsWith('..') && !path.isAbsolute(relativePath)
+  );
 }
 
 function inferLanguageId(filePath: string): string {
@@ -129,7 +131,11 @@ function detectFrameworkHint(
     };
   }
 
-  if (dependencyNames.some((dependency) => dependency === 'langium' || dependency.startsWith('langium/'))) {
+  if (
+    dependencyNames.some(
+      (dependency) => dependency === 'langium' || dependency.startsWith('langium/')
+    )
+  ) {
     return {
       frameworkHint: 'langium',
       frameworkReason: 'The workspace dependencies reference Langium.'
@@ -175,7 +181,9 @@ export async function buildScaffoldWorkspaceProfile(
     path.join(workspaceRoot, 'pom.xml')
   ].filter((candidate): candidate is string => Boolean(candidate));
 
-  const uniqueCandidates = [...new Set(candidateFiles.map((candidate) => path.normalize(candidate)))];
+  const uniqueCandidates = [
+    ...new Set(candidateFiles.map((candidate) => path.normalize(candidate)))
+  ];
   const existingCandidates = (
     await Promise.all(
       uniqueCandidates.map(async (candidate) =>
@@ -191,11 +199,7 @@ export async function buildScaffoldWorkspaceProfile(
   const hasLangiumConfig = existingCandidates.some(
     (candidate) => path.basename(candidate) === 'langium-config.json'
   );
-  const framework = detectFrameworkHint(
-    activeFile,
-    dependencyNames,
-    hasLangiumConfig
-  );
+  const framework = detectFrameworkHint(activeFile, dependencyNames, hasLangiumConfig);
   const buildTools = [
     buildToolInfo?.gradle ? 'Gradle' : undefined,
     buildToolInfo?.maven ? 'Maven' : undefined

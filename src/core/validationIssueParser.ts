@@ -55,9 +55,7 @@ const lineParsers: IssueLineParser[] = [
       file: match.groups.file,
       line: Number.parseInt(match.groups.line, 10),
       column: Number.parseInt(match.groups.column, 10),
-      endColumn: match.groups.endColumn
-        ? Number.parseInt(match.groups.endColumn, 10)
-        : undefined,
+      endColumn: match.groups.endColumn ? Number.parseInt(match.groups.endColumn, 10) : undefined,
       severity: normalizeIssueSeverity(match.groups.severity),
       code: match.groups.code,
       message: match.groups.message,
@@ -109,8 +107,7 @@ const lineParsers: IssueLineParser[] = [
     };
   },
   (line) => {
-    const match =
-      /^(?<file>.+?):(?<line>\d+):(?<column>\d+)\s+(?<message>.+)$/i.exec(line);
+    const match = /^(?<file>.+?):(?<line>\d+):(?<column>\d+)\s+(?<message>.+)$/i.exec(line);
 
     if (!match?.groups) {
       return undefined;
@@ -131,9 +128,7 @@ const lineParsers: IssueLineParser[] = [
   },
   (line) => {
     const match =
-      /^(?<severity>error|warning|info)\s*(?<code>[A-Z]+\d+)?:?\s*(?<message>.+)$/i.exec(
-        line
-      );
+      /^(?<severity>error|warning|info)\s*(?<code>[A-Z]+\d+)?:?\s*(?<message>.+)$/i.exec(line);
 
     if (!match?.groups) {
       return undefined;
@@ -161,8 +156,7 @@ const lineParsers: IssueLineParser[] = [
     };
   },
   (line) => {
-    const match =
-      /^(?<severity>Error|Warning|Info):\s*(?<message>.+)$/i.exec(line);
+    const match = /^(?<severity>Error|Warning|Info):\s*(?<message>.+)$/i.exec(line);
 
     if (!match?.groups) {
       return undefined;
@@ -179,9 +173,7 @@ const lineParsers: IssueLineParser[] = [
   }
 ];
 
-function normalizeIssueSeverity(
-  rawSeverity: string | undefined
-): ValidationIssue['severity'] {
+function normalizeIssueSeverity(rawSeverity: string | undefined): ValidationIssue['severity'] {
   switch ((rawSeverity ?? '').toLowerCase()) {
     case 'warning':
       return 'warning';
@@ -249,10 +241,7 @@ export function normalizeValidationMessage(message: string): string {
   return normalized.trim();
 }
 
-function normalizeFilePath(
-  rawFilePath: string,
-  workspaceRoot: string | undefined
-): string {
+function normalizeFilePath(rawFilePath: string, workspaceRoot: string | undefined): string {
   const unquotedPath = rawFilePath
     .trim()
     .replace(/^['"]|['"]$/g, '')
@@ -269,23 +258,16 @@ function toValidationIssue(
   match: LineIssueMatch,
   options: ParseValidationIssuesOptions
 ): ValidationIssue | undefined {
-  const hasLocation =
-    typeof match.line !== 'undefined' && typeof match.column !== 'undefined';
+  const hasLocation = typeof match.line !== 'undefined' && typeof match.column !== 'undefined';
 
-  if (
-    hasLocation &&
-    (!Number.isFinite(match.line) || !Number.isFinite(match.column))
-  ) {
+  if (hasLocation && (!Number.isFinite(match.line) || !Number.isFinite(match.column))) {
     return undefined;
   }
 
-  const normalized = extractCodeFromMessage(
-    normalizeValidationMessage(match.message)
-  );
+  const normalized = extractCodeFromMessage(normalizeValidationMessage(match.message));
 
   return {
-    filePath:
-      match.file ? normalizeFilePath(match.file, options.workspaceRoot) : undefined,
+    filePath: match.file ? normalizeFilePath(match.file, options.workspaceRoot) : undefined,
     line: match.line,
     column: match.column,
     endLine: match.endLine,
@@ -332,8 +314,7 @@ function sortValidationIssues(issues: ValidationIssue[]): ValidationIssue[] {
     }
 
     const leftSeverity = left.severity === 'error' ? 0 : left.severity === 'warning' ? 1 : 2;
-    const rightSeverity =
-      right.severity === 'error' ? 0 : right.severity === 'warning' ? 1 : 2;
+    const rightSeverity = right.severity === 'error' ? 0 : right.severity === 'warning' ? 1 : 2;
 
     if (leftSeverity !== rightSeverity) {
       return leftSeverity - rightSeverity;

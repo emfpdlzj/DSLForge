@@ -3,10 +3,7 @@ import type { ResolvedProjectContext } from './projectService';
 import type { ValidationRunResult } from '../types';
 import { appendOutputLine } from './outputChannel';
 import { runShellCommand } from './commandRunner';
-import {
-  dedupeValidationIssues,
-  parseValidationIssues
-} from './validationDiagnostics';
+import { dedupeValidationIssues, parseValidationIssues } from './validationDiagnostics';
 import { resolveValidationPlan } from './validationCommandResolver';
 
 const activeValidationRuns = new Set<string>();
@@ -71,9 +68,7 @@ export class ValidationOrchestrator {
       configuration.get<number>('validation.maxCapturedOutputCharacters') ?? 250000,
       10000
     );
-    appendOutputLine(
-      `[validation] executing=${plan.command.commandLine ?? 'unknown'}`
-    );
+    appendOutputLine(`[validation] executing=${plan.command.commandLine ?? 'unknown'}`);
 
     try {
       const execution = await runShellCommand(plan.command.commandLine!, {
@@ -92,10 +87,7 @@ export class ValidationOrchestrator {
         workspaceRoot: projectContext.workspaceFolder.uri.fsPath,
         defaultSource: projectContext.adapter.displayName
       });
-      const issues = dedupeValidationIssues([
-        ...interpretedIssues,
-        ...genericIssues
-      ]);
+      const issues = dedupeValidationIssues([...interpretedIssues, ...genericIssues]);
 
       if (execution.cancelled) {
         return {

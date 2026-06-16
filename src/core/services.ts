@@ -9,11 +9,7 @@ import { antlr4Adapter } from '../antlr4/adapter';
 import { langiumAdapter } from '../langium/adapter';
 import { xtextAdapter } from '../xtext/adapter';
 
-const adapterRegistry = new AdapterRegistry([
-  langiumAdapter,
-  antlr4Adapter,
-  xtextAdapter
-]);
+const adapterRegistry = new AdapterRegistry([langiumAdapter, antlr4Adapter, xtextAdapter]);
 
 export const projectService = new ProjectService(adapterRegistry);
 export const validationOrchestrator = new ValidationOrchestrator();

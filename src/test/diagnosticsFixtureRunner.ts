@@ -121,18 +121,12 @@ function findMatchingIssue(
 }
 
 async function loadManifest(): Promise<FixtureManifest> {
-  const manifestPath = path.resolve(
-    process.cwd(),
-    'test-fixtures/diagnostics/fixtures.json'
-  );
+  const manifestPath = path.resolve(process.cwd(), 'test-fixtures/diagnostics/fixtures.json');
   const raw = await fs.readFile(manifestPath, 'utf8');
   return JSON.parse(raw) as FixtureManifest;
 }
 
-async function runFixture(
-  manifest: FixtureManifest,
-  fixture: DiagnosticsFixture
-): Promise<void> {
+async function runFixture(manifest: FixtureManifest, fixture: DiagnosticsFixture): Promise<void> {
   const effectiveWorkspaceRoot = path.resolve(
     process.cwd(),
     fixture.workspaceRoot ?? manifest.workspaceRoot
@@ -155,10 +149,7 @@ async function runFixture(
         ? interpretAntlr4ValidationOutput({
             project: createAntlr4Project(
               effectiveWorkspaceRoot,
-              resolveExpectedFilePath(
-                effectiveWorkspaceRoot,
-                fixture.activeGrammarFile
-              )
+              resolveExpectedFilePath(effectiveWorkspaceRoot, fixture.activeGrammarFile)
             ),
             context: {
               activeGrammarFile: resolveExpectedFilePath(
@@ -171,32 +162,29 @@ async function runFixture(
             },
             rawOutput
           })
-      : fixture.parser === 'xtext'
-        ? interpretXtextValidationOutput({
-            project: createXtextProject(
-              effectiveWorkspaceRoot,
-              resolveExpectedFilePath(
+        : fixture.parser === 'xtext'
+          ? interpretXtextValidationOutput({
+              project: createXtextProject(
                 effectiveWorkspaceRoot,
-                fixture.activeGrammarFile
-              )
-            ),
-            context: {
-              activeGrammarFile: resolveExpectedFilePath(
-                effectiveWorkspaceRoot,
-                fixture.activeGrammarFile
+                resolveExpectedFilePath(effectiveWorkspaceRoot, fixture.activeGrammarFile)
               ),
-              relatedFiles: [],
-              contextFiles: [],
-              notes: []
-            },
-            rawOutput
-          })
-      : dedupeValidationIssues(
-          parseValidationIssues(rawOutput, {
-            workspaceRoot: effectiveWorkspaceRoot,
-            defaultSource: fixture.defaultSource
-          })
-        );
+              context: {
+                activeGrammarFile: resolveExpectedFilePath(
+                  effectiveWorkspaceRoot,
+                  fixture.activeGrammarFile
+                ),
+                relatedFiles: [],
+                contextFiles: [],
+                notes: []
+              },
+              rawOutput
+            })
+          : dedupeValidationIssues(
+              parseValidationIssues(rawOutput, {
+                workspaceRoot: effectiveWorkspaceRoot,
+                defaultSource: fixture.defaultSource
+              })
+            );
 
   assert.equal(
     issues.length,
@@ -207,15 +195,9 @@ async function runFixture(
   for (const expectedIssue of fixture.expectedIssues) {
     const matched = findMatchingIssue(issues, {
       ...expectedIssue,
-      filePath: resolveExpectedFilePath(
-        effectiveWorkspaceRoot,
-        expectedIssue.filePath
-      )
+      filePath: resolveExpectedFilePath(effectiveWorkspaceRoot, expectedIssue.filePath)
     });
-    assert.ok(
-      matched,
-      `${fixture.name}: missing expected issue ${JSON.stringify(expectedIssue)}`
-    );
+    assert.ok(matched, `${fixture.name}: missing expected issue ${JSON.stringify(expectedIssue)}`);
   }
 }
 

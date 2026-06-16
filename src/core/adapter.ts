@@ -41,5 +41,7 @@ export interface DslAdapter {
   getValidationPreferences(
     input: AdapterValidationPlanningInput
   ): Promise<AdapterValidationPreferences>;
-  interpretValidationOutput?(input: AdapterValidationInterpretationInput): Promise<ValidationIssue[]>;
+  interpretValidationOutput?(
+    input: AdapterValidationInterpretationInput
+  ): Promise<ValidationIssue[]>;
 }

@@ -1,12 +1,8 @@
 import * as vscode from 'vscode';
 import { getAiCommandGate } from '../core/aiCommandGate';
-import {
-  dslScaffoldService,
-  projectService
-} from '../core/services';
-import {
-  showFeatureExecutionError
-} from '../core/userGuidance';
+import { dslScaffoldService, projectService } from '../core/services';
+import { showFeatureExecutionError } from '../core/userGuidance';
+import { getTelemetryService } from '../core/telemetry';
 import { ensureTrustedWorkspace } from '../core/workspaceTrust';
 
 export const CREATE_DSL_SCAFFOLD_COMMAND = 'dslforge.createDslScaffold';
@@ -28,9 +24,7 @@ export function createDslScaffold(): vscode.Disposable {
     }
 
     const projectContext = await projectService.resolveProjectContext();
-    const gateResult = await getAiCommandGate().ensureAccess(
-      'Create DSL Scaffold'
-    );
+    const gateResult = await getAiCommandGate().ensureAccess('Create DSL Scaffold');
 
     if (gateResult.status !== 'ready') {
       return;
@@ -42,6 +36,10 @@ export function createDslScaffold(): vscode.Disposable {
         gateResult.selectedModel!
       );
     } catch (error) {
+      getTelemetryService().sendError('feature_error', {
+        feature_name: 'Create DSL Scaffold',
+        error_type: error instanceof Error ? error.name : typeof error
+      });
       const message =
         error instanceof Error
           ? error.message

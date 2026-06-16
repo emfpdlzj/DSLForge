@@ -4,9 +4,7 @@
     {
       "id": "import-context-fixture",
       "grammar": "src/language/main.langium",
-      "fileExtensions": [
-        ".icf"
-      ]
+      "fileExtensions": [".icf"]
     }
   ],
   "out": "src/language/generated"

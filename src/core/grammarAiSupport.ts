@@ -85,17 +85,13 @@ function buildProjectContextSummary(projectContext: ResolvedProjectContext): str
 }
 
 function uniqueFilePaths(projectContext: ResolvedProjectContext): string[] {
-  return [
-    ...new Set(projectContext.context.contextFiles.map((file) => file.filePath))
-  ];
+  return [...new Set(projectContext.context.contextFiles.map((file) => file.filePath))];
 }
 
 function selectionByPath(
   projectContext: ResolvedProjectContext
 ): Map<string, GrammarContextFileSelection> {
-  return new Map(
-    projectContext.context.contextFiles.map((file) => [file.filePath, file])
-  );
+  return new Map(projectContext.context.contextFiles.map((file) => [file.filePath, file]));
 }
 
 async function readFileContent(filePath: string): Promise<string> {
@@ -129,12 +125,11 @@ export async function collectGrammarModelContext(
     const selection = selections.get(filePath);
 
     files.push({
-      filePath:
-        selection?.detail
-          ? `${filePath} [${selection.kind}: ${selection.detail}]`
-          : selection
-            ? `${filePath} [${selection.kind}]`
-            : filePath,
+      filePath: selection?.detail
+        ? `${filePath} [${selection.kind}: ${selection.detail}]`
+        : selection
+          ? `${filePath} [${selection.kind}]`
+          : filePath,
       content,
       truncated,
       languageId: selection?.languageId ?? 'text'
@@ -297,7 +292,10 @@ export function normalizeAiContractMarkdown(
     const joined = sectionContent.get(section)?.join('\n').trim() ?? '';
     return joined.length === 0;
   });
-  const normalized = preamble.join('\n').trim().length > 0 || missingSections.length > 0 || unexpectedSections.length > 0;
+  const normalized =
+    preamble.join('\n').trim().length > 0 ||
+    missingSections.length > 0 ||
+    unexpectedSections.length > 0;
   const carryover = preamble.join('\n').trim();
   let carryoverConsumed = false;
 
@@ -351,9 +349,7 @@ export function appendAiContractReport(
   }
 
   if (validation.unexpectedSections.length > 0) {
-    appendOutputLine(
-      `unexpected sections: ${validation.unexpectedSections.join(', ')}`
-    );
+    appendOutputLine(`unexpected sections: ${validation.unexpectedSections.join(', ')}`);
   }
 }
 
@@ -367,9 +363,7 @@ export function appendGrammarAiReport(
   appendOutputLine(`workspace: ${projectContext.workspaceFolder.uri.fsPath}`);
   appendOutputLine(`adapter: ${projectContext.adapter.displayName}`);
   appendOutputLine(`model: ${model.vendor}/${model.family} (${model.name})`);
-  appendOutputLine(
-    `active grammar: ${projectContext.context.activeGrammarFile ?? 'none'}`
-  );
+  appendOutputLine(`active grammar: ${projectContext.context.activeGrammarFile ?? 'none'}`);
   appendOutputLine(`context files: ${context.files.length}`);
   appendOutputLine(`context characters: ${context.totalCharacters}`);
 
@@ -404,9 +398,7 @@ export function formatLanguageModelError(error: unknown): string {
   return 'Language model request failed for an unknown reason.';
 }
 
-export async function requestTextFromModel(
-  request: ModelTextRequest
-): Promise<string> {
+export async function requestTextFromModel(request: ModelTextRequest): Promise<string> {
   return vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,

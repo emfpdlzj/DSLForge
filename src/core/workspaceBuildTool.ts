@@ -105,8 +105,8 @@ export function buildGradleWrapperCommand(
 
   const wrapperPath =
     process.platform === 'win32'
-      ? gradle.wrapperBatchPath ?? gradle.wrapperScriptPath
-      : gradle.wrapperScriptPath ?? gradle.wrapperBatchPath;
+      ? (gradle.wrapperBatchPath ?? gradle.wrapperScriptPath)
+      : (gradle.wrapperScriptPath ?? gradle.wrapperBatchPath);
 
   if (!wrapperPath) {
     return undefined;
@@ -125,8 +125,8 @@ export function buildMavenWrapperCommand(
 
   const wrapperPath =
     process.platform === 'win32'
-      ? maven.wrapperCommandPath ?? maven.wrapperScriptPath
-      : maven.wrapperScriptPath ?? maven.wrapperCommandPath;
+      ? (maven.wrapperCommandPath ?? maven.wrapperScriptPath)
+      : (maven.wrapperScriptPath ?? maven.wrapperCommandPath);
 
   if (!wrapperPath) {
     return undefined;

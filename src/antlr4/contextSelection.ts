@@ -109,9 +109,7 @@ async function collectImportedGrammarFiles(
   return importedFiles;
 }
 
-function determineActiveGrammarFile(
-  input: Antlr4ContextSelectionInput
-): string | undefined {
+function determineActiveGrammarFile(input: Antlr4ContextSelectionInput): string | undefined {
   if (input.activeFile?.endsWith('.g4')) {
     return path.normalize(input.activeFile);
   }
@@ -127,14 +125,10 @@ export async function buildAntlr4ContextSelection(
     ...input,
     grammarFiles
   });
-  const importedGrammarFiles = await collectImportedGrammarFiles(
-    activeGrammarFile,
-    grammarFiles
-  );
+  const importedGrammarFiles = await collectImportedGrammarFiles(activeGrammarFile, grammarFiles);
   const siblingGrammarFiles = grammarFiles.filter(
     (grammarFile) =>
-      grammarFile !== activeGrammarFile &&
-      !importedGrammarFiles.includes(grammarFile)
+      grammarFile !== activeGrammarFile && !importedGrammarFiles.includes(grammarFile)
   );
   const contextSelections: GrammarContextFileSelection[] = [];
   const packageInfo = await readWorkspacePackageInfo(input.workspaceRoot);
