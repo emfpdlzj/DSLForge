@@ -1,7 +1,7 @@
 {
   "name": "dslforge",
   "displayName": "DSLForge",
-  "description": "Multi-framework DSL workflow assistant for Visual Studio Code with Langium, ANTLR4, and Xtext support.",
+  "description": "Copilot-assisted DSL authoring for Visual Studio Code across Langium, ANTLR4, and Xtext workflows.",
   "version": "0.2.0",
   "publisher": "emfpdlzj",
   "engines": {

@@ -1,20 +1,22 @@
 # DSLForge
 
-DSLForge is a VS Code extension for DSL authoring workflows across Langium, ANTLR4, and Xtext workspaces.
+DSLForge is a VS Code extension for Copilot-assisted DSL authoring across Langium, ANTLR4, and Xtext workspaces.
 
-It is not a generic AI generator. The current branch focuses on the real loop around grammar work: detect the active DSL project, choose the right context, run the workspace's actual validation path, and present diagnostics in a form you can act on.
+It helps language engineers generate, explain, and iterate on DSL grammars inside VS Code without pretending to replace the underlying DSL engine. DSLForge detects the active grammar context, keeps AI features focused on explicit authoring tasks, and routes validation through the workspace's real command path so generated ideas can be checked against the actual project workflow.
 
 ## Current Status
 
 DSLForge is currently a pre-release extension.
 
 - current branch work supports Langium, ANTLR4, and Xtext workflows
+- AI commands are the primary authoring-assistance surface for scaffold, explanation, and sample generation
 - `Validate Current Grammar` is intentionally non-AI
 - AI commands require GitHub Copilot or another supported VS Code model environment
 - if AI access is unavailable, DSLForge stops and shows guidance instead of inventing a fake fallback
 
 ## Features
 
+- explains current grammars and generates scaffold or sample proposals through supported VS Code model access
 - detects the current Langium, ANTLR4, or Xtext workspace and grammar context
 - follows import-aware grammar context selection for Langium, reference-aware context selection for ANTLR4, and workflow-aware context selection for Xtext
 - resolves validation from the real workspace in this order:
@@ -24,7 +26,7 @@ DSLForge is currently a pre-release extension.
   4. auto-detected `mvnw` goal
   5. setup guidance
 - publishes normalized diagnostics into Problems
-- uses AI only for explicitly AI-scoped authoring tasks
+- uses AI only for explicit DSL authoring tasks instead of generic coding assistance
 - exposes grammar actions from editor and Explorer context menus in addition to the Command Palette
 - lets reviewed AI preview documents move toward workspace files through an explicit diff-and-apply flow
 
@@ -49,9 +51,9 @@ Until then, you can evaluate it locally:
 
 1. Open a Langium, ANTLR4, or Xtext workspace.
 2. Open the grammar file you are working on.
-3. Run `DSLForge: Validate Current Grammar`.
-4. If DSLForge cannot resolve a validation command, set `dslforge.validation.command` or add a supported `package.json` script, `gradlew` task, or `mvnw` goal.
-5. Use the AI commands only if VS Code already has a supported model environment available.
+3. Run `DSLForge: Explain Current Grammar`, `Create DSL Scaffold`, or `Generate Sample DSL` when GitHub Copilot or another supported model is available.
+4. Run `DSLForge: Validate Current Grammar` to check the grammar through the workspace's real validation command path.
+5. If DSLForge cannot resolve validation, set `dslforge.validation.command` or add a supported `package.json` script, `gradlew` task, or `mvnw` goal.
 
 Scaffold-only bootstrap flow:
 
@@ -77,7 +79,7 @@ Non-AI:
 
 - `DSLForge: Validate Current Grammar`
 
-AI-backed:
+AI-backed authoring assistance:
 
 - `DSLForge: Explain Current Grammar`
 - `DSLForge: Create DSL Scaffold`
