@@ -150,7 +150,7 @@ export async function collectGrammarModelContext(
 
 export function buildGrammarContextBlock(context: GrammarModelContext): string {
   if (context.files.length === 0) {
-    return 'No grammar files were available in the current context.';
+    return 'No context files were available for the current request.';
   }
 
   return context.files

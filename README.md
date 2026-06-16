@@ -1,6 +1,6 @@
 # DSLForge
 
-DSLForge is a VS Code extension for DSL workflow orchestration across Langium, ANTLR4, and Xtext workspaces.
+DSLForge is a VS Code extension for DSL authoring workflows across Langium, ANTLR4, and Xtext workspaces.
 
 It is not a generic AI generator. The current branch focuses on the real loop around grammar work: detect the active DSL project, choose the right context, run the workspace's actual validation path, and present diagnostics in a form you can act on.
 
@@ -8,12 +8,12 @@ It is not a generic AI generator. The current branch focuses on the real loop ar
 
 DSLForge is currently a pre-release extension.
 
-- current branch work supports Langium, ANTLR4, and Xtext detection for validation planning
+- current branch work supports Langium, ANTLR4, and Xtext workflows
 - `Validate Current Grammar` is intentionally non-AI
 - AI commands require GitHub Copilot or another supported VS Code model environment
 - if AI access is unavailable, DSLForge stops and shows guidance instead of inventing a fake fallback
 
-## What DSLForge Does
+## Features
 
 - detects the current Langium, ANTLR4, or Xtext workspace and grammar context
 - follows import-aware grammar context selection for Langium, reference-aware context selection for ANTLR4, and workflow-aware context selection for Xtext
@@ -53,6 +53,12 @@ Until then, you can evaluate it locally:
 4. If DSLForge cannot resolve a validation command, set `dslforge.validation.command` or add a supported `package.json` script, `gradlew` task, or `mvnw` goal.
 5. Use the AI commands only if VS Code already has a supported model environment available.
 
+Scaffold-only bootstrap flow:
+
+1. Open any trusted workspace folder, even if it does not contain a detected DSL yet.
+2. Run `DSLForge: Create DSL Scaffold`.
+3. Review the proposal before creating files manually.
+
 Recommended first local check from this repository:
 
 1. open `test-fixtures/langium/configured-command`
@@ -76,6 +82,11 @@ AI-backed:
 - `DSLForge: Explain Current Grammar`
 - `DSLForge: Create DSL Scaffold`
 - `DSLForge: Generate Sample DSL`
+
+`Create DSL Scaffold` can run in two modes:
+
+- detected-workspace mode when DSLForge recognizes a Langium, ANTLR4, or Xtext context
+- bootstrap mode when the workspace is open but no supported DSL framework has been detected yet
 
 ## Validation Behavior
 
