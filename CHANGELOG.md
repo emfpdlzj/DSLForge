@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+- Updated the development toolchain to TypeScript 7 and Node.js 24 for CI.
+- Aligned Node.js and VS Code type definitions with the VS Code 1.120 minimum supported version.
+- Updated GitHub Actions workflows to the latest major versions and refreshed Langium and Xtext project-detection fixtures.
+- Added contribution guidelines and a community Code of Conduct.
+- Verified the updated toolchain through formatting, type checking, builds, the complete fixture test suite, and an npm security audit with no known vulnerabilities.
+
 ## 0.3.1 - 2026-06-16
 
 - Added bootstrap-mode support for `DSLForge: Create DSL Scaffold`, so scaffold proposals can run in any trusted workspace folder even before Langium or ANTLR4 is detected.
