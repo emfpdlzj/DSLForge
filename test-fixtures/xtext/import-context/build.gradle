@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-  implementation "org.eclipse.xtext:org.eclipse.xtext:2.38.0"
+  implementation "org.eclipse.xtext:org.eclipse.xtext:2.44.0"
 }
 
 tasks.register('generateXtext') {
