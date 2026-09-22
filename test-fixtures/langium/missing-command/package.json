@@ -2,7 +2,7 @@
   "name": "dslforge-fixture-missing-command",
   "private": true,
   "devDependencies": {
-    "langium": "^3.0.0"
+    "langium": "^4.4.0"
   },
   "scripts": {
     "langium:generate": "echo \"langium generate fixture\"",

@@ -188,4 +188,8 @@ Useful commands:
 - `npm run test:manifest`
 - `npm exec -- vsce package`
 
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before
+opening an issue or pull request. Everyone participating in the project must
+follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
 Release notes live in [CHANGELOG.md](CHANGELOG.md).
