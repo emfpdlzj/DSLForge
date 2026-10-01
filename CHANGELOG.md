@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.3.2 - 2026-10-01
 
-- Automated Marketplace publishing for untagged package versions promoted to `main`, with release-tag rollback on publish failure, GitHub Actions v7, a pinned `@vscode/vsce` toolchain, package-content verification, and archived VSIX artifacts.
+- Automated OIDC-authenticated Marketplace publishing for untagged package versions promoted to `main`, with release-tag rollback on publish failure, GitHub Actions v7, a pinned `@vscode/vsce` toolchain, package-content verification, and archived VSIX artifacts.
 - Added CI packaging checks so pull requests verify the same extension payload used by releases.
 - Added telemetry policy and proxy regression coverage for opt-out behavior, endpoint selection, sensitive-field filtering, payload validation, sink failures, and rate limiting.
 - Fixed client telemetry filtering so allowlisted aggregate fields such as output kind, context file counts, and apply target counts are preserved without allowing workspace content or paths.
