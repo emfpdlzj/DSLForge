@@ -38,7 +38,7 @@ Completed in this audit:
 - untagged package versions promoted to `main` now publish automatically and archive the generated VSIX
 - `preview: true` remains intentional for `0.3.2`
 - `dslforge-0.3.2.vsix` installs successfully in an isolated VS Code profile
-- the `VSCE_PAT` secret and `DSLFORGE_TELEMETRY_PROXY_ENDPOINT` repository variable are configured
+- the Marketplace trusted publishing policy and `DSLFORGE_TELEMETRY_PROXY_ENDPOINT` repository variable are configured
 
 ## Remaining Release-Critical Work
 
@@ -128,8 +128,8 @@ These items must be true before `vsce publish`:
 - Confirm Marketplace publisher exists for `emfpdlzj`
 - Confirm you can authenticate with the publisher account
 - Confirm the pinned `@vscode/vsce` version installs through `npm ci`
-- Confirm the `VSCE_PAT` GitHub Actions secret exists before merging a new package version to `main`
-- Prefer an Entra ID-based publishing path for longer-term automation planning
+- Confirm the Marketplace trusted publishing policy grants this repository and `publish-extension.yml` workflow access
+- Keep `id-token: write` scoped to the publish job so `vsce publish --oidc` can request a short-lived Marketplace credential
 - If doing a one-off manual publish, confirm the current official authentication path you will use before release day
 
 ## Execution Log
@@ -150,7 +150,7 @@ Audit run on 2026-10-01 for `0.3.2`:
   - passed
   - installed extension: `emfpdlzj.dslforge@0.3.2`
 - GitHub release configuration
-  - `VSCE_PAT` secret exists
+  - Marketplace trusted publishing policy is configured for `publish-extension.yml`
   - `DSLFORGE_TELEMETRY_PROXY_ENDPOINT` variable exists
 
 Audit run on 2026-06-15:
