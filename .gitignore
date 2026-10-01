@@ -14,3 +14,4 @@ AGENTS.md
 *.vsix
 .vscode-test/
 .tmp-vsix-*/
+.tmp/

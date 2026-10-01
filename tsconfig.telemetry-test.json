@@ -3,13 +3,15 @@
     "target": "ES2022",
     "module": "Node16",
     "moduleResolution": "Node16",
+    "rootDir": ".",
+    "outDir": ".tmp/telemetry-test",
     "types": ["node"],
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "sourceMap": false
   },
-  "include": ["api/**/*.ts"],
-  "exclude": [".tmp", "node_modules", "test"]
+  "include": ["api/**/*.ts", "test/telemetryProxyFixtureRunner.ts"],
+  "exclude": ["node_modules"]
 }

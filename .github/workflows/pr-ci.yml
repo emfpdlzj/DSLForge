@@ -72,3 +72,22 @@ jobs:
 
       - name: Run test suite
         run: npm run test
+
+  package:
+    name: package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify extension package
+        run: npm run package:check

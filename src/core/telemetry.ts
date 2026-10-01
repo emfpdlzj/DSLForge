@@ -3,15 +3,12 @@ import * as http from 'node:http';
 import * as https from 'node:https';
 import * as vscode from 'vscode';
 import { DEFAULT_TELEMETRY_ENDPOINT } from '../generated/telemetryConfig';
-
-type TelemetryScalar = string | number | boolean | undefined;
-type TelemetryProperties = Record<string, TelemetryScalar>;
-type TelemetryMeasurements = Record<string, number | undefined>;
-
-interface TelemetryConfiguration {
-  enabled: boolean;
-  endpoint?: string;
-}
+import {
+  resolveTelemetryEndpoint,
+  TelemetryMeasurements,
+  TelemetryProperties,
+  toTelemetryProperties
+} from './telemetryPolicy';
 
 interface TelemetryEnvelope {
   event: string;
@@ -22,35 +19,6 @@ interface TelemetryEnvelope {
 const TELEMETRY_CONFIGURATION_SECTION = 'dslforge.telemetry';
 const TELEMETRY_ENDPOINT_ENV = 'DSLFORGE_TELEMETRY_ENDPOINT';
 const TELEMETRY_TIMEOUT_MS = 3000;
-const SENSITIVE_PROPERTY_PATTERN =
-  /(?:file|path|prompt|content|output|stack|trace|workspace|target|message)/i;
-
-function trimToUndefined(value: string | undefined): string | undefined {
-  const trimmed = value?.trim();
-  return trimmed ? trimmed : undefined;
-}
-
-function toEnvelopeProperties(
-  properties?: TelemetryProperties,
-  measurements?: TelemetryMeasurements
-): Record<string, string | number | boolean> {
-  const normalizedProperties = Object.fromEntries(
-    Object.entries(properties ?? {}).filter(
-      ([key, value]) => typeof value !== 'undefined' && !SENSITIVE_PROPERTY_PATTERN.test(key)
-    )
-  ) as Record<string, string | number | boolean>;
-  const normalizedMeasurements = Object.fromEntries(
-    Object.entries(measurements ?? {}).filter(
-      ([key, value]) =>
-        typeof value === 'number' && Number.isFinite(value) && !SENSITIVE_PROPERTY_PATTERN.test(key)
-    )
-  ) as Record<string, number>;
-
-  return {
-    ...normalizedProperties,
-    ...normalizedMeasurements
-  };
-}
 
 function postJson(endpoint: string, payload: TelemetryEnvelope): Promise<void> {
   return new Promise((resolve) => {
@@ -178,23 +146,20 @@ export class TelemetryService implements vscode.Disposable {
   }
 
   private reconfigure(): void {
-    const configuration = this.readConfiguration();
-    this.endpoint = configuration.enabled ? configuration.endpoint : undefined;
+    this.endpoint = this.readEndpoint();
   }
 
-  private readConfiguration(): TelemetryConfiguration {
+  private readEndpoint(): string | undefined {
     const configuration = vscode.workspace.getConfiguration('dslforge');
     const extensionEnabled = configuration.get<boolean>('telemetry.enabled') ?? true;
-    const endpointOverride = trimToUndefined(
-      configuration.get<string>('telemetry.endpointOverride')
-    );
-    const environmentEndpoint = trimToUndefined(process.env[TELEMETRY_ENDPOINT_ENV]);
-    const embeddedEndpoint = trimToUndefined(DEFAULT_TELEMETRY_ENDPOINT);
 
-    return {
-      enabled: vscode.env.isTelemetryEnabled && extensionEnabled,
-      endpoint: endpointOverride ?? environmentEndpoint ?? embeddedEndpoint
-    };
+    return resolveTelemetryEndpoint({
+      vscodeTelemetryEnabled: vscode.env.isTelemetryEnabled,
+      extensionTelemetryEnabled: extensionEnabled,
+      endpointOverride: configuration.get<string>('telemetry.endpointOverride'),
+      environmentEndpoint: process.env[TELEMETRY_ENDPOINT_ENV],
+      embeddedEndpoint: DEFAULT_TELEMETRY_ENDPOINT
+    });
   }
 
   private buildCommonProperties(): Record<string, string | boolean> {
@@ -221,7 +186,7 @@ export class TelemetryService implements vscode.Disposable {
       distinctId: this.distinctId,
       properties: {
         ...this.buildCommonProperties(),
-        ...toEnvelopeProperties(properties, measurements)
+        ...toTelemetryProperties(properties, measurements)
       }
     }).finally(() => {
       this.pendingRequests.delete(request);

@@ -39,7 +39,7 @@ The current workstream excludes screenshot capture, so screenshot items remain p
 
 Companion onboarding doc:
 
-- [docs/onboarding-quickstart.md](/private/tmp/DSLForge-xtext-validation-normalization/docs/onboarding-quickstart.md:1)
+- [onboarding quickstart](onboarding-quickstart.md)
 
 ## Supported Workspace Examples
 

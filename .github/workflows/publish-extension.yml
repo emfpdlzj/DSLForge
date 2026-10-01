@@ -20,12 +20,12 @@ jobs:
       DSLFORGE_TELEMETRY_PROXY_ENDPOINT: ${{ vars.DSLFORGE_TELEMETRY_PROXY_ENDPOINT }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -61,10 +61,20 @@ jobs:
       - name: Run test suite
         run: npm run test
 
+      - name: Verify extension package contents
+        run: npm exec -- vsce ls
+
       - name: Package extension
-        run: npm exec --yes @vscode/vsce -- package
+        run: npm exec -- vsce package --out "dslforge-${GITHUB_REF_NAME#v}.vsix"
+
+      - name: Upload extension package
+        uses: actions/upload-artifact@v7
+        with:
+          name: dslforge-${{ github.ref_name }}
+          path: dslforge-*.vsix
+          if-no-files-found: error
 
       - name: Publish extension
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
-        run: npm exec --yes @vscode/vsce -- publish --packagePath "dslforge-${GITHUB_REF_NAME#v}.vsix" -p "$VSCE_PAT"
+        run: npm exec -- vsce publish --packagePath "dslforge-${GITHUB_REF_NAME#v}.vsix" -p "$VSCE_PAT"

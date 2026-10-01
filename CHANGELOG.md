@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.3.2 - 2026-10-01
+
+- Hardened the tag-based release workflow with GitHub Actions v7, a pinned `@vscode/vsce` toolchain, package-content verification, and archived VSIX artifacts.
+- Added CI packaging checks so pull requests verify the same extension payload used by releases.
+- Added telemetry policy and proxy regression coverage for opt-out behavior, endpoint selection, sensitive-field filtering, payload validation, sink failures, and rate limiting.
+- Fixed client telemetry filtering so allowlisted aggregate fields such as output kind, context file counts, and apply target counts are preserved without allowing workspace content or paths.
+- Made generated telemetry endpoint configuration deterministic and compatible with the repository's formatting rules.
 - Updated the development toolchain to TypeScript 7 and Node.js 24 for CI.
 - Aligned Node.js and VS Code type definitions with the VS Code 1.120 minimum supported version.
 - Updated GitHub Actions workflows to the latest major versions and refreshed Langium and Xtext project-detection fixtures.
