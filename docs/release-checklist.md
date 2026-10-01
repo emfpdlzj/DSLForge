@@ -35,7 +35,7 @@ Completed in this audit:
 - reviewed AI preview apply logic now has dedicated fixture coverage for file-target parsing, bundle selection, and conflict detection
 - telemetry client policy and proxy validation now have automated regression coverage
 - pull requests now verify the extension package payload with pinned `@vscode/vsce`
-- tagged releases now archive the generated VSIX before publishing
+- untagged package versions promoted to `main` now publish automatically and archive the generated VSIX
 - `preview: true` remains intentional for `0.3.2`
 - `dslforge-0.3.2.vsix` installs successfully in an isolated VS Code profile
 - the `VSCE_PAT` secret and `DSLFORGE_TELEMETRY_PROXY_ENDPOINT` repository variable are configured
@@ -44,8 +44,8 @@ Completed in this audit:
 
 - complete manual VS Code smoke for the Xtext fixtures and AI preview/apply path
 - confirm publisher access and Marketplace login path
-- review the exact release commit state before `vsce publish`
-- publish intentionally with the confirmed publisher account
+- review the exact release commit state before merging the version change to `main`
+- confirm the automatic Marketplace publish and generated release tag succeed
 
 ## Deferred Or Optional For This Workstream
 
@@ -120,14 +120,15 @@ These items must be true before `vsce publish`:
   - `package.json.bugs.url`
   - `package.json.homepage`
   - git `origin`
-- Release tagging is intentional, but Marketplace publish now runs automatically from the `Publish Extension` GitHub Actions workflow when a `v*` tag is pushed
+- Marketplace publish runs automatically when `main` contains a package version without a matching `v*` tag
+- the workflow validates the dated changelog heading, packages and publishes the extension, then keeps the generated tag only when Marketplace publish succeeds
 
 ## Publisher Checklist
 
 - Confirm Marketplace publisher exists for `emfpdlzj`
 - Confirm you can authenticate with the publisher account
 - Confirm the pinned `@vscode/vsce` version installs through `npm ci`
-- Confirm the `VSCE_PAT` GitHub Actions secret exists before pushing a release tag
+- Confirm the `VSCE_PAT` GitHub Actions secret exists before merging a new package version to `main`
 - Prefer an Entra ID-based publishing path for longer-term automation planning
 - If doing a one-off manual publish, confirm the current official authentication path you will use before release day
 
