@@ -66,6 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write
     env:
       DSLFORGE_TELEMETRY_PROXY_ENDPOINT: ${{ vars.DSLFORGE_TELEMETRY_PROXY_ENDPOINT }}
       RELEASE_TAG: ${{ needs.detect_release.outputs.tag }}
@@ -117,9 +118,7 @@ jobs:
 
       - name: Publish extension
         id: marketplace_publish
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
-        run: npm exec -- vsce publish --packagePath "dslforge-${RELEASE_VERSION}.vsix" -p "$VSCE_PAT"
+        run: npm exec -- vsce publish --oidc --packagePath "dslforge-${RELEASE_VERSION}.vsix"
 
       - name: Remove release tag after publish failure
         if: always() && steps.release_tag.outcome == 'success' && steps.marketplace_publish.outcome != 'success'
