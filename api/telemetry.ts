@@ -2,7 +2,7 @@ import { PostHog } from 'posthog-node';
 
 type Primitive = string | number | boolean;
 
-interface TelemetryRequestBody {
+export interface TelemetryRequestBody {
   event?: unknown;
   distinctId?: unknown;
   properties?: unknown;
@@ -155,7 +155,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function parseBody(body: unknown): TelemetryRequestBody | undefined {
+export function parseBody(body: unknown): TelemetryRequestBody | undefined {
   if (typeof body === 'string') {
     if (body.length > MAX_BODY_CHARACTERS) {
       return undefined;
@@ -186,7 +186,7 @@ function sanitizeString(value: string): string | undefined {
   return trimmed ? trimmed.slice(0, MAX_STRING_LENGTH) : undefined;
 }
 
-function sanitizeProperties(value: unknown): Record<string, Primitive> | undefined {
+export function sanitizeProperties(value: unknown): Record<string, Primitive> | undefined {
   if (!isPlainObject(value)) {
     return undefined;
   }
@@ -227,7 +227,7 @@ function sanitizeProperties(value: unknown): Record<string, Primitive> | undefin
   return entries.length > 0 ? Object.fromEntries(entries) : undefined;
 }
 
-function validatePayload(body: TelemetryRequestBody):
+export function validatePayload(body: TelemetryRequestBody):
   | {
       event: string;
       distinctId: string;

@@ -17,11 +17,11 @@ The goal is to verify four things:
 
 Use this workspace unless a case explicitly says otherwise:
 
-- `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/langium/import-context`
+- `test-fixtures/langium/import-context`
 
 Additional Xtext workspace for context-sensitive AI smoke:
 
-- `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/xtext/import-context`
+- `test-fixtures/xtext/import-context`
 
 Open this file before running commands:
 
@@ -43,7 +43,7 @@ Expected selected context set for AI commands:
 
 ## Launch
 
-Use the dedicated extension host configuration in [.vscode/launch.json](/Users/emfpdlzj/Desktop/DSLForge/.vscode/launch.json:1):
+Use the dedicated extension host configuration in [`.vscode/launch.json`](../.vscode/launch.json):
 
 - `Run DSLForge: import-context fixture`
 - `Run DSLForge: xtext-import-context fixture`

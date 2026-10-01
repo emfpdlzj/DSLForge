@@ -4,12 +4,12 @@ This document fixes the validation-resolution paths used by `DSLForge: Validate 
 
 ## Fixtures
 
-- configured command: `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/langium/configured-command`
-- package script: `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/langium/package-script`
-- missing command: `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/langium/missing-command`
-- import context: `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/langium/import-context`
-- xtext gradle wrapper: `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/xtext/gradle-wrapper`
-- xtext maven wrapper: `/Users/emfpdlzj/Desktop/DSLForge/test-fixtures/xtext/maven-wrapper`
+- configured command: `test-fixtures/langium/configured-command`
+- package script: `test-fixtures/langium/package-script`
+- missing command: `test-fixtures/langium/missing-command`
+- import context: `test-fixtures/langium/import-context`
+- xtext gradle wrapper: `test-fixtures/xtext/gradle-wrapper`
+- xtext maven wrapper: `test-fixtures/xtext/maven-wrapper`
 
 ## Launch
 

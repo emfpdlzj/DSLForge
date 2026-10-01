@@ -1,8 +1,8 @@
 # DSLForge Release Checklist
 
-Last updated: 2026-06-16
+Last updated: 2026-10-01
 
-This checklist is for the first public VS Code Marketplace release of `DSLForge`.
+This checklist tracks the `0.3.2` VS Code Marketplace patch release of `DSLForge`.
 
 ## Release Goal
 
@@ -33,13 +33,16 @@ Completed in this audit:
 - `docs/onboarding-quickstart.md` now provides a short onboarding path for supported workspaces
 - current branch packaging still succeeds after the reviewed AI preview apply flow changes
 - reviewed AI preview apply logic now has dedicated fixture coverage for file-target parsing, bundle selection, and conflict detection
+- telemetry client policy and proxy validation now have automated regression coverage
+- pull requests now verify the extension package payload with pinned `@vscode/vsce`
+- tagged releases now archive the generated VSIX before publishing
+- `preview: true` remains intentional for `0.3.2`
+- `dslforge-0.3.2.vsix` installs successfully in an isolated VS Code profile
+- the `VSCE_PAT` secret and `DSLFORGE_TELEMETRY_PROXY_ENDPOINT` repository variable are configured
 
 ## Remaining Release-Critical Work
 
 - complete manual VS Code smoke for the Xtext fixtures and AI preview/apply path
-- run one final local VSIX install smoke on the exact package to publish
-- decide whether to keep `preview: true` for the first public release
-- fix `origin` remote to the intended public repository
 - confirm publisher access and Marketplace login path
 - review the exact release commit state before `vsce publish`
 - publish intentionally with the confirmed publisher account
@@ -48,13 +51,13 @@ Completed in this audit:
 
 - Marketplace screenshots are deferred by current user instruction and are not treated as an active release blocker unless release policy changes.
 - Extra README copy polish is optional as long as the current opening section stays accurate and concrete.
-- Additional launch collateral beyond the existing [docs/marketplace-launch.md](/private/tmp/DSLForge-xtext-validation-normalization/docs/marketplace-launch.md:1) pack is optional.
+- Additional launch collateral beyond the existing [Marketplace launch pack](marketplace-launch.md) is optional.
 
 ## Post-Publish Follow-Up
 
 - announce the release through the intended promotion channels
 - re-enable and capture Marketplace screenshots later if the release process requires them
-- collect first-user feedback and fold any follow-up items back into [docs/development-todo.md](/private/tmp/DSLForge-xtext-validation-normalization/docs/development-todo.md:1)
+- collect first-user feedback and fold any follow-up items back into the [development backlog](development-todo.md)
 
 ## Blocking Checks
 
@@ -78,8 +81,8 @@ These items must be true before `vsce publish`:
 
 - Confirm extension title and short description are final
 - Confirm `keywords` match real discovery terms
-- Review [docs/marketplace-launch.md](/private/tmp/DSLForge-xtext-validation-normalization/docs/marketplace-launch.md:1) and finalize one short description candidate plus the opening paragraph
-- Review [docs/onboarding-quickstart.md](/private/tmp/DSLForge-xtext-validation-normalization/docs/onboarding-quickstart.md:1) and keep it aligned with the README quick-start flow
+- Review the [Marketplace launch pack](marketplace-launch.md) and finalize one short description candidate plus the opening paragraph
+- Review the [onboarding quickstart](onboarding-quickstart.md) and keep it aligned with the README quick-start flow
 - Keep README opening section short and concrete:
   - what DSLForge is
   - currently documented adapter scope
@@ -92,8 +95,7 @@ These items must be true before `vsce publish`:
 - Run `npm run build`
 - Run `npm run typecheck`
 - Run `npm run test`
-- Run `npm exec -- vsce ls`
-- Run `npm exec -- vsce package`
+- Run `npm run package:check`
 - Install the generated `.vsix` into a clean VS Code profile or Extension Development Host
 - Verify validation command paths:
   - configured command fixture
@@ -124,12 +126,31 @@ These items must be true before `vsce publish`:
 
 - Confirm Marketplace publisher exists for `emfpdlzj`
 - Confirm you can authenticate with the publisher account
-- Confirm `vsce` is available in the intended publishing environment
+- Confirm the pinned `@vscode/vsce` version installs through `npm ci`
 - Confirm the `VSCE_PAT` GitHub Actions secret exists before pushing a release tag
 - Prefer an Entra ID-based publishing path for longer-term automation planning
 - If doing a one-off manual publish, confirm the current official authentication path you will use before release day
 
 ## Execution Log
+
+Audit run on 2026-10-01 for `0.3.2`:
+
+- `npm run ci:check`
+  - passed
+- `npm test`
+  - passed, including telemetry client and proxy fixtures
+- `npm audit`
+  - passed with no known vulnerabilities
+- `npm run package:check`
+  - passed
+  - package payload excludes source, test, proxy, and build-only files
+  - output package: `dslforge-0.3.2.vsix`
+- isolated VS Code profile install
+  - passed
+  - installed extension: `emfpdlzj.dslforge@0.3.2`
+- GitHub release configuration
+  - `VSCE_PAT` secret exists
+  - `DSLFORGE_TELEMETRY_PROXY_ENDPOINT` variable exists
 
 Audit run on 2026-06-15:
 
@@ -170,10 +191,10 @@ Earlier audit notes on 2026-06-14:
 ## Recommended Release Order
 
 1. Finish the remaining manual VS Code smoke for Xtext and AI preview/apply.
-2. Fix repository remote alignment and confirm Marketplace publisher access.
+2. Confirm Marketplace publisher access.
 3. Re-run technical verification on the exact release candidate.
 4. Review `git status` and staged diff for the intended release commit.
-5. Package with `npm exec -- vsce package`.
+5. Package with `npm run package:check`.
 6. Install the generated VSIX once more.
 7. Publish intentionally with the confirmed publisher account.
 8. Run promotion as a post-publish activity.
